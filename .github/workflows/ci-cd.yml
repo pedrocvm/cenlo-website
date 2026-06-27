@@ -35,7 +35,7 @@ jobs:
         run: pnpm install --no-frozen-lockfile
 
       - name: Lint
-        run: pnpm exec next lint .
+        run: pnpm exec next lint --dir app --dir components --dir lib
 
       - name: Type-check
         run: pnpm exec tsc --noEmit
