@@ -6,13 +6,13 @@ type Form = { nome: string; negocio: string; cidade: string; segmento: string; t
 
 const empty: Form = { nome: '', negocio: '', cidade: '', segmento: '', telefone: '', email: '', mensagem: '' }
 
-type Field = { key: keyof Omit<Form,'mensagem'>; label: string; ph: string; type?: string; required?: boolean }
+type Field = { key: keyof Omit<Form,'mensagem'>; label: string; ph: string; type?: string; required?: boolean; pattern?: string; title?: string }
 const fields: Field[] = [
   { key: 'nome',     label: 'Nome *',            ph: 'O seu nome',          required: true },
   { key: 'negocio',  label: 'Negócio',            ph: 'Nome do seu negócio' },
   { key: 'cidade',   label: 'Cidade',             ph: 'Ex.: Porto' },
   { key: 'segmento', label: 'Segmento',           ph: 'Ex.: Pizzaria' },
-  { key: 'telefone', label: 'Telefone *',         ph: 'Telemóvel',           type: 'tel', required: true },
+  { key: 'telefone', label: 'Telefone *',         ph: 'Telemóvel',           type: 'tel', required: true, pattern: '[+0-9 \\-]{9,}', title: 'Use pelo menos 9 caracteres. Pode incluir +, números, espaços e hífen.' },
   { key: 'email',    label: 'Email (opcional)',   ph: 'nome@email.pt',       type: 'email' },
 ]
 
@@ -47,12 +47,24 @@ export default function ContactForm() {
   const inputStyle: React.CSSProperties = { width: '100%', background: 'var(--bg)', border: '1px solid var(--line)', borderRadius: 10, padding: '11px 13px', fontSize: 15, fontFamily: 'inherit', color: 'var(--ink)' }
 
   if (sent) {
+    const mailtoBody = encodeURIComponent(
+      `Nome: ${form.nome}\nNegócio: ${form.negocio}\nCidade: ${form.cidade}\nTelefone: ${form.telefone}\nMensagem: ${form.mensagem}`
+    )
+    const mailto = `mailto:ola@cenlo.pt?subject=Pedido%20de%20demonstra%C3%A7%C3%A3o%20Cenlo&body=${mailtoBody}`
     return (
-      <div style={{ textAlign: 'center', padding: '30px 10px' }}>
+      <div role="status" aria-live="polite" style={{ textAlign: 'center', padding: '30px 10px' }}>
         <div style={{ width: 52, height: 52, borderRadius: '50%', background: 'var(--oliveBg)', color: 'var(--olive)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24, margin: '0 auto', fontWeight: 700 }}>✓</div>
-        <h3 style={{ fontSize: 22, marginTop: 18, fontFamily: 'var(--font-schibsted)' }}>Pedido recebido</h3>
-        <p style={{ fontSize: 15, color: 'var(--ink2)', marginTop: 8 }}>Obrigado. Entramos em contacto para combinar a demonstração.</p>
-        <button onClick={reset} style={{ marginTop: 20, background: 'none', border: '1px solid var(--line)', padding: '10px 18px', borderRadius: 10, fontWeight: 600, fontSize: 14, cursor: 'pointer', color: 'var(--ink)' }}>Enviar outro pedido</button>
+        <h3 style={{ fontSize: 22, marginTop: 18, fontFamily: 'var(--font-schibsted)' }}>Obrigado pelo interesse</h3>
+        <p style={{ fontSize: 15, color: 'var(--ink2)', marginTop: 8, lineHeight: 1.6 }}>
+          Neste momento o formulário está em validação. Para garantir que recebemos o seu pedido de demonstração, envie-nos um email:
+        </p>
+        <a
+          href={mailto}
+          style={{ display: 'inline-block', marginTop: 18, background: 'var(--terraBtn)', color: '#fff', padding: '12px 22px', borderRadius: 11, fontWeight: 700, fontSize: 15, textDecoration: 'none' }}
+        >
+          Enviar email para ola@cenlo.pt
+        </a>
+        <button onClick={reset} style={{ display: 'block', margin: '16px auto 0', background: 'none', border: '1px solid var(--line)', padding: '10px 18px', borderRadius: 10, fontWeight: 600, fontSize: 14, cursor: 'pointer', color: 'var(--ink)' }}>Preencher novamente</button>
       </div>
     )
   }
@@ -71,6 +83,8 @@ export default function ContactForm() {
               onChange={e => setField(f.key, e.target.value)}
               placeholder={f.ph}
               required={f.required}
+              pattern={f.pattern}
+              title={f.title}
               autoComplete={f.key === 'telefone' ? 'tel' : f.key === 'email' ? 'email' : undefined}
               style={inputStyle}
             />
