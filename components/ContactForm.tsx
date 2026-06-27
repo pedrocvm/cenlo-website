@@ -6,13 +6,14 @@ type Form = { nome: string; negocio: string; cidade: string; segmento: string; t
 
 const empty: Form = { nome: '', negocio: '', cidade: '', segmento: '', telefone: '', email: '', mensagem: '' }
 
-const fields: { key: keyof Omit<Form,'mensagem'>; label: string; ph: string; type?: string }[] = [
-  { key: 'nome', label: 'Nome', ph: 'O seu nome' },
-  { key: 'negocio', label: 'Negócio', ph: 'Nome do seu negócio' },
-  { key: 'cidade', label: 'Cidade', ph: 'Ex.: Porto' },
-  { key: 'segmento', label: 'Segmento', ph: 'Ex.: Restaurante' },
-  { key: 'telefone', label: 'Telefone', ph: 'Telemóvel', type: 'tel' },
-  { key: 'email', label: 'Email (opcional)', ph: 'nome@email.pt', type: 'email' },
+type Field = { key: keyof Omit<Form,'mensagem'>; label: string; ph: string; type?: string; required?: boolean }
+const fields: Field[] = [
+  { key: 'nome',     label: 'Nome *',            ph: 'O seu nome',          required: true },
+  { key: 'negocio',  label: 'Negócio',            ph: 'Nome do seu negócio' },
+  { key: 'cidade',   label: 'Cidade',             ph: 'Ex.: Porto' },
+  { key: 'segmento', label: 'Segmento',           ph: 'Ex.: Pizzaria' },
+  { key: 'telefone', label: 'Telefone *',         ph: 'Telemóvel',           type: 'tel', required: true },
+  { key: 'email',    label: 'Email (opcional)',   ph: 'nome@email.pt',       type: 'email' },
 ]
 
 export default function ContactForm() {
@@ -28,7 +29,10 @@ export default function ContactForm() {
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    if (!form.nome.trim() || !consent) { setShowErr(true); return }
+    if (!form.nome.trim() || !form.telefone.trim() || !consent) {
+      setShowErr(true)
+      return
+    }
     setSent(true)
     setShowErr(false)
     window.scrollTo({ top: 0, behavior: 'smooth' })
@@ -54,23 +58,29 @@ export default function ContactForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit}>
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+    <form onSubmit={handleSubmit} noValidate>
+      <div className="grid-two" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
         {fields.map(f => (
-          <label key={f.key}>
+          <label key={f.key} htmlFor={f.key}>
             <span style={{ display: 'block', fontSize: 13, fontWeight: 600, color: 'var(--ink2)', marginBottom: 6 }}>{f.label}</span>
             <input
+              id={f.key}
+              name={f.key}
               type={f.type || 'text'}
               value={form[f.key]}
               onChange={e => setField(f.key, e.target.value)}
               placeholder={f.ph}
+              required={f.required}
+              autoComplete={f.key === 'telefone' ? 'tel' : f.key === 'email' ? 'email' : undefined}
               style={inputStyle}
             />
           </label>
         ))}
-        <label style={{ gridColumn: '1 / -1' }}>
+        <label htmlFor="mensagem" style={{ gridColumn: '1 / -1' }}>
           <span style={{ display: 'block', fontSize: 13, fontWeight: 600, color: 'var(--ink2)', marginBottom: 6 }}>Mensagem</span>
           <textarea
+            id="mensagem"
+            name="mensagem"
             value={form.mensagem}
             onChange={e => setField('mensagem', e.target.value)}
             rows={3}
@@ -79,22 +89,27 @@ export default function ContactForm() {
           />
         </label>
       </div>
-      <label style={{ display: 'flex', gap: 11, alignItems: 'flex-start', marginTop: 16, cursor: 'pointer' }}>
+
+      <label htmlFor="consent" style={{ display: 'flex', gap: 11, alignItems: 'flex-start', marginTop: 16, cursor: 'pointer' }}>
         <input
+          id="consent"
           type="checkbox"
           checked={consent}
           onChange={e => { setConsent(e.target.checked); setShowErr(false) }}
+          required
           style={{ marginTop: 3, width: 17, height: 17, accentColor: 'var(--terra)', flexShrink: 0 }}
         />
         <span style={{ fontSize: 12.5, color: 'var(--muted)', lineHeight: 1.5 }}>
-          Autorizo o tratamento dos meus dados para resposta a este pedido de demonstração. Os dados servem apenas para entrarmos em contacto e não são partilhados com terceiros. Consulte a{' '}
+          Aceito que a Cenlo utilize estes dados para responder ao meu pedido de contacto/demonstração. Os dados não serão partilhados com terceiros. Consulte a{' '}
           <button type="button" onClick={openModal} style={{ background: 'none', border: 'none', padding: 0, font: 'inherit', color: 'var(--terra)', fontWeight: 600, cursor: 'pointer', textDecoration: 'underline' }}>Política de Privacidade</button>.
         </span>
       </label>
+
       <button type="submit" style={{ width: '100%', marginTop: 18, background: 'var(--terraBtn)', color: '#fff', border: 'none', padding: 14, borderRadius: 11, fontWeight: 700, fontSize: 16, cursor: 'pointer' }}>
         Pedir demonstração
       </button>
-      {showErr && <p style={{ fontSize: 13, color: 'var(--terraD)', marginTop: 10, textAlign: 'center' }}>Preencha o nome e o consentimento para enviar.</p>}
+      <p style={{ fontSize: 13, color: 'var(--muted)', textAlign: 'center', marginTop: 8 }}>Demonstração curta, sem compromisso.</p>
+      {showErr && <p role="alert" style={{ fontSize: 13, color: 'var(--terraD)', marginTop: 10, textAlign: 'center' }}>Preencha o nome, o telefone e aceite o consentimento para enviar.</p>}
     </form>
   )
 }

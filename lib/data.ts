@@ -122,6 +122,17 @@ export const beforeAfter = [
   { before: 'Fim do dia sem números', after: 'Fecho diário com os dados reais' },
 ]
 
+export const terms = [
+  { t: 'Aceitação dos termos', d: 'Ao aceder e utilizar o site da Cenlo, concorda com estes termos. Se não concordar, pedimos que não utilize o site nem os formulários disponibilizados.' },
+  { t: 'O que a Cenlo oferece', d: 'A Cenlo desenvolve centrais inteligentes de atendimento e operação para negócios locais. Este site serve para apresentar os produtos e permitir o pedido de demonstração. O acesso aos produtos é feito mediante acordo comercial próprio.' },
+  { t: 'Utilização do site', d: 'O site destina-se a fins informativos e ao contacto comercial. Compromete-se a fornecer informação verdadeira nos formulários e a não utilizar o site para fins ilícitos, fraudulentos ou que prejudiquem o funcionamento do serviço.' },
+  { t: 'Pedidos de demonstração', d: 'O envio de um pedido de demonstração não constitui qualquer contrato nem obrigação de fornecimento. A Cenlo entra em contacto para avaliar, em conjunto, se o produto faz sentido para o seu negócio.' },
+  { t: 'Propriedade intelectual', d: 'A marca Cenlo, os textos, o design e o software associados são propriedade da Cenlo. Não é permitida a reprodução, cópia ou utilização sem autorização escrita.' },
+  { t: 'Limitação de responsabilidade', d: 'O site é disponibilizado "tal como está". A Cenlo procura manter a informação atualizada e o serviço disponível, mas não garante ausência de erros ou interrupções, dentro dos limites permitidos por lei.' },
+  { t: 'Alterações', d: 'A Cenlo pode atualizar estes termos a qualquer momento. A versão em vigor é sempre a publicada nesta página, com a data da última atualização.' },
+  { t: 'Lei aplicável', d: 'Estes termos regem-se pela lei portuguesa. Qualquer litígio será resolvido pelos tribunais competentes em Portugal.' },
+]
+
 export const privacy = [
   { t: 'Quem somos', d: 'A Cenlo desenvolve centrais inteligentes de atendimento e operação para quem atende clientes todos os dias. Esta política explica como tratamos os dados que nos confia.' },
   { t: 'Que dados recolhemos', d: 'Apenas os dados que nos envia ao pedir uma demonstração ou ao falar connosco: nome, nome do negócio, cidade, segmento, telefone, email e a mensagem que escrever.' },

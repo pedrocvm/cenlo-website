@@ -21,8 +21,24 @@ const schibsted = Schibsted_Grotesk({
 })
 
 export const metadata: Metadata = {
-  title: 'Cenlo — Central inteligente para negócios',
-  description: 'A Cenlo organiza atendimento, clientes, pedidos e operação diária para quem atende clientes todos os dias. Sem trocar a forma como o seu cliente já fala consigo.',
+  metadataBase: new URL('https://cenlo.pt'),
+  title: {
+    default: 'Cenlo — central de pedidos por WhatsApp para negócios locais',
+    template: '%s',
+  },
+  description: 'O Cenlo ajuda pizzarias e negócios locais a organizar pedidos e atendimento pelo WhatsApp, com menos pedidos perdidos, menos erros e mais clareza na operação.',
+  openGraph: {
+    type: 'website',
+    locale: 'pt_PT',
+    siteName: 'Cenlo',
+  },
+  twitter: {
+    card: 'summary_large_image',
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
   icons: {
     icon: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='5' fill='%23FF6A2C'/%3E%3Cpath d='M17.6 7.6 A 7 7 0 1 0 17.6 16.4' fill='none' stroke='%23ffffff' stroke-width='3' stroke-linecap='round'/%3E%3Ccircle cx='13.4' cy='12' r='2.4' fill='%23ffffff'/%3E%3C/svg%3E",
   },
@@ -30,7 +46,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="pt" className={`${hanken.variable} ${schibsted.variable}`}>
+    <html lang="pt-PT" className={`${hanken.variable} ${schibsted.variable}`}>
       <body style={{ fontFamily: 'var(--font-hanken), system-ui, sans-serif' }}>
         <PrivacyProvider>
           <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>

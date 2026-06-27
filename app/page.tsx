@@ -1,5 +1,41 @@
+import type { Metadata } from 'next'
 import Link from 'next/link'
 import { pains, flowMini, verticals, pizzaPills } from '@/lib/data'
+
+export const metadata: Metadata = {
+  title: 'Cenlo — central de pedidos por WhatsApp para negócios locais',
+  description: 'O Cenlo ajuda pizzarias e negócios locais a organizar pedidos e atendimento pelo WhatsApp, com menos pedidos perdidos, menos erros e mais clareza na operação.',
+  alternates: { canonical: 'https://cenlo.pt' },
+  openGraph: {
+    title: 'Cenlo — central de pedidos por WhatsApp para negócios locais',
+    description: 'O Cenlo ajuda pizzarias e negócios locais a organizar pedidos e atendimento pelo WhatsApp, com menos pedidos perdidos, menos erros e mais clareza na operação.',
+    url: 'https://cenlo.pt',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Cenlo — central de pedidos por WhatsApp para negócios locais',
+    description: 'O Cenlo ajuda pizzarias e negócios locais a organizar pedidos e atendimento pelo WhatsApp, com menos pedidos perdidos, menos erros e mais clareza na operação.',
+  },
+}
+
+const orgSchema = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'Organization',
+      name: 'Cenlo',
+      url: 'https://cenlo.pt',
+      description: 'Central de pedidos por WhatsApp para negócios locais em Portugal.',
+      contactPoint: { '@type': 'ContactPoint', email: 'ola@cenlo.pt', contactType: 'customer service' },
+    },
+    {
+      '@type': 'WebSite',
+      name: 'Cenlo',
+      url: 'https://cenlo.pt',
+    },
+  ],
+}
 
 function BadgeStyle({ status }: { status: 'Disponível' | 'Em breve' }) {
   if (status === 'Disponível') {
@@ -11,6 +47,11 @@ function BadgeStyle({ status }: { status: 'Disponível' | 'Em breve' }) {
 export default function Home() {
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(orgSchema) }}
+      />
+
       {/* HERO */}
       <section style={{ position: 'relative', maxWidth: 1160, margin: '0 auto', padding: '64px 24px 40px', overflow: 'hidden' }}>
         <div aria-hidden="true" style={{ position: 'absolute', top: -180, right: -120, width: 560, height: 560, borderRadius: '50%', background: 'radial-gradient(circle,rgba(255,106,44,.20),rgba(255,106,44,0) 65%)', pointerEvents: 'none', zIndex: 0 }} />
@@ -18,23 +59,24 @@ export default function Home() {
         <div className="grid-two" style={{ position: 'relative', zIndex: 1, display: 'grid', gridTemplateColumns: '1.05fr .95fr', gap: 54, alignItems: 'center' }}>
           <div className="animate-fade-up">
             <h1 className="hd" style={{ fontSize: 52, margin: 0, fontWeight: 800, fontFamily: 'var(--font-schibsted)' }}>
-              A central inteligente de atendimento e operação para quem atende clientes todos os dias.
+              A central inteligente para negócios locais que atendem pelo WhatsApp.
             </h1>
             <p style={{ fontSize: 18.5, color: 'var(--ink2)', marginTop: 20, maxWidth: 520 }}>
-              A Cenlo ajuda o seu negócio a organizar atendimento, clientes e operação diária, e a reativar quem já é cliente, para faturar mais com menos improviso.
+              O Cenlo organiza os pedidos que chegam pelo WhatsApp para a sua pizzaria perder menos pedido, errar menos pedido e operar com mais clareza.
             </p>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginTop: 30 }}>
-              <Link href="/produtos" style={{ display: 'inline-flex', alignItems: 'center', gap: 9, background: 'var(--terraBtn)', color: '#fff', border: 'none', padding: '15px 24px', borderRadius: 11, fontWeight: 600, fontSize: 16, boxShadow: '0 8px 20px -10px var(--terra)' }}>
-                Conhecer produtos →
-              </Link>
-              <Link href="/contacto" style={{ background: 'var(--surface)', color: 'var(--ink)', border: '1px solid var(--line)', padding: '15px 22px', borderRadius: 11, fontWeight: 600, fontSize: 16 }}>
+              <Link href="/contacto" style={{ display: 'inline-flex', alignItems: 'center', gap: 9, background: 'var(--terraBtn)', color: '#fff', border: 'none', padding: '15px 24px', borderRadius: 11, fontWeight: 600, fontSize: 16, boxShadow: '0 8px 20px -10px var(--terra)' }}>
                 Pedir demonstração
               </Link>
+              <Link href="/pizza" style={{ background: 'var(--surface)', color: 'var(--ink)', border: '1px solid var(--line)', padding: '15px 22px', borderRadius: 11, fontWeight: 600, fontSize: 16 }}>
+                Ver como funciona →
+              </Link>
             </div>
-            <div style={{ display: 'flex', gap: 22, marginTop: 30, flexWrap: 'wrap' }}>
-              <div style={{ fontSize: 13.5, color: 'var(--muted)' }}><strong style={{ color: 'var(--ink)', fontWeight: 600 }}>Atendimento</strong> sem nada perdido</div>
-              <div style={{ fontSize: 13.5, color: 'var(--muted)' }}><strong style={{ color: 'var(--ink)', fontWeight: 600 }}>Clientes</strong> registados e reativados</div>
-              <div style={{ fontSize: 13.5, color: 'var(--muted)' }}><strong style={{ color: 'var(--ink)', fontWeight: 600 }}>Operação</strong> clara, do primeiro contacto ao fecho do dia</div>
+            <p style={{ fontSize: 13, color: 'var(--muted)', marginTop: 10 }}>Demonstração curta, sem compromisso.</p>
+            <div style={{ display: 'flex', gap: 22, marginTop: 22, flexWrap: 'wrap' }}>
+              <div style={{ fontSize: 13.5, color: 'var(--muted)' }}><strong style={{ color: 'var(--ink)', fontWeight: 600 }}>Menos</strong> pedidos perdidos</div>
+              <div style={{ fontSize: 13.5, color: 'var(--muted)' }}><strong style={{ color: 'var(--ink)', fontWeight: 600 }}>Menos</strong> erros na cozinha</div>
+              <div style={{ fontSize: 13.5, color: 'var(--muted)' }}><strong style={{ color: 'var(--ink)', fontWeight: 600 }}>Mais</strong> clareza na operação</div>
             </div>
           </div>
 
@@ -139,7 +181,22 @@ export default function Home() {
           </div>
           <div className="grid-two" style={{ display: 'grid', gridTemplateColumns: 'repeat(2,1fr)', gap: 16, marginTop: 34 }}>
             {verticals.map(v => (
-              <Link key={v.name} href={v.href} style={{ textAlign: 'left', background: 'var(--surface)', border: '1px solid var(--line)', borderRadius: 15, padding: 24, display: 'flex', flexDirection: 'column', gap: 0 }}>
+              <Link
+                key={v.name}
+                href={v.href}
+                style={{
+                  textAlign: 'left',
+                  background: 'var(--surface)',
+                  border: v.status === 'Disponível' ? '1px solid var(--terra)' : '1px solid var(--line)',
+                  borderRadius: 15,
+                  padding: 24,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 0,
+                  opacity: v.status === 'Em breve' ? 0.72 : 1,
+                  transition: 'opacity .15s',
+                }}
+              >
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <span style={{ fontFamily: 'var(--font-schibsted)', fontWeight: 800, fontSize: 21, color: '#fff' }}>{v.name}</span>
                   <BadgeStyle status={v.status} />
@@ -158,11 +215,12 @@ export default function Home() {
           <div style={{ padding: '48px 44px' }}>
             <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'rgba(255,106,44,.22)', color: '#FFB68F', padding: '6px 13px', borderRadius: 999, fontSize: 13, fontWeight: 600 }}>Em destaque</span>
             <h2 style={{ fontSize: 38, color: '#fff', marginTop: 18, fontFamily: 'var(--font-schibsted)' }}>Cenlo Pizza: os pedidos da sua pizzaria, finalmente organizados.</h2>
-            <p style={{ fontSize: 17, color: '#C9BCA8', marginTop: 16, maxWidth: 460 }}>Transforma o atendimento em pedidos claros, envia-os para a cozinha, regista clientes, ajuda a reativar quem já comprou e mostra o que aconteceu no dia.</p>
+            <p style={{ fontSize: 17, color: '#C9BCA8', marginTop: 16, maxWidth: 460 }}>Organiza o atendimento em pedidos claros, envia para a cozinha, regista clientes e mostra o que aconteceu no dia. Para a sua pizzaria perder menos pedido, errar menos e operar com mais clareza.</p>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginTop: 28 }}>
-              <Link href="/pizza" style={{ background: 'var(--terraBtn)', color: '#fff', border: 'none', padding: '14px 22px', borderRadius: 11, fontWeight: 600, fontSize: 16 }}>Ver o Cenlo Pizza →</Link>
-              <Link href="/contacto" style={{ background: 'transparent', color: '#fff', border: '1px solid rgba(255,255,255,.28)', padding: '14px 22px', borderRadius: 11, fontWeight: 600, fontSize: 16 }}>Falar sobre a minha pizzaria</Link>
+              <Link href="/contacto" style={{ background: 'var(--terraBtn)', color: '#fff', border: 'none', padding: '14px 22px', borderRadius: 11, fontWeight: 600, fontSize: 16 }}>Pedir demonstração</Link>
+              <Link href="/pizza" style={{ background: 'transparent', color: '#fff', border: '1px solid rgba(255,255,255,.28)', padding: '14px 22px', borderRadius: 11, fontWeight: 600, fontSize: 16 }}>Ver o Cenlo Pizza →</Link>
             </div>
+            <p style={{ fontSize: 13, color: 'rgba(255,255,255,.4)', marginTop: 10 }}>Mostramos em poucos minutos se faz sentido para a sua pizzaria.</p>
           </div>
           <div className="hide-sm" style={{ background: '#0E0E13', padding: 36, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 12, borderLeft: '1px solid var(--line)' }}>
             {pizzaPills.map(pp => (
@@ -189,6 +247,7 @@ export default function Home() {
                 <Link href="/contacto" style={{ background: 'var(--terraBtn)', color: '#fff', border: 'none', padding: '15px 26px', borderRadius: 11, fontWeight: 600, fontSize: 16 }}>Pedir demonstração</Link>
                 <Link href="/produtos" style={{ background: 'transparent', color: '#fff', border: '1px solid var(--line)', padding: '15px 24px', borderRadius: 11, fontWeight: 600, fontSize: 16 }}>Ver produtos</Link>
               </div>
+              <p style={{ fontSize: 13, color: 'var(--muted)', marginTop: 10 }}>Demonstração curta, sem compromisso.</p>
             </div>
             <div className="hide-sm" style={{ background: 'rgba(11,11,15,.55)', border: '1px solid var(--line)', borderRadius: 16, padding: 22, backdropFilter: 'blur(4px)' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>

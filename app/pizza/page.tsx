@@ -1,29 +1,178 @@
+import type { Metadata } from 'next'
 import Link from 'next/link'
 import FaqAccordion from '@/components/FaqAccordion'
-import { pizzaFor, pizzaProblems, pizzaSteps, pizzaFeatures, benefits, pizzaNot, demoSteps } from '@/lib/data'
+import { pizzaFor, pizzaProblems, pizzaSteps, pizzaFeatures, benefits, pizzaNot, demoSteps, faqs } from '@/lib/data'
 
-export const metadata = {
-  title: 'Cenlo Pizza — Software de pedidos para pizzarias',
-  description: 'O Cenlo Pizza transforma o atendimento em pedidos claros, envia-os para a cozinha, regista clientes e ajuda a reativar quem já comprou.',
+export const metadata: Metadata = {
+  title: 'Cenlo Pizza — pedidos por WhatsApp para pizzarias em Portugal',
+  description: 'Organize os pedidos da sua pizzaria pelo WhatsApp, reduza erros, evite pedidos perdidos e dê mais clareza à cozinha e ao atendimento.',
+  alternates: { canonical: 'https://cenlo.pt/pizza' },
+  openGraph: {
+    title: 'Cenlo Pizza — pedidos por WhatsApp para pizzarias em Portugal',
+    description: 'Organize os pedidos da sua pizzaria pelo WhatsApp, reduza erros, evite pedidos perdidos e dê mais clareza à cozinha e ao atendimento.',
+    url: 'https://cenlo.pt/pizza',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Cenlo Pizza — pedidos por WhatsApp para pizzarias em Portugal',
+    description: 'Organize os pedidos da sua pizzaria pelo WhatsApp, reduza erros, evite pedidos perdidos e dê mais clareza à cozinha e ao atendimento.',
+  },
 }
 
-function MockupFrame({ title, caption, glyph }: { title: string; caption: string; glyph: string }) {
+const faqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map(f => ({
+    '@type': 'Question',
+    name: f.q,
+    acceptedAnswer: { '@type': 'Answer', text: f.a },
+  })),
+}
+
+const productSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'SoftwareApplication',
+  name: 'Cenlo Pizza',
+  applicationCategory: 'BusinessApplication',
+  operatingSystem: 'Web',
+  description: 'Central de pedidos por WhatsApp para pizzarias. Organiza atendimento, estrutura pedidos, envia para a cozinha e regista clientes.',
+  url: 'https://cenlo.pt/pizza',
+  offers: { '@type': 'Offer', availability: 'https://schema.org/InStock' },
+}
+
+/* ── DOM Mockups (replace placeholders with real-looking demo UI) ── */
+
+function ChromeBar({ title }: { title: string }) {
   return (
-    <figure style={{ margin: 0, position: 'relative', background: 'var(--surface)', border: '1px solid var(--line)', borderRadius: 14, overflow: 'hidden', boxShadow: '0 24px 50px -38px rgba(0,0,0,.45)' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 7, padding: '11px 14px', background: 'var(--surface2)', borderBottom: '1px solid var(--line2)' }}>
-        <span style={{ width: 9, height: 9, borderRadius: '50%', background: '#FF5F57', display: 'inline-block' }} />
-        <span style={{ width: 9, height: 9, borderRadius: '50%', background: '#FEBC2E', display: 'inline-block' }} />
-        <span style={{ width: 9, height: 9, borderRadius: '50%', background: '#28C840', display: 'inline-block' }} />
-        <span style={{ marginLeft: 8, fontSize: 12, color: 'var(--muted)' }}>app.cenlo.pt · {title}</span>
+    <div style={{ display: 'flex', alignItems: 'center', gap: 7, padding: '11px 14px', background: 'var(--surface2)', borderBottom: '1px solid var(--line2)' }}>
+      <span style={{ width: 9, height: 9, borderRadius: '50%', background: '#FF5F57', display: 'inline-block' }} />
+      <span style={{ width: 9, height: 9, borderRadius: '50%', background: '#FEBC2E', display: 'inline-block' }} />
+      <span style={{ width: 9, height: 9, borderRadius: '50%', background: '#28C840', display: 'inline-block' }} />
+      <span style={{ marginLeft: 8, fontSize: 12, color: 'var(--muted)' }}>app.cenlo.pt · {title}</span>
+    </div>
+  )
+}
+
+function MockupCaption({ title, caption }: { title: string; caption: string }) {
+  return (
+    <figcaption style={{ padding: '10px 14px', borderTop: '1px solid var(--line2)', fontSize: 13, color: 'var(--ink2)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10 }}>
+      <span><strong style={{ color: 'var(--ink)' }}>{title}</strong> · {caption}</span>
+      <span style={{ fontSize: 11, color: 'var(--muted)', flexShrink: 0 }}>Dados de demonstração</span>
+    </figcaption>
+  )
+}
+
+function frameStyle(): React.CSSProperties {
+  return { margin: 0, position: 'relative', background: 'var(--surface)', border: '1px solid var(--line)', borderRadius: 14, overflow: 'hidden', boxShadow: '0 24px 50px -38px rgba(0,0,0,.45)' }
+}
+
+function PedidosMockup() {
+  const orders = [
+    { id: '#1042', desc: 'Margherita M · ½ Pepperoni ½ Funghi · entrega', status: 'Em preparação', sc: 'var(--amber)', sb: 'var(--amberBg)' },
+    { id: '#1041', desc: '2× Diavola M · entrega Rua das Flores 12',       status: 'Pronto',        sc: 'var(--olive)', sb: 'var(--oliveBg)' },
+    { id: '#1040', desc: 'Quattro Formaggi G · recolha',                   status: 'Entregue',     sc: 'var(--muted)', sb: 'var(--bg2)' },
+    { id: '#1039', desc: '½ Pepperoni ½ Funghi M · recolha',               status: 'Entregue',     sc: 'var(--muted)', sb: 'var(--bg2)' },
+  ]
+  return (
+    <figure style={frameStyle()}>
+      <ChromeBar title="Pedidos" />
+      <div style={{ padding: '14px 14px 10px', background: 'var(--bg)', display: 'flex', flexDirection: 'column', gap: 8 }}>
+        {orders.map(o => (
+          <div key={o.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'var(--surface)', border: '1px solid var(--line2)', borderRadius: 10, padding: '11px 13px' }}>
+            <div>
+              <div style={{ fontWeight: 600, fontSize: 13.5 }}>Pedido {o.id}</div>
+              <div style={{ fontSize: 11.5, color: 'var(--muted)', marginTop: 2 }}>{o.desc}</div>
+            </div>
+            <span style={{ fontSize: 10.5, fontWeight: 700, color: o.sc, background: o.sb, padding: '3px 8px', borderRadius: 6, flexShrink: 0, marginLeft: 8 }}>{o.status}</span>
+          </div>
+        ))}
       </div>
-      <div style={{ aspectRatio: '16/10', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 10, background: 'var(--bg)', textAlign: 'center', padding: 24 }}>
-        <span style={{ width: 42, height: 42, borderRadius: 11, background: 'var(--terraBg)', color: 'var(--terra)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, fontFamily: 'var(--font-schibsted)', fontWeight: 800 }}>{glyph}</span>
-        <span style={{ fontWeight: 600, fontSize: 15, color: 'var(--ink)' }}>{title} · captura em preparação</span>
-        <span style={{ fontSize: 12.5, color: 'var(--muted)', maxWidth: 280 }}>Imagem temporária — substituir por captura real</span>
+      <MockupCaption title="Pedidos" caption="o dia inteiro com estado e valor, num só ecrã." />
+    </figure>
+  )
+}
+
+function ClientesMockup() {
+  const clients = [
+    { name: 'Maria C.',  orders: 8,  label: 'Cliente recorrente', last: 'há 3 dias' },
+    { name: 'João S.',   orders: 12, label: 'Cliente recorrente', last: 'ontem' },
+    { name: 'Ana R.',    orders: 3,  label: 'Novo este mês',       last: 'esta semana' },
+  ]
+  return (
+    <figure style={frameStyle()}>
+      <ChromeBar title="Clientes" />
+      <div style={{ padding: '14px 14px 10px', background: 'var(--bg)', display: 'flex', flexDirection: 'column', gap: 8 }}>
+        {clients.map(c => (
+          <div key={c.name} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'var(--surface)', border: '1px solid var(--line2)', borderRadius: 10, padding: '11px 13px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <span style={{ width: 32, height: 32, borderRadius: '50%', background: 'var(--terraBg)', color: 'var(--terra)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: 13, flexShrink: 0 }}>{c.name[0]}</span>
+              <div>
+                <div style={{ fontWeight: 600, fontSize: 13.5 }}>{c.name}</div>
+                <div style={{ fontSize: 11.5, color: 'var(--muted)' }}>{c.label} · última compra {c.last}</div>
+              </div>
+            </div>
+            <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--ink2)', flexShrink: 0, marginLeft: 8 }}>{c.orders} ped.</span>
+          </div>
+        ))}
       </div>
-      <figcaption style={{ padding: '12px 16px', borderTop: '1px solid var(--line2)', fontSize: 13.5, color: 'var(--ink2)' }}>
-        <strong style={{ color: 'var(--ink)' }}>{title}</strong> · {caption}
-      </figcaption>
+      <MockupCaption title="Clientes" caption="histórico e recompra construídos a partir do WhatsApp." />
+    </figure>
+  )
+}
+
+function ConversasMockup() {
+  return (
+    <figure style={frameStyle()}>
+      <ChromeBar title="Conversas" />
+      <div style={{ padding: 14, background: 'var(--bg)', display: 'flex', flexDirection: 'column', gap: 8 }}>
+        <div style={{ alignSelf: 'flex-start', maxWidth: '80%', background: '#fff', border: '1px solid var(--line2)', padding: '8px 11px', borderRadius: '12px 12px 12px 3px', fontSize: 13, color: '#23201C' }}>Boa noite! Queria uma Diavola grande e duas Margherita médias</div>
+        <div style={{ alignSelf: 'flex-end', maxWidth: '80%', background: '#DDF3D8', padding: '8px 11px', borderRadius: '12px 12px 3px 12px', fontSize: 13, color: '#23201C' }}>Anotado! Entrega ou recolha?</div>
+        <div style={{ alignSelf: 'flex-start', maxWidth: '80%', background: '#fff', border: '1px solid var(--line2)', padding: '8px 11px', borderRadius: '12px 12px 12px 3px', fontSize: 13, color: '#23201C' }}>Entrega, Rua das Flores 12</div>
+        <div style={{ background: 'var(--surface2)', border: '1px solid var(--line)', borderRadius: 10, padding: '10px 12px', marginTop: 4 }}>
+          <div style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: '.06em', textTransform: 'uppercase', color: 'var(--terra)', marginBottom: 6 }}>Pedido #1043 · estruturado</div>
+          <div style={{ fontSize: 12.5, color: 'var(--ink2)', display: 'flex', flexDirection: 'column', gap: 4 }}>
+            <span>Diavola G · €10,50</span>
+            <span>2× Margherita M · €17,00</span>
+            <span style={{ color: 'var(--ink)', fontWeight: 600 }}>Entrega · Rua das Flores 12</span>
+          </div>
+        </div>
+      </div>
+      <MockupCaption title="Conversas" caption="a mensagem vira pedido estruturado, pronto a confirmar." />
+    </figure>
+  )
+}
+
+function CozinhaMockup() {
+  return (
+    <figure style={frameStyle()}>
+      <ChromeBar title="Cozinha" />
+      <div style={{ padding: 14, background: 'var(--bg)', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+        <div>
+          <div style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.07em', color: 'var(--amber)', marginBottom: 8 }}>Em preparação</div>
+          {[
+            { id: '#1042', items: ['Margherita M', '½ Pep ½ Funghi M'] },
+            { id: '#1043', items: ['Diavola G', '2× Margherita M'] },
+          ].map(o => (
+            <div key={o.id} style={{ background: 'var(--surface)', border: '1px solid var(--line2)', borderRadius: 9, padding: '10px 12px', marginBottom: 8 }}>
+              <div style={{ fontWeight: 600, fontSize: 12.5, marginBottom: 5 }}>Pedido {o.id}</div>
+              {o.items.map(it => <div key={it} style={{ fontSize: 12, color: 'var(--ink2)' }}>· {it}</div>)}
+            </div>
+          ))}
+        </div>
+        <div>
+          <div style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.07em', color: 'var(--olive)', marginBottom: 8 }}>Pronto</div>
+          {[
+            { id: '#1041', items: ['2× Diavola M'] },
+          ].map(o => (
+            <div key={o.id} style={{ background: 'var(--oliveBg)', border: '1px solid rgba(52,211,153,.2)', borderRadius: 9, padding: '10px 12px', marginBottom: 8 }}>
+              <div style={{ fontWeight: 600, fontSize: 12.5, marginBottom: 5 }}>Pedido {o.id}</div>
+              {o.items.map(it => <div key={it} style={{ fontSize: 12, color: 'var(--ink2)' }}>· {it}</div>)}
+            </div>
+          ))}
+        </div>
+      </div>
+      <MockupCaption title="Cozinha" caption="pedidos em colunas, sem cópias à mão." />
     </figure>
   )
 }
@@ -31,6 +180,9 @@ function MockupFrame({ title, caption, glyph }: { title: string; caption: string
 export default function PizzaPage() {
   return (
     <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(productSchema) }} />
+
       {/* HERO */}
       <section style={{ position: 'relative', maxWidth: 1160, margin: '0 auto', padding: '60px 24px 40px', overflow: 'hidden' }}>
         <div aria-hidden="true" style={{ position: 'absolute', top: -160, right: -100, width: 520, height: 520, borderRadius: '50%', background: 'radial-gradient(circle,rgba(255,106,44,.18),rgba(255,106,44,0) 65%)', pointerEvents: 'none', zIndex: 0 }} />
@@ -38,11 +190,12 @@ export default function PizzaPage() {
           <div>
             <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'var(--oliveBg)', color: 'var(--olive)', padding: '6px 13px', borderRadius: 999, fontSize: 13, fontWeight: 700 }}>Já em operação</span>
             <h1 className="hd" style={{ fontSize: 50, marginTop: 18, fontFamily: 'var(--font-schibsted)' }}>O software de pedidos da sua pizzaria, finalmente organizado.</h1>
-            <p style={{ fontSize: 18.5, color: 'var(--ink2)', marginTop: 18, maxWidth: 520 }}>O Cenlo Pizza transforma o atendimento em pedidos claros, envia-os para a cozinha, regista clientes e ajuda a reativar quem já comprou, para a sua pizzaria vender mais com menos improviso.</p>
+            <p style={{ fontSize: 18.5, color: 'var(--ink2)', marginTop: 18, maxWidth: 520 }}>O Cenlo Pizza organiza os pedidos que chegam pelo WhatsApp para a sua pizzaria perder menos pedido, errar menos pedido e operar com mais clareza.</p>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginTop: 28 }}>
               <Link href="/contacto" style={{ background: 'var(--terraBtn)', color: '#fff', border: 'none', padding: '15px 24px', borderRadius: 11, fontWeight: 600, fontSize: 16, boxShadow: '0 8px 20px -10px var(--terra)' }}>Pedir demonstração</Link>
               <a href="#como-funciona" style={{ background: 'var(--surface)', border: '1px solid var(--line)', padding: '15px 22px', borderRadius: 11, fontWeight: 600, fontSize: 16, display: 'inline-flex', alignItems: 'center' }}>Ver como funciona</a>
             </div>
+            <p style={{ fontSize: 13, color: 'var(--muted)', marginTop: 10 }}>Demonstração curta, sem compromisso.</p>
           </div>
 
           {/* Dashboard mockup */}
@@ -141,22 +294,22 @@ export default function PizzaPage() {
         </div>
       </section>
 
-      {/* SCREENSHOTS */}
+      {/* DASHBOARD POR DENTRO — DOM mockups */}
       <section style={{ background: 'var(--bg2)', borderTop: '1px solid var(--line)', borderBottom: '1px solid var(--line)' }}>
         <div style={{ maxWidth: 1160, margin: '0 auto', padding: '60px 24px' }}>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, justifyContent: 'space-between', alignItems: 'flex-end' }}>
             <div style={{ maxWidth: 520 }}>
               <h2 style={{ fontSize: 32, fontFamily: 'var(--font-schibsted)' }}>A dashboard por dentro</h2>
-              <p style={{ fontSize: 16, color: 'var(--ink2)', marginTop: 10 }}>Pré-visualização da app. Capturas reais em preparação, com dados de demonstração.</p>
+              <p style={{ fontSize: 16, color: 'var(--ink2)', marginTop: 10 }}>Pré-visualização da interface com dados de demonstração.</p>
             </div>
           </div>
           <div className="grid-two" style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: 14, marginTop: 28 }}>
-            <MockupFrame title="Pedidos" caption="o dia inteiro com estado e valor, num só ecrã." glyph="P" />
-            <MockupFrame title="Clientes" caption="histórico e recompra construídos a partir do WhatsApp." glyph="C" />
+            <PedidosMockup />
+            <ClientesMockup />
           </div>
           <div className="grid-two" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginTop: 14 }}>
-            <MockupFrame title="Conversas" caption="a mensagem vira pedido estruturado, pronto a confirmar." glyph="❯" />
-            <MockupFrame title="Cozinha" caption="pedidos em colunas, sem cópias à mão." glyph="▢" />
+            <ConversasMockup />
+            <CozinhaMockup />
           </div>
         </div>
       </section>
@@ -205,6 +358,7 @@ export default function PizzaPage() {
               <h2 style={{ fontSize: 30, fontFamily: 'var(--font-schibsted)' }}>Veja a Cenlo Pizza na sua operação</h2>
               <p style={{ fontSize: 16.5, color: 'var(--ink2)', marginTop: 14 }}>O Cenlo Pizza está a organizar pizzarias em Portugal, com acompanhamento próximo desde o início. Marcamos uma demonstração curta, vemos como a sua pizzaria atende hoje e mostramos como fica organizado.</p>
               <Link href="/contacto" style={{ display: 'inline-block', marginTop: 22, background: 'var(--terraBtn)', color: '#fff', border: 'none', padding: '14px 24px', borderRadius: 11, fontWeight: 600, fontSize: 16 }}>Pedir demonstração</Link>
+              <p style={{ fontSize: 13, color: 'var(--muted)', marginTop: 8 }}>Demonstração curta, sem compromisso.</p>
             </div>
             <div style={{ background: 'var(--surface)', border: '1px solid var(--line)', borderRadius: 15, padding: 22, display: 'flex', flexDirection: 'column', gap: 12 }}>
               {demoSteps.map(d => (
@@ -236,6 +390,15 @@ export default function PizzaPage() {
           </div>
         </div>
       </section>
+
+      {/* Sticky CTA — mobile only, via CSS class */}
+      <div className="pizza-sticky-cta">
+        <Link
+          href="/contacto"
+          style={{ background: 'var(--terraBtn)', color: '#fff', padding: '12px 28px', borderRadius: 10, fontWeight: 700, fontSize: 15, display: 'inline-block' }}
+        >Pedir demonstração</Link>
+        <span style={{ fontSize: 12, color: 'var(--muted)' }}>Sem compromisso</span>
+      </div>
     </>
   )
 }

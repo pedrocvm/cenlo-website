@@ -1,9 +1,22 @@
+import type { Metadata } from 'next'
 import Link from 'next/link'
 import { values, beforeAfter } from '@/lib/data'
 
-export const metadata = {
-  title: 'Sobre — Cenlo',
+export const metadata: Metadata = {
+  title: 'Sobre a Cenlo — tecnologia para negócios locais',
   description: 'A Cenlo nasceu para organizar o atendimento e operação de quem atende clientes todos os dias, a começar pelo WhatsApp.',
+  alternates: { canonical: 'https://cenlo.pt/sobre' },
+  openGraph: {
+    title: 'Sobre a Cenlo — tecnologia para negócios locais',
+    description: 'A Cenlo nasceu para organizar o atendimento e operação de quem atende clientes todos os dias, a começar pelo WhatsApp.',
+    url: 'https://cenlo.pt/sobre',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Sobre a Cenlo — tecnologia para negócios locais',
+    description: 'A Cenlo nasceu para organizar o atendimento e operação de quem atende clientes todos os dias, a começar pelo WhatsApp.',
+  },
 }
 
 export default function SobrePage() {
@@ -13,6 +26,10 @@ export default function SobrePage() {
         <span style={{ fontSize: 13, fontWeight: 700, letterSpacing: '.08em', textTransform: 'uppercase', color: 'var(--terra)' }}>Sobre a Cenlo</span>
         <h1 className="hd" style={{ fontSize: 46, marginTop: 14, fontFamily: 'var(--font-schibsted)' }}>Cada mensagem ignorada é um cliente que pode estar a ir para o concorrente.</h1>
         <p style={{ fontSize: 19, color: 'var(--ink2)', marginTop: 20 }}>A Cenlo nasceu para resolver isso, a começar pelos canais onde esses negócios já falam com os clientes: WhatsApp, mensagens e contacto direto.</p>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginTop: 28 }}>
+          <Link href="/contacto" style={{ background: 'var(--terraBtn)', color: '#fff', border: 'none', padding: '15px 24px', borderRadius: 11, fontWeight: 600, fontSize: 16, boxShadow: '0 8px 20px -10px var(--terra)' }}>Pedir demonstração</Link>
+          <Link href="/produtos" style={{ background: 'var(--surface)', color: 'var(--ink)', border: '1px solid var(--line)', padding: '15px 22px', borderRadius: 11, fontWeight: 600, fontSize: 16 }}>Conhecer produtos →</Link>
+        </div>
       </section>
 
       <section style={{ maxWidth: 820, margin: '0 auto', padding: '8px 24px 20px' }}>

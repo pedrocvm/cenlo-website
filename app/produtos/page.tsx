@@ -1,9 +1,22 @@
+import type { Metadata } from 'next'
 import Link from 'next/link'
 import { pizzaPills, soon, glossary } from '@/lib/data'
 
-export const metadata = {
-  title: 'Produtos — Cenlo',
+export const metadata: Metadata = {
+  title: 'Produtos Cenlo — soluções para negócios locais',
   description: 'Centrais inteligentes para cada tipo de negócio. Cenlo Pizza disponível, Cenlo Food, Night e Services em breve.',
+  alternates: { canonical: 'https://cenlo.pt/produtos' },
+  openGraph: {
+    title: 'Produtos Cenlo — soluções para negócios locais',
+    description: 'Centrais inteligentes para cada tipo de negócio. Cenlo Pizza disponível, Cenlo Food, Night e Services em breve.',
+    url: 'https://cenlo.pt/produtos',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Produtos Cenlo — soluções para negócios locais',
+    description: 'Centrais inteligentes para cada tipo de negócio. Cenlo Pizza disponível, Cenlo Food, Night e Services em breve.',
+  },
 }
 
 export default function ProdutosPage() {

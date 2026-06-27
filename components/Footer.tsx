@@ -36,15 +36,14 @@ export default function Footer() {
                 <Link href="/sobre" style={{ color: '#E8DECE' }}>Sobre</Link>
                 <Link href="/contacto" style={{ color: '#E8DECE' }}>Contacto</Link>
                 <button onClick={openModal} style={{ background: 'none', border: 'none', color: '#E8DECE', textAlign: 'left', padding: 0, fontSize: 14.5, cursor: 'pointer' }}>Política de Privacidade</button>
-                <a href="#" style={{ color: '#E8DECE' }}>Termos</a>
+                <Link href="/termos" style={{ color: '#E8DECE' }}>Termos</Link>
               </div>
             </div>
           </div>
         </div>
 
-        <div style={{ borderTop: '1px solid #3A322A', marginTop: 38, paddingTop: 22, display: 'flex', flexWrap: 'wrap', gap: 12, justifyContent: 'space-between', alignItems: 'center' }}>
+        <div style={{ borderTop: '1px solid #3A322A', marginTop: 38, paddingTop: 22 }}>
           <span style={{ fontSize: 13, color: '#B7AC9A' }}>© 2026 Cenlo · central + local</span>
-          <span style={{ fontSize: 13, color: '#B7AC9A' }}>Identidade visual provisória, em validação</span>
         </div>
       </div>
     </footer>
