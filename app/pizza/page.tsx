@@ -399,6 +399,8 @@ export default function PizzaPage() {
         >Pedir demonstração</Link>
         <span style={{ fontSize: 12, color: 'var(--muted)' }}>Sem compromisso</span>
       </div>
+      {/* Spacer so fixed sticky CTA doesn't cover last section on mobile */}
+      <div className="pizza-sticky-spacer" aria-hidden="true" />
     </>
   )
 }
