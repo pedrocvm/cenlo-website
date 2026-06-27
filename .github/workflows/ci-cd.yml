@@ -35,7 +35,10 @@ jobs:
         run: pnpm install --no-frozen-lockfile
 
       - name: Lint
-        run: pnpm exec next lint --dir app --dir components --dir lib
+        run: |
+          echo "Next.js version: $(node_modules/.bin/next --version)"
+          node_modules/.bin/next lint --help 2>&1 | head -20 || true
+          node_modules/.bin/next lint
 
       - name: Type-check
         run: pnpm exec tsc --noEmit
