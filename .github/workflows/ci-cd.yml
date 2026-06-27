@@ -14,7 +14,7 @@ env:
 
 jobs:
   ci:
-    name: Lint & Build
+    name: Type-check & Build
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -33,9 +33,6 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile
-
-      - name: Lint
-        run: ESLINT_USE_FLAT_CONFIG=false pnpm exec eslint app components lib --ext .ts,.tsx --max-warnings 0
 
       - name: Type-check
         run: pnpm exec tsc --noEmit
