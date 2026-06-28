@@ -189,11 +189,11 @@ export default function PizzaPage() {
         <div className="grid-two" style={{ position: 'relative', zIndex: 1, display: 'grid', gridTemplateColumns: '1.05fr .95fr', gap: 50, alignItems: 'center' }}>
           <div>
             <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'var(--oliveBg)', color: 'var(--olive)', padding: '6px 13px', borderRadius: 999, fontSize: 13, fontWeight: 700 }}>Já em operação</span>
-            <h1 className="hd" style={{ fontSize: 50, marginTop: 18, fontFamily: 'var(--font-schibsted)' }}>O software de pedidos da sua pizzaria, finalmente organizado.</h1>
-            <p style={{ fontSize: 18.5, color: 'var(--ink2)', marginTop: 18, maxWidth: 520 }}>O Cenlo Pizza organiza os pedidos que chegam pelo WhatsApp para a sua pizzaria perder menos pedido, errar menos pedido e operar com mais clareza.</p>
+            <h1 className="hd" style={{ fontSize: 50, marginTop: 18, fontFamily: 'var(--font-schibsted)' }}>Os pedidos da sua pizzaria, finalmente organizados.</h1>
+            <p style={{ fontSize: 18.5, color: 'var(--ink2)', marginTop: 18, maxWidth: 520 }}>Recebe o pedido no WhatsApp, estrutura-o, manda-o para a cozinha e regista o cliente — com menos enganos e menos pedidos perdidos.</p>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginTop: 28 }}>
-              <Link href="/contacto" style={{ background: 'var(--terraBtn)', color: '#fff', border: 'none', padding: '15px 24px', borderRadius: 11, fontWeight: 600, fontSize: 16, boxShadow: '0 8px 20px -10px var(--terra)' }}>Pedir demonstração</Link>
-              <a href="#como-funciona" style={{ background: 'var(--surface)', border: '1px solid var(--line)', padding: '15px 22px', borderRadius: 11, fontWeight: 600, fontSize: 16, display: 'inline-flex', alignItems: 'center' }}>Ver como funciona</a>
+              <Link href="/contacto" className="cta-primary" style={{ background: 'var(--terraBtn)', color: '#fff', border: 'none', padding: '15px 24px', borderRadius: 11, fontWeight: 600, fontSize: 16, boxShadow: '0 8px 20px -10px var(--terra)' }}>Pedir demonstração</Link>
+              <a href="#como-funciona" className="cta-primary" style={{ background: 'var(--surface)', border: '1px solid var(--line)', padding: '15px 22px', borderRadius: 11, fontWeight: 600, fontSize: 16, display: 'inline-flex', alignItems: 'center' }}>Ver como funciona</a>
             </div>
             <p style={{ fontSize: 13, color: 'var(--muted)', marginTop: 10 }}>Demonstração curta, sem compromisso.</p>
           </div>
@@ -357,7 +357,7 @@ export default function PizzaPage() {
             <div>
               <h2 style={{ fontSize: 30, fontFamily: 'var(--font-schibsted)' }}>Veja a Cenlo Pizza na sua operação</h2>
               <p style={{ fontSize: 16.5, color: 'var(--ink2)', marginTop: 14 }}>O Cenlo Pizza está a organizar pizzarias em Portugal, com acompanhamento próximo desde o início. Marcamos uma demonstração curta, vemos como a sua pizzaria atende hoje e mostramos como fica organizado.</p>
-              <Link href="/contacto" style={{ display: 'inline-block', marginTop: 22, background: 'var(--terraBtn)', color: '#fff', border: 'none', padding: '14px 24px', borderRadius: 11, fontWeight: 600, fontSize: 16 }}>Pedir demonstração</Link>
+              <Link href="/contacto" className="cta-primary" style={{ display: 'inline-block', marginTop: 22, background: 'var(--terraBtn)', color: '#fff', border: 'none', padding: '14px 24px', borderRadius: 11, fontWeight: 600, fontSize: 16 }}>Pedir demonstração</Link>
               <p style={{ fontSize: 13, color: 'var(--muted)', marginTop: 8 }}>Demonstração curta, sem compromisso.</p>
             </div>
             <div style={{ background: 'var(--surface)', border: '1px solid var(--line)', borderRadius: 15, padding: 22, display: 'flex', flexDirection: 'column', gap: 12 }}>
@@ -386,7 +386,7 @@ export default function PizzaPage() {
             <span style={{ fontSize: 13, fontWeight: 700, letterSpacing: '.08em', textTransform: 'uppercase', color: 'var(--terra)' }}>Cenlo Pizza</span>
             <h2 style={{ fontSize: 38, color: '#fff', marginTop: 14, fontFamily: 'var(--font-schibsted)' }}>Menos pedidos perdidos no WhatsApp. Mais controlo na cozinha.</h2>
             <p style={{ fontSize: 17, color: 'var(--ink2)', marginTop: 14, maxWidth: 500 }}>Veja a Cenlo a organizar a sua pizzaria numa demonstração curta, com o seu menu e o seu fluxo.</p>
-            <Link href="/contacto" style={{ display: 'inline-block', marginTop: 28, background: 'var(--terraBtn)', color: '#fff', border: 'none', padding: '15px 28px', borderRadius: 11, fontWeight: 600, fontSize: 16 }}>Pedir demonstração</Link>
+            <Link href="/contacto" className="cta-primary" style={{ display: 'inline-block', marginTop: 28, background: 'var(--terraBtn)', color: '#fff', border: 'none', padding: '15px 28px', borderRadius: 11, fontWeight: 600, fontSize: 16 }}>Pedir demonstração</Link>
           </div>
         </div>
       </section>

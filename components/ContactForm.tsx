@@ -119,7 +119,7 @@ export default function ContactForm() {
         </span>
       </label>
 
-      <button type="submit" style={{ width: '100%', marginTop: 18, background: 'var(--terraBtn)', color: '#fff', border: 'none', padding: 14, borderRadius: 11, fontWeight: 700, fontSize: 16, cursor: 'pointer' }}>
+      <button type="submit" className="cta-primary" style={{ width: '100%', marginTop: 18, background: 'var(--terraBtn)', color: '#fff', border: 'none', padding: 14, borderRadius: 11, fontWeight: 700, fontSize: 16, cursor: 'pointer' }}>
         Pedir demonstração
       </button>
       <p style={{ fontSize: 13, color: 'var(--muted)', textAlign: 'center', marginTop: 8 }}>Demonstração curta, sem compromisso.</p>

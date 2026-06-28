@@ -24,11 +24,11 @@ export default function SobrePage() {
     <>
       <section style={{ maxWidth: 820, margin: '0 auto', padding: '72px 24px 40px' }}>
         <span style={{ fontSize: 13, fontWeight: 700, letterSpacing: '.08em', textTransform: 'uppercase', color: 'var(--terra)' }}>Sobre a Cenlo</span>
-        <h1 className="hd" style={{ fontSize: 46, marginTop: 14, fontFamily: 'var(--font-schibsted)' }}>Cada mensagem ignorada é um cliente que pode estar a ir para o concorrente.</h1>
+        <h1 className="hd" style={{ fontSize: 46, marginTop: 14, fontFamily: 'var(--font-schibsted)' }}>Construído em Portugal, para quem atende clientes todos os dias.</h1>
         <p style={{ fontSize: 19, color: 'var(--ink2)', marginTop: 20 }}>A Cenlo nasceu para resolver isso, a começar pelos canais onde esses negócios já falam com os clientes: WhatsApp, mensagens e contacto direto.</p>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginTop: 28 }}>
-          <Link href="/contacto" style={{ background: 'var(--terraBtn)', color: '#fff', border: 'none', padding: '15px 24px', borderRadius: 11, fontWeight: 600, fontSize: 16, boxShadow: '0 8px 20px -10px var(--terra)' }}>Pedir demonstração</Link>
-          <Link href="/produtos" style={{ background: 'var(--surface)', color: 'var(--ink)', border: '1px solid var(--line)', padding: '15px 22px', borderRadius: 11, fontWeight: 600, fontSize: 16 }}>Conhecer produtos →</Link>
+          <Link href="/contacto" className="cta-primary" style={{ background: 'var(--terraBtn)', color: '#fff', border: 'none', padding: '15px 24px', borderRadius: 11, fontWeight: 600, fontSize: 16, boxShadow: '0 8px 20px -10px var(--terra)' }}>Pedir demonstração</Link>
+          <Link href="/produtos" className="cta-primary" style={{ background: 'var(--surface)', color: 'var(--ink)', border: '1px solid var(--line)', padding: '15px 22px', borderRadius: 11, fontWeight: 600, fontSize: 16 }}>Conhecer produtos →</Link>
         </div>
       </section>
 
@@ -44,7 +44,7 @@ export default function SobrePage() {
           <h2 style={{ fontSize: 28, fontFamily: 'var(--font-schibsted)' }}>O que defende a Cenlo</h2>
           <div className="grid-three" style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 14, marginTop: 24 }}>
             {values.map(v => (
-              <div key={v.t} style={{ background: 'var(--surface)', border: '1px solid var(--line)', borderRadius: 14, padding: 22 }}>
+              <div key={v.t} className="card-hover" style={{ background: 'var(--surface)', border: '1px solid var(--line)', borderRadius: 14, padding: 22 }}>
                 <div style={{ fontWeight: 700, fontSize: 17.5, color: 'var(--terra)' }}>{v.t}</div>
                 <p style={{ fontSize: 14.5, color: 'var(--ink2)', marginTop: 8 }}>{v.d}</p>
               </div>
@@ -77,8 +77,8 @@ export default function SobrePage() {
             &ldquo;Quem atende clientes todos os dias não precisa de mais tecnologia. Precisa de ordem no que já faz, para fechar mais negócio e trazer clientes de volta.&rdquo;
           </p>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, justifyContent: 'center', marginTop: 28 }}>
-            <Link href="/produtos" style={{ background: 'var(--terraBtn)', color: '#fff', border: 'none', padding: '14px 24px', borderRadius: 11, fontWeight: 600, fontSize: 16 }}>Conhecer produtos</Link>
-            <Link href="/contacto" style={{ background: 'transparent', color: '#fff', border: '1px solid rgba(255,255,255,.4)', padding: '14px 22px', borderRadius: 11, fontWeight: 600, fontSize: 16 }}>Falar connosco</Link>
+            <Link href="/produtos" className="cta-primary" style={{ background: 'var(--terraBtn)', color: '#fff', border: 'none', padding: '14px 24px', borderRadius: 11, fontWeight: 600, fontSize: 16 }}>Conhecer produtos</Link>
+            <Link href="/contacto" className="cta-primary" style={{ background: 'transparent', color: '#fff', border: '1px solid rgba(255,255,255,.4)', padding: '14px 22px', borderRadius: 11, fontWeight: 600, fontSize: 16 }}>Falar connosco</Link>
           </div>
         </div>
       </section>

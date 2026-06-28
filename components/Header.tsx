@@ -66,7 +66,7 @@ export default function Header() {
         <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
           <Link
             href="/contacto"
-            className="header-cta"
+            className="header-cta cta-primary"
             style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'var(--terraBtn)', color: '#fff', border: 'none', padding: '11px 18px', borderRadius: 10, fontWeight: 600, fontSize: 14.5, whiteSpace: 'nowrap' }}
           >Pedir demonstração</Link>
 
@@ -83,7 +83,7 @@ export default function Header() {
       </div>
 
       {mobileOpen && (
-        <div id="mobile-nav" style={{ borderTop: '1px solid var(--line)', background: 'var(--bg)', padding: '8px 16px 16px' }}>
+        <div id="mobile-nav" className="mobile-menu-panel" style={{ borderTop: '1px solid var(--line)', background: 'var(--bg)', padding: '8px 16px 16px' }}>
           {navItems.map(item => (
             <Link
               key={item.href}

@@ -25,6 +25,7 @@ export default function PrivacyModal() {
     >
       <div
         onClick={e => e.stopPropagation()}
+        className="modal-panel"
         style={{ background: 'var(--surface)', border: '1px solid var(--line)', borderRadius: 18, maxWidth: 620, width: '100%', boxShadow: '0 40px 80px -40px rgba(0,0,0,.7)' }}
       >
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16, padding: '22px 26px', borderBottom: '1px solid var(--line2)', position: 'sticky', top: 0, background: 'var(--surface)', borderRadius: '18px 18px 0 0' }}>

@@ -18,11 +18,11 @@ export default function FaqAccordion() {
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 16 }}>
               <span style={{ fontWeight: 600, fontSize: 16, color: '#fff' }}>{q.q}</span>
-              <span style={{ fontSize: 20, color: 'var(--terra)', flexShrink: 0, lineHeight: 1 }}>{isOpen ? '–' : '+'}</span>
+              <span className={`faq-icon${isOpen ? ' open' : ''}`} style={{ fontSize: 20, color: 'var(--terra)', flexShrink: 0, lineHeight: 1 }}>+</span>
             </div>
-            {isOpen && (
-              <p style={{ fontSize: 15, color: 'var(--ink2)', marginTop: 12 }}>{q.a}</p>
-            )}
+            <div className={`faq-body${isOpen ? ' open' : ''}`}>
+              <div><p style={{ fontSize: 15, color: 'var(--ink2)', marginTop: 12 }}>{q.a}</p></div>
+            </div>
           </button>
         )
       })}
