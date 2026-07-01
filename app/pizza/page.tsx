@@ -198,31 +198,27 @@ export default function PizzaPage() {
             <p style={{ fontSize: 13, color: 'var(--muted)', marginTop: 10 }}>Demonstração curta, sem compromisso.</p>
           </div>
 
-          {/* Dashboard mockup */}
-          <div style={{ position: 'relative' }}>
-            <div style={{ background: 'var(--surface)', border: '1px solid var(--line)', borderRadius: 18, boxShadow: '0 30px 60px -34px rgba(0,0,0,.45)', overflow: 'hidden' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '12px 16px', borderBottom: '1px solid var(--line2)', background: 'var(--surface2)' }}>
-                <span style={{ width: 9, height: 9, borderRadius: '50%', background: 'var(--terra)', display: 'inline-block' }} />
-                <span style={{ fontWeight: 600, fontSize: 13.5 }}>Cenlo Pizza · Dashboard</span>
-                <span style={{ marginLeft: 'auto', display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 11.5, color: 'var(--olive)', fontWeight: 600 }}>
-                  <span style={{ width: 7, height: 7, borderRadius: '50%', background: 'var(--olive)', display: 'inline-block' }} className="animate-dot-pulse" />
-                  WhatsApp ligado
-                </span>
+          {/* Conversa → pedido estruturado */}
+          <div style={{ background: 'var(--surface)', border: '1px solid var(--line)', borderRadius: 18, boxShadow: '0 30px 60px -34px rgba(0,0,0,.45)', overflow: 'hidden' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 9, padding: '13px 16px', borderBottom: '1px solid var(--line2)', background: 'var(--surface2)' }}>
+              <span style={{ width: 10, height: 10, borderRadius: '50%', background: '#25D366', display: 'inline-block' }} />
+              <span style={{ fontWeight: 600, fontSize: 14 }}>WhatsApp · O Tasco da Rua Nova</span>
+              <span style={{ marginLeft: 'auto', fontSize: 11.5, color: 'var(--muted)' }}>há 1 min</span>
+            </div>
+            <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 9, background: 'var(--bg)' }}>
+              <div style={{ alignSelf: 'flex-start', maxWidth: '78%', background: '#fff', border: '1px solid var(--line2)', padding: '9px 12px', borderRadius: '13px 13px 13px 4px', fontSize: 13.5, color: '#23201C' }}>Olá! Queria pedir para entrega — prato do dia e uma laranjada natural, por favor</div>
+              <div style={{ alignSelf: 'flex-end', maxWidth: '78%', background: '#DDF3D8', padding: '9px 12px', borderRadius: '13px 13px 4px 13px', fontSize: 13.5, color: '#23201C' }}>Claro! Qual a morada de entrega?</div>
+              <div style={{ alignSelf: 'flex-start', maxWidth: '78%', background: '#fff', border: '1px solid var(--line2)', padding: '9px 12px', borderRadius: '13px 13px 13px 4px', fontSize: 13.5, color: '#23201C' }}>Av. República 28, 2.º Dto</div>
+            </div>
+            <div style={{ padding: '14px 16px', borderTop: '1px dashed var(--line)', background: 'var(--surface2)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
+                <span style={{ fontSize: 12, fontWeight: 700, letterSpacing: '.06em', textTransform: 'uppercase', color: 'var(--terra)' }}>Pedido #1042 · estruturado</span>
+                <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--amber)', background: 'var(--amberBg)', padding: '3px 8px', borderRadius: 6 }}>Em preparação</span>
               </div>
-              <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 9 }}>
-                {[
-                  { id: '#1042', desc: 'Margherita M · ½ Pepperoni ½ Funghi', status: 'Em preparação', statusColor: 'var(--amber)', statusBg: 'var(--amberBg)' },
-                  { id: '#1041', desc: '2× Diavola · entrega', status: 'Pronto', statusColor: 'var(--olive)', statusBg: 'var(--oliveBg)' },
-                  { id: '#1040', desc: 'Quattro Formaggi · recolha', status: 'Entregue', statusColor: 'var(--ink2)', statusBg: 'var(--bg2)' },
-                ].map(o => (
-                  <div key={o.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'var(--bg)', border: '1px solid var(--line2)', borderRadius: 11, padding: '12px 14px' }}>
-                    <div>
-                      <div style={{ fontWeight: 600, fontSize: 14 }}>Pedido {o.id}</div>
-                      <div style={{ fontSize: 12, color: 'var(--muted)' }}>{o.desc}</div>
-                    </div>
-                    <span style={{ fontSize: 10.5, fontWeight: 700, color: o.statusColor, background: o.statusBg, padding: '3px 8px', borderRadius: 6 }}>{o.status}</span>
-                  </div>
-                ))}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 7, fontSize: 13.5 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>Prato do dia</span><span style={{ color: 'var(--muted)' }}>€8,50</span></div>
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>Laranjada natural</span><span style={{ color: 'var(--muted)' }}>€2,50</span></div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px solid var(--line2)', paddingTop: 7, marginTop: 2, fontWeight: 700 }}><span>Total · entrega</span><span>€11,00</span></div>
               </div>
             </div>
           </div>

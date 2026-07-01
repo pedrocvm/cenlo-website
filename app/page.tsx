@@ -37,6 +37,50 @@ const orgSchema = {
   ],
 }
 
+function CentralDiagram() {
+  const cx = 210, cy = 155
+  const nodes = [
+    { x: 210, y: 38,  label: 'WhatsApp', lx: 210, ly: 18,  anchor: 'middle', delay: '0s' },
+    { x: 322, y: 114, label: 'Pedido',   lx: 368, ly: 118, anchor: 'start',  delay: '0.6s' },
+    { x: 282, y: 244, label: 'Reserva',  lx: 282, ly: 268, anchor: 'middle', delay: '1.2s' },
+    { x: 138, y: 244, label: 'Mensagem', lx: 138, ly: 268, anchor: 'middle', delay: '1.8s' },
+    { x: 98,  y: 114, label: 'Telefone', lx: 52,  ly: 118, anchor: 'end',    delay: '2.4s' },
+  ]
+  return (
+    <div style={{ background: 'var(--surface)', border: '1px solid var(--line)', borderRadius: 18, padding: '12px 8px 8px', boxShadow: '0 30px 60px -34px rgba(0,0,0,.45)' }}>
+      <svg viewBox="0 0 420 295" style={{ width: '100%', height: 'auto' }} aria-hidden="true">
+        <defs>
+          <style>{`
+            @keyframes cPulse { 0% { r:40; opacity:.35 } 100% { r:64; opacity:0 } }
+            .cPulse { animation: cPulse 2.6s ease-out infinite; }
+          `}</style>
+        </defs>
+        <circle cx={cx} cy={cy} r={40} fill="none" stroke="var(--terra)" strokeWidth={1.5} className="cPulse" />
+        <circle cx={cx} cy={cy} r={40} fill="none" stroke="var(--terra)" strokeWidth={1.5} className="cPulse" style={{ animationDelay: '1.3s' }} />
+        {nodes.map(n => (
+          <line key={n.label} x1={n.x} y1={n.y} x2={cx} y2={cy} stroke="var(--line)" strokeWidth={1} strokeDasharray="5 4" />
+        ))}
+        {nodes.map(n => (
+          <circle key={`d-${n.label}`} r={3.5} fill="var(--terra)">
+            <animateMotion dur="2s" repeatCount="indefinite" begin={n.delay} path={`M ${n.x} ${n.y} L ${cx} ${cy}`} />
+            <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;.08;.88;1" dur="2s" repeatCount="indefinite" begin={n.delay} />
+          </circle>
+        ))}
+        {nodes.map(n => (
+          <g key={`n-${n.label}`}>
+            <circle cx={n.x} cy={n.y} r={9} fill="var(--bg2)" stroke="var(--line)" strokeWidth={1.5} />
+            <circle cx={n.x} cy={n.y} r={3.5} fill="var(--terra)" />
+            <text x={n.lx} y={n.ly} textAnchor={n.anchor as 'middle'|'start'|'end'} fontSize={11} fontWeight={500} fill="var(--muted)" fontFamily="var(--font-hanken)">{n.label}</text>
+          </g>
+        ))}
+        <circle cx={cx} cy={cy} r={38} fill="var(--terraBtn)" />
+        <text x={cx} y={cy - 3} textAnchor="middle" fontSize={14} fontWeight={800} fill="white" fontFamily="var(--font-schibsted)">Cenlo</text>
+        <text x={cx} y={cy + 13} textAnchor="middle" fontSize={9} fill="rgba(255,255,255,.6)" fontFamily="var(--font-hanken)">central</text>
+      </svg>
+    </div>
+  )
+}
+
 function BadgeStyle({ status }: { status: 'Disponível' | 'Em breve' }) {
   if (status === 'Disponível') {
     return <span style={{ fontSize: 11.5, fontWeight: 700, color: 'var(--olive)', background: 'var(--oliveBg)', padding: '4px 10px', borderRadius: 7 }}>Disponível</span>
@@ -80,31 +124,8 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Hero mockup: conversa → pedido */}
-          <div style={{ position: 'relative' }} className="animate-fade-up-d">
-            <div style={{ background: 'var(--surface)', border: '1px solid var(--line)', borderRadius: 18, boxShadow: '0 30px 60px -34px rgba(0,0,0,.45)', overflow: 'hidden' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 9, padding: '13px 16px', borderBottom: '1px solid var(--line2)', background: 'var(--surface2)' }}>
-                <span style={{ width: 10, height: 10, borderRadius: '50%', background: '#25D366', display: 'inline-block' }} />
-                <span style={{ fontWeight: 600, fontSize: 14 }}>WhatsApp · O Tasco da Rua Nova</span>
-                <span style={{ marginLeft: 'auto', fontSize: 11.5, color: 'var(--muted)' }}>há 1 min</span>
-              </div>
-              <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 9, background: 'var(--bg)' }}>
-                <div style={{ alignSelf: 'flex-start', maxWidth: '78%', background: '#fff', border: '1px solid var(--line2)', padding: '9px 12px', borderRadius: '13px 13px 13px 4px', fontSize: 13.5, color: '#23201C' }}>Olá! Queria pedir para entrega — prato do dia e uma laranjada natural, por favor</div>
-                <div style={{ alignSelf: 'flex-end', maxWidth: '78%', background: '#DDF3D8', padding: '9px 12px', borderRadius: '13px 13px 4px 13px', fontSize: 13.5, color: '#23201C' }}>Claro! Qual a morada de entrega?</div>
-                <div style={{ alignSelf: 'flex-start', maxWidth: '78%', background: '#fff', border: '1px solid var(--line2)', padding: '9px 12px', borderRadius: '13px 13px 13px 4px', fontSize: 13.5, color: '#23201C' }}>Av. República 28, 2.º Dto</div>
-              </div>
-              <div style={{ padding: '14px 16px', borderTop: '1px dashed var(--line)', background: 'var(--surface2)' }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
-                  <span style={{ fontSize: 12, fontWeight: 700, letterSpacing: '.06em', textTransform: 'uppercase', color: 'var(--terra)' }}>Pedido #1042 · estruturado</span>
-                  <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--amber)', background: 'var(--amberBg)', padding: '3px 8px', borderRadius: 6 }}>Em preparação</span>
-                </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 7, fontSize: 13.5 }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>Prato do dia</span><span style={{ color: 'var(--muted)' }}>€8,50</span></div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>Laranjada natural</span><span style={{ color: 'var(--muted)' }}>€2,50</span></div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px solid var(--line2)', paddingTop: 7, marginTop: 2, fontWeight: 700 }}><span>Total · entrega</span><span>€11,00</span></div>
-                </div>
-              </div>
-            </div>
+          <div className="animate-fade-up-d">
+            <CentralDiagram />
           </div>
         </div>
       </section>
