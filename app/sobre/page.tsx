@@ -19,6 +19,61 @@ export const metadata: Metadata = {
   },
 }
 
+function CentralDiagram() {
+  const cx = 210, cy = 155
+  const nodes = [
+    { x: 210, y: 38,  label: 'WhatsApp', lx: 210, ly: 18,  anchor: 'middle', delay: '0s' },
+    { x: 322, y: 114, label: 'Pedido',   lx: 368, ly: 118, anchor: 'start',  delay: '0.6s' },
+    { x: 282, y: 244, label: 'Reserva',  lx: 282, ly: 268, anchor: 'middle', delay: '1.2s' },
+    { x: 138, y: 244, label: 'Mensagem', lx: 138, ly: 268, anchor: 'middle', delay: '1.8s' },
+    { x: 98,  y: 114, label: 'Telefone', lx: 52,  ly: 118, anchor: 'end',    delay: '2.4s' },
+  ]
+  return (
+    <div style={{ background: 'var(--surface)', border: '1px solid var(--line)', borderRadius: 16, padding: '12px 8px 8px' }}>
+      <svg viewBox="0 0 420 295" style={{ width: '100%', height: 'auto' }} aria-hidden="true">
+        <defs>
+          <style>{`
+            @keyframes cPulse { 0% { r:40; opacity:.35 } 100% { r:64; opacity:0 } }
+            .cPulse { animation: cPulse 2.6s ease-out infinite; }
+          `}</style>
+        </defs>
+
+        <circle cx={cx} cy={cy} r={40} fill="none" stroke="var(--terra)" strokeWidth={1.5} className="cPulse" />
+        <circle cx={cx} cy={cy} r={40} fill="none" stroke="var(--terra)" strokeWidth={1.5} className="cPulse" style={{ animationDelay: '1.3s' }} />
+
+        {nodes.map(n => (
+          <line key={n.label} x1={n.x} y1={n.y} x2={cx} y2={cy}
+            stroke="var(--line)" strokeWidth={1} strokeDasharray="5 4" />
+        ))}
+
+        {nodes.map(n => (
+          <circle key={`d-${n.label}`} r={3.5} fill="var(--terra)">
+            <animateMotion dur="2s" repeatCount="indefinite" begin={n.delay}
+              path={`M ${n.x} ${n.y} L ${cx} ${cy}`} />
+            <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;.08;.88;1"
+              dur="2s" repeatCount="indefinite" begin={n.delay} />
+          </circle>
+        ))}
+
+        {nodes.map(n => (
+          <g key={`n-${n.label}`}>
+            <circle cx={n.x} cy={n.y} r={9} fill="var(--bg2)" stroke="var(--line)" strokeWidth={1.5} />
+            <circle cx={n.x} cy={n.y} r={3.5} fill="var(--terra)" />
+            <text x={n.lx} y={n.ly} textAnchor={n.anchor as 'middle' | 'start' | 'end'}
+              fontSize={11} fontWeight={500} fill="var(--muted)" fontFamily="var(--font-hanken)">{n.label}</text>
+          </g>
+        ))}
+
+        <circle cx={cx} cy={cy} r={38} fill="var(--terraBtn)" />
+        <text x={cx} y={cy - 3} textAnchor="middle" fontSize={14} fontWeight={800}
+          fill="white" fontFamily="var(--font-schibsted)">Cenlo</text>
+        <text x={cx} y={cy + 13} textAnchor="middle" fontSize={9} fill="rgba(255,255,255,.6)"
+          fontFamily="var(--font-hanken)">central</text>
+      </svg>
+    </div>
+  )
+}
+
 export default function SobrePage() {
   return (
     <>
@@ -33,18 +88,7 @@ export default function SobrePage() {
               <Link href="/produtos" className="cta-primary" style={{ background: 'var(--surface)', color: 'var(--ink)', border: '1px solid var(--line)', padding: '15px 22px', borderRadius: 11, fontWeight: 600, fontSize: 16 }}>Conhecer produtos →</Link>
             </div>
           </div>
-          <div style={{ background: 'var(--surface)', border: '1px solid var(--line)', borderRadius: 16, overflow: 'hidden' }}>
-            <div style={{ padding: '12px 16px', borderBottom: '1px solid var(--line2)', background: 'var(--surface2)', display: 'flex', gap: 20 }}>
-              <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '.06em', flex: 1 }}>Antes</span>
-              <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--olive)', textTransform: 'uppercase', letterSpacing: '.06em', flex: 1 }}>Depois</span>
-            </div>
-            {beforeAfter.map(r => (
-              <div key={r.before} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', borderBottom: '1px solid var(--line2)' }}>
-                <div style={{ padding: '13px 16px', fontSize: 13.5, color: 'var(--muted)', borderRight: '1px solid var(--line2)' }}>{r.before}</div>
-                <div style={{ padding: '13px 16px', fontSize: 13.5, color: 'var(--ink)' }}>{r.after}</div>
-              </div>
-            ))}
-          </div>
+          <CentralDiagram />
         </div>
       </section>
 
