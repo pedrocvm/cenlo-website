@@ -74,7 +74,7 @@ function CentralDiagram() {
           </g>
         ))}
         <circle cx={cx} cy={cy} r={38} fill="var(--terraBtn)" />
-        <text x={cx} y={cy - 3} textAnchor="middle" fontSize={14} fontWeight={800} fill="white" fontFamily="var(--font-schibsted)">Cenlo</text>
+        <text x={cx} y={cy} textAnchor="middle" dominantBaseline="central" fontSize={14} fontWeight={800} fill="white" fontFamily="var(--font-schibsted)">Cenlo</text>
       </svg>
     </div>
   )
@@ -111,8 +111,8 @@ export default function Home() {
               <Link href="/contacto" className="cta-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: 9, background: 'var(--terraBtn)', color: '#fff', border: 'none', padding: '15px 24px', borderRadius: 11, fontWeight: 600, fontSize: 16, boxShadow: '0 8px 20px -10px var(--terra)' }}>
                 Pedir demonstração
               </Link>
-              <Link href="/pizza" className="cta-primary" style={{ background: 'var(--surface)', color: 'var(--ink)', border: '1px solid var(--line)', padding: '15px 22px', borderRadius: 11, fontWeight: 600, fontSize: 16 }}>
-                Ver como funciona →
+              <Link href="/produtos" className="cta-primary" style={{ background: 'var(--surface)', color: 'var(--ink)', border: '1px solid var(--line)', padding: '15px 22px', borderRadius: 11, fontWeight: 600, fontSize: 16 }}>
+                Ver produtos →
               </Link>
             </div>
             <p style={{ fontSize: 13, color: 'var(--muted)', marginTop: 10 }}>Demonstração curta, sem compromisso.</p>

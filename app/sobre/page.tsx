@@ -82,7 +82,7 @@ export default function SobrePage() {
         <h1 className="hd" style={{ fontSize: 52, marginTop: 14, fontFamily: 'var(--font-schibsted)', maxWidth: 760 }}>Construído em Portugal, para quem atende clientes todos os dias.</h1>
         <p style={{ fontSize: 20, color: 'var(--ink2)', marginTop: 22, maxWidth: 680 }}>A Cenlo nasceu para resolver isso, a começar pelos canais onde esses negócios já falam com os clientes: WhatsApp, mensagens e contacto direto.</p>
         <div style={{ borderLeft: '3px solid var(--terra)', padding: '6px 0 6px 24px', marginTop: 36, display: 'flex', flexDirection: 'column', gap: 18, maxWidth: 700 }}>
-          <p style={{ fontSize: 17, color: 'var(--ink2)' }}>A Cenlo nasce de uma observação simples: muitos negócios atendem, vendem e acompanham clientes todos os dias, mas ainda operam no improviso. O produto começou onde a dor é maior, no atendimento por WhatsApp, e cresce a partir daí.</p>
+          <p style={{ fontSize: 17, color: 'var(--ink2)' }}>A Cenlo nasce de uma observação simples: muitos negócios atendem, vendem e acompanham clientes todos os dias, mas ainda operam no improviso.</p>
           <p style={{ fontSize: 17, color: 'var(--ink2)' }}>O nome vem de <strong style={{ color: 'var(--ink)' }}>central + local</strong>: uma central inteligente que vive perto do negócio, não um sistema pesado e distante. Em vez de pedir para mudar tudo, a Cenlo organiza o que já existe.</p>
         </div>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginTop: 32 }}>
