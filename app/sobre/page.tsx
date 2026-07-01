@@ -23,12 +23,24 @@ export default function SobrePage() {
   return (
     <>
       <section style={{ maxWidth: 1160, margin: '0 auto', padding: '64px 24px 40px' }}>
-        <span style={{ fontSize: 13, fontWeight: 700, letterSpacing: '.08em', textTransform: 'uppercase', color: 'var(--terra)' }}>Sobre a Cenlo</span>
-        <h1 className="hd" style={{ fontSize: 46, marginTop: 14, fontFamily: 'var(--font-schibsted)', maxWidth: 680 }}>Construído em Portugal, para quem atende clientes todos os dias.</h1>
-        <p style={{ fontSize: 19, color: 'var(--ink2)', marginTop: 20, maxWidth: 580 }}>A Cenlo nasceu para resolver isso, a começar pelos canais onde esses negócios já falam com os clientes: WhatsApp, mensagens e contacto direto.</p>
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginTop: 28 }}>
-          <Link href="/contacto" className="cta-primary" style={{ background: 'var(--terraBtn)', color: '#fff', border: 'none', padding: '15px 24px', borderRadius: 11, fontWeight: 600, fontSize: 16, boxShadow: '0 8px 20px -10px var(--terra)' }}>Pedir demonstração</Link>
-          <Link href="/produtos" className="cta-primary" style={{ background: 'var(--surface)', color: 'var(--ink)', border: '1px solid var(--line)', padding: '15px 22px', borderRadius: 11, fontWeight: 600, fontSize: 16 }}>Conhecer produtos →</Link>
+        <div className="grid-two" style={{ display: 'grid', gridTemplateColumns: '1.1fr .9fr', gap: 54, alignItems: 'center' }}>
+          <div>
+            <span style={{ fontSize: 13, fontWeight: 700, letterSpacing: '.08em', textTransform: 'uppercase', color: 'var(--terra)' }}>Sobre a Cenlo</span>
+            <h1 className="hd" style={{ fontSize: 46, marginTop: 14, fontFamily: 'var(--font-schibsted)' }}>Construído em Portugal, para quem atende clientes todos os dias.</h1>
+            <p style={{ fontSize: 19, color: 'var(--ink2)', marginTop: 20 }}>A Cenlo nasceu para resolver isso, a começar pelos canais onde esses negócios já falam com os clientes: WhatsApp, mensagens e contacto direto.</p>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginTop: 28 }}>
+              <Link href="/contacto" className="cta-primary" style={{ background: 'var(--terraBtn)', color: '#fff', border: 'none', padding: '15px 24px', borderRadius: 11, fontWeight: 600, fontSize: 16, boxShadow: '0 8px 20px -10px var(--terra)' }}>Pedir demonstração</Link>
+              <Link href="/produtos" className="cta-primary" style={{ background: 'var(--surface)', color: 'var(--ink)', border: '1px solid var(--line)', padding: '15px 22px', borderRadius: 11, fontWeight: 600, fontSize: 16 }}>Conhecer produtos →</Link>
+            </div>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            {values.map(v => (
+              <div key={v.t} style={{ background: 'var(--surface)', border: '1px solid var(--line)', borderRadius: 13, padding: '18px 20px' }}>
+                <div style={{ fontFamily: 'var(--font-schibsted)', fontWeight: 700, fontSize: 16, color: 'var(--terra)' }}>{v.t}</div>
+                <p style={{ fontSize: 14, color: 'var(--ink2)', marginTop: 6 }}>{v.d}</p>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
