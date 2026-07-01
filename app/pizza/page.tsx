@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import FaqAccordion from '@/components/FaqAccordion'
-import { pizzaFor, pizzaProblems, pizzaSteps, pizzaFeatures, benefits, pizzaNot, demoSteps, faqs } from '@/lib/data'
+import { pizzaFor, pizzaProblems, pizzaSteps, pizzaFeatures, benefits, pizzaNot, demoSteps, faqs, pizzaE2ESteps } from '@/lib/data'
 
 export const metadata: Metadata = {
   title: 'Cenlo Pizza — pedidos por WhatsApp para pizzarias em Portugal',
@@ -254,6 +254,27 @@ export default function PizzaPage() {
               <span style={{ fontSize: 15, color: 'var(--ink2)' }}>{p}</span>
             </div>
           ))}
+        </div>
+      </section>
+
+      {/* E2E: DO GOOGLE À COZINHA */}
+      <section style={{ background: 'var(--bg2)', borderTop: '1px solid var(--line)', borderBottom: '1px solid var(--line)' }}>
+        <div style={{ maxWidth: 1160, margin: '0 auto', padding: '64px 24px' }}>
+          <span style={{ fontSize: 13, fontWeight: 700, letterSpacing: '.08em', textTransform: 'uppercase', color: 'var(--terra)' }}>Do pedido direto à cozinha</span>
+          <h2 style={{ fontSize: 34, marginTop: 12, fontFamily: 'var(--font-schibsted)', maxWidth: 560 }}>Do Google à cozinha da sua pizzaria.</h2>
+          <p style={{ fontSize: 17, color: 'var(--ink2)', marginTop: 16, maxWidth: 600 }}>O cliente que prefere pedir direto tem um caminho claro: do Google ao WhatsApp, sem comissão. O Cenlo organiza esses pedidos e todos os outros que já chegam à sua pizzaria.</p>
+          <div className="grid-four" style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 14, marginTop: 36 }}>
+            {pizzaE2ESteps.map(s => (
+              <div key={s.n} style={{ background: 'var(--surface)', border: '1px solid var(--line)', borderRadius: 14, padding: 20 }}>
+                <span style={{ display: 'flex', width: 30, height: 30, borderRadius: 8, background: 'var(--terraBg)', color: 'var(--terra)', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: 13, fontFamily: 'var(--font-schibsted)' }}>{s.n}</span>
+                <div style={{ fontWeight: 600, fontSize: 15.5, marginTop: 14 }}>{s.title}</div>
+                <p style={{ fontSize: 13.5, color: 'var(--ink2)', marginTop: 6 }}>{s.desc}</p>
+              </div>
+            ))}
+          </div>
+          <div style={{ marginTop: 22, background: 'var(--surface)', border: '1px solid var(--line)', borderRadius: 12, padding: '16px 18px', fontSize: 14.5, color: 'var(--ink2)' }}>
+            O cliente faz cada passo com um clique. Quando o pedido entra no Cenlo, a central organiza-o e encaminha-o para a cozinha. A recompra fica ao critério do dono: o Cenlo prepara a informação, e é o dono que decide quando e a quem contactar.
+          </div>
         </div>
       </section>
 

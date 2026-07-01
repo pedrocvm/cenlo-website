@@ -3,19 +3,19 @@ import Link from 'next/link'
 import { pains, flowMini, verticals, pizzaPills } from '@/lib/data'
 
 export const metadata: Metadata = {
-  title: 'Cenlo — central de pedidos por WhatsApp para negócios locais',
-  description: 'O Cenlo ajuda pizzarias e negócios locais a organizar pedidos e atendimento pelo WhatsApp, com menos pedidos perdidos, menos erros e mais clareza na operação.',
+  title: 'Cenlo — a central inteligente para negócios locais',
+  description: 'O Cenlo organiza atendimento, pedidos, reservas e clientes de negócios locais — pelos canais onde o seu cliente já fala consigo. Menos confusão na operação, mais clareza no fecho do dia.',
   alternates: { canonical: 'https://cenlo.pt' },
   openGraph: {
-    title: 'Cenlo — central de pedidos por WhatsApp para negócios locais',
-    description: 'O Cenlo ajuda pizzarias e negócios locais a organizar pedidos e atendimento pelo WhatsApp, com menos pedidos perdidos, menos erros e mais clareza na operação.',
+    title: 'Cenlo — a central inteligente para negócios locais',
+    description: 'O Cenlo organiza atendimento, pedidos, reservas e clientes de negócios locais — pelos canais onde o seu cliente já fala consigo. Menos confusão na operação, mais clareza no fecho do dia.',
     url: 'https://cenlo.pt',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Cenlo — central de pedidos por WhatsApp para negócios locais',
-    description: 'O Cenlo ajuda pizzarias e negócios locais a organizar pedidos e atendimento pelo WhatsApp, com menos pedidos perdidos, menos erros e mais clareza na operação.',
+    title: 'Cenlo — a central inteligente para negócios locais',
+    description: 'O Cenlo organiza atendimento, pedidos, reservas e clientes de negócios locais — pelos canais onde o seu cliente já fala consigo. Menos confusão na operação, mais clareza no fecho do dia.',
   },
 }
 
@@ -26,7 +26,7 @@ const orgSchema = {
       '@type': 'Organization',
       name: 'Cenlo',
       url: 'https://cenlo.pt',
-      description: 'Central de pedidos por WhatsApp para negócios locais em Portugal.',
+      description: 'Central inteligente de atendimento, pedidos, reservas e clientes para negócios locais em Portugal.',
       contactPoint: { '@type': 'ContactPoint', email: 'ola@cenlo.pt', contactType: 'customer service' },
     },
     {
@@ -59,10 +59,10 @@ export default function Home() {
         <div className="grid-two" style={{ position: 'relative', zIndex: 1, display: 'grid', gridTemplateColumns: '1.05fr .95fr', gap: 54, alignItems: 'center' }}>
           <div className="animate-fade-up">
             <h1 className="hd" style={{ fontSize: 52, margin: 0, fontWeight: 800, fontFamily: 'var(--font-schibsted)' }}>
-              Pare de perder pedidos no WhatsApp. Organize a operação num só lugar.
+              Pare de perder pedidos e clientes. Organize a operação num só lugar.
             </h1>
             <p style={{ fontSize: 18.5, color: 'var(--ink2)', marginTop: 20, maxWidth: 520 }}>
-              Transforma conversas soltas em pedidos claros, clientes registados e números no fecho do dia. Sem trocar a forma como o seu cliente já fala consigo.
+              Transforma conversas, pedidos e reservas em operação clara — por mensagem, telefone ou presencialmente. Sem trocar a forma como o seu cliente já fala consigo.
             </p>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginTop: 30 }}>
               <Link href="/contacto" className="cta-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: 9, background: 'var(--terraBtn)', color: '#fff', border: 'none', padding: '15px 24px', borderRadius: 11, fontWeight: 600, fontSize: 16, boxShadow: '0 8px 20px -10px var(--terra)' }}>
@@ -82,17 +82,16 @@ export default function Home() {
 
           {/* Hero mockup: conversa → pedido */}
           <div style={{ position: 'relative' }} className="animate-fade-up-d">
-            <div style={{ position: 'absolute', top: -14, right: -6, zIndex: 2, background: 'var(--terraBtn)', color: '#fff', fontSize: 11, fontWeight: 600, padding: '5px 10px', borderRadius: 7 }}>Cenlo Pizza</div>
             <div style={{ background: 'var(--surface)', border: '1px solid var(--line)', borderRadius: 18, boxShadow: '0 30px 60px -34px rgba(0,0,0,.45)', overflow: 'hidden' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 9, padding: '13px 16px', borderBottom: '1px solid var(--line2)', background: 'var(--surface2)' }}>
                 <span style={{ width: 10, height: 10, borderRadius: '50%', background: '#25D366', display: 'inline-block' }} />
-                <span style={{ fontWeight: 600, fontSize: 14 }}>WhatsApp · Bella Napoli</span>
+                <span style={{ fontWeight: 600, fontSize: 14 }}>WhatsApp · O Tasco da Rua Nova</span>
                 <span style={{ marginLeft: 'auto', fontSize: 11.5, color: 'var(--muted)' }}>há 1 min</span>
               </div>
               <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 9, background: 'var(--bg)' }}>
-                <div style={{ alignSelf: 'flex-start', maxWidth: '78%', background: '#fff', border: '1px solid var(--line2)', padding: '9px 12px', borderRadius: '13px 13px 13px 4px', fontSize: 13.5, color: '#23201C' }}>Boa noite! Queria uma Margherita média e meia Pepperoni meia Funghi 🍕</div>
-                <div style={{ alignSelf: 'flex-end', maxWidth: '78%', background: '#DDF3D8', padding: '9px 12px', borderRadius: '13px 13px 4px 13px', fontSize: 13.5, color: '#23201C' }}>Anotado! Entrega ou recolha?</div>
-                <div style={{ alignSelf: 'flex-start', maxWidth: '78%', background: '#fff', border: '1px solid var(--line2)', padding: '9px 12px', borderRadius: '13px 13px 13px 4px', fontSize: 13.5, color: '#23201C' }}>Entrega, Rua das Flores 12</div>
+                <div style={{ alignSelf: 'flex-start', maxWidth: '78%', background: '#fff', border: '1px solid var(--line2)', padding: '9px 12px', borderRadius: '13px 13px 13px 4px', fontSize: 13.5, color: '#23201C' }}>Olá! Queria pedir para entrega — prato do dia e uma laranjada natural, por favor</div>
+                <div style={{ alignSelf: 'flex-end', maxWidth: '78%', background: '#DDF3D8', padding: '9px 12px', borderRadius: '13px 13px 4px 13px', fontSize: 13.5, color: '#23201C' }}>Claro! Qual a morada de entrega?</div>
+                <div style={{ alignSelf: 'flex-start', maxWidth: '78%', background: '#fff', border: '1px solid var(--line2)', padding: '9px 12px', borderRadius: '13px 13px 13px 4px', fontSize: 13.5, color: '#23201C' }}>Av. República 28, 2.º Dto</div>
               </div>
               <div style={{ padding: '14px 16px', borderTop: '1px dashed var(--line)', background: 'var(--surface2)' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
@@ -100,9 +99,9 @@ export default function Home() {
                   <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--amber)', background: 'var(--amberBg)', padding: '3px 8px', borderRadius: 6 }}>Em preparação</span>
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 7, fontSize: 13.5 }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>Pizza Margherita · M</span><span style={{ color: 'var(--muted)' }}>€8,50</span></div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>½ Pepperoni · ½ Funghi · M</span><span style={{ color: 'var(--muted)' }}>€9,90</span></div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px solid var(--line2)', paddingTop: 7, marginTop: 2, fontWeight: 700 }}><span>Total · entrega</span><span>€18,40</span></div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>Prato do dia</span><span style={{ color: 'var(--muted)' }}>€8,50</span></div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}><span>Laranjada natural</span><span style={{ color: 'var(--muted)' }}>€2,50</span></div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px solid var(--line2)', paddingTop: 7, marginTop: 2, fontWeight: 700 }}><span>Total · entrega</span><span>€11,00</span></div>
                 </div>
               </div>
             </div>
@@ -214,9 +213,9 @@ export default function Home() {
       <section style={{ maxWidth: 1160, margin: '0 auto', padding: '72px 24px 84px' }}>
         <div className="grid-two" style={{ background: 'var(--panel)', color: '#F4EBDC', borderRadius: 22, overflow: 'hidden', display: 'grid', gridTemplateColumns: '1.05fr .95fr' }}>
           <div style={{ padding: '48px 44px' }}>
-            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'rgba(255,106,44,.22)', color: '#FFB68F', padding: '6px 13px', borderRadius: 999, fontSize: 13, fontWeight: 600 }}>Produto disponível agora</span>
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'rgba(255,106,44,.22)', color: '#FFB68F', padding: '6px 13px', borderRadius: 999, fontSize: 13, fontWeight: 600 }}>Primeiro produto disponível</span>
             <h2 style={{ fontSize: 38, color: '#fff', marginTop: 18, fontFamily: 'var(--font-schibsted)' }}>Cenlo Pizza: os pedidos da sua pizzaria, finalmente organizados.</h2>
-            <p style={{ fontSize: 17, color: '#C9BCA8', marginTop: 16, maxWidth: 460 }}>Organiza o atendimento em pedidos claros, envia para a cozinha, regista clientes e mostra o que aconteceu no dia. Menos pedidos perdidos, menos erros na cozinha, mais clareza na operação.</p>
+            <p style={{ fontSize: 17, color: '#C9BCA8', marginTop: 16, maxWidth: 460 }}>Organiza o atendimento em pedidos claros, envia para a cozinha, regista clientes e mostra o que aconteceu no dia. É o primeiro produto disponível — de uma família de centrais Cenlo pensadas para cada tipo de negócio local.</p>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginTop: 28 }}>
               <Link href="/contacto" className="cta-primary" style={{ background: 'var(--terraBtn)', color: '#fff', border: 'none', padding: '14px 22px', borderRadius: 11, fontWeight: 600, fontSize: 16 }}>Pedir demonstração</Link>
               <Link href="/pizza" className="cta-primary" style={{ background: 'transparent', color: '#fff', border: '1px solid rgba(255,255,255,.28)', padding: '14px 22px', borderRadius: 11, fontWeight: 600, fontSize: 16 }}>Ver o Cenlo Pizza →</Link>

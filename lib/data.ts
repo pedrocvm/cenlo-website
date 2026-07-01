@@ -42,11 +42,11 @@ export const glossary = [
 ]
 
 export const pizzaFor = [
-  'Pizzarias em Portugal',
-  'Pizzarias que recebem pedidos por WhatsApp',
-  'Operações com entrega e/ou recolha',
-  'Donos que controlam tudo por mensagem, papel, memória ou folhas de cálculo',
-  'Pizzarias que usam apps de entrega, mas querem organizar melhor o canal próprio',
+  'Pizzarias onde já houve pedidos perdidos nas mensagens',
+  'Donos que gerem a operação por mensagem, papel ou memória',
+  'Operações com entrega e recolha em simultâneo',
+  'Quem quer fechar o dia sabendo o que vendeu, sem reconstituir tudo da memória',
+  'Pizzarias nos apps de entrega que querem organizar também o canal próprio',
 ]
 
 export const pizzaProblems = [
@@ -96,6 +96,13 @@ export const demoSteps = [
   { n: '1', t: 'Marcamos uma conversa curta sobre a sua pizzaria.' },
   { n: '2', t: 'Mostramos a central com o menu e o fluxo da sua operação.' },
   { n: '3', t: 'Acompanhamos os primeiros dias de perto.' },
+]
+
+export const pizzaE2ESteps = [
+  { n: 'A', title: 'O cliente encontra a pizzaria no Google', desc: 'O perfil da pizzaria aparece quando alguém pesquisa pizza perto de si. Um perfil bem preenchido é o que faz o cliente clicar.' },
+  { n: 'B', title: 'Abre o site e escolhe o pedido', desc: 'O site da pizzaria mostra o menu. O cliente escolhe e monta o pedido pelo telemóvel.' },
+  { n: 'C', title: 'Pede pelo WhatsApp com um clique', desc: 'O site monta o pedido e abre o WhatsApp com tudo preenchido. O cliente clica em enviar.' },
+  { n: 'D', title: 'O pedido entra no Cenlo, vai para a cozinha', desc: 'O pedido aparece na dashboard e segue para o painel de cozinha. O cliente fica registado para recompra futura.' },
 ]
 
 export const faqs = [
