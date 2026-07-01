@@ -22,18 +22,18 @@ export const metadata: Metadata = {
 export default function SobrePage() {
   return (
     <>
-      <section style={{ maxWidth: 820, margin: '0 auto', padding: '72px 24px 40px' }}>
+      <section style={{ maxWidth: 1160, margin: '0 auto', padding: '64px 24px 40px' }}>
         <span style={{ fontSize: 13, fontWeight: 700, letterSpacing: '.08em', textTransform: 'uppercase', color: 'var(--terra)' }}>Sobre a Cenlo</span>
-        <h1 className="hd" style={{ fontSize: 46, marginTop: 14, fontFamily: 'var(--font-schibsted)' }}>Construído em Portugal, para quem atende clientes todos os dias.</h1>
-        <p style={{ fontSize: 19, color: 'var(--ink2)', marginTop: 20 }}>A Cenlo nasceu para resolver isso, a começar pelos canais onde esses negócios já falam com os clientes: WhatsApp, mensagens e contacto direto.</p>
+        <h1 className="hd" style={{ fontSize: 46, marginTop: 14, fontFamily: 'var(--font-schibsted)', maxWidth: 680 }}>Construído em Portugal, para quem atende clientes todos os dias.</h1>
+        <p style={{ fontSize: 19, color: 'var(--ink2)', marginTop: 20, maxWidth: 580 }}>A Cenlo nasceu para resolver isso, a começar pelos canais onde esses negócios já falam com os clientes: WhatsApp, mensagens e contacto direto.</p>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginTop: 28 }}>
           <Link href="/contacto" className="cta-primary" style={{ background: 'var(--terraBtn)', color: '#fff', border: 'none', padding: '15px 24px', borderRadius: 11, fontWeight: 600, fontSize: 16, boxShadow: '0 8px 20px -10px var(--terra)' }}>Pedir demonstração</Link>
           <Link href="/produtos" className="cta-primary" style={{ background: 'var(--surface)', color: 'var(--ink)', border: '1px solid var(--line)', padding: '15px 22px', borderRadius: 11, fontWeight: 600, fontSize: 16 }}>Conhecer produtos →</Link>
         </div>
       </section>
 
-      <section style={{ maxWidth: 820, margin: '0 auto', padding: '8px 24px 20px' }}>
-        <div style={{ borderLeft: '3px solid var(--terra)', padding: '6px 0 6px 24px', display: 'flex', flexDirection: 'column', gap: 18 }}>
+      <section style={{ maxWidth: 1160, margin: '0 auto', padding: '8px 24px 20px' }}>
+        <div style={{ borderLeft: '3px solid var(--terra)', padding: '6px 0 6px 24px', display: 'flex', flexDirection: 'column', gap: 18, maxWidth: 680 }}>
           <p style={{ fontSize: 17, color: 'var(--ink2)' }}>A Cenlo nasce de uma observação simples: muitos negócios atendem, vendem e acompanham clientes todos os dias, mas ainda operam no improviso. O produto começou onde a dor é maior, no atendimento por WhatsApp, e cresce a partir daí.</p>
           <p style={{ fontSize: 17, color: 'var(--ink2)' }}>O nome vem de <strong style={{ color: 'var(--ink)' }}>central + local</strong>: uma central inteligente que vive perto do negócio, não um sistema pesado e distante. Em vez de pedir para mudar tudo, a Cenlo organiza o que já existe.</p>
         </div>

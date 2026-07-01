@@ -33,7 +33,7 @@ export default function Header() {
   }
 
   return (
-    <header style={{ position: 'sticky', top: 0, zIndex: 50, background: 'rgba(11,11,15,.78)', backdropFilter: 'blur(12px)', borderBottom: '1px solid var(--line)' }}>
+    <header style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 50, background: 'rgba(11,11,15,.78)', backdropFilter: 'blur(12px)', borderBottom: '1px solid var(--line)' }}>
       <div style={{ maxWidth: 1160, margin: '0 auto', padding: '0 24px', height: 68, display: 'flex', alignItems: 'center', gap: 28 }}>
         <Link href="/" aria-label="Início Cenlo" style={{ background: 'none', border: 'none', padding: 0, display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
           <Logo />

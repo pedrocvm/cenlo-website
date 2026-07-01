@@ -23,10 +23,10 @@ const schibsted = Schibsted_Grotesk({
 export const metadata: Metadata = {
   metadataBase: new URL('https://cenlo.pt'),
   title: {
-    default: 'Cenlo — central de pedidos por WhatsApp para negócios locais',
+    default: 'Cenlo — a central inteligente para negócios locais',
     template: '%s',
   },
-  description: 'O Cenlo ajuda pizzarias e negócios locais a organizar pedidos e atendimento pelo WhatsApp, com menos pedidos perdidos, menos erros e mais clareza na operação.',
+  description: 'O Cenlo organiza atendimento, pedidos, reservas e clientes de negócios locais — pelos canais onde o seu cliente já fala consigo.',
   openGraph: {
     type: 'website',
     locale: 'pt_PT',
@@ -51,7 +51,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <PrivacyProvider>
           <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
             <Header />
-            <main style={{ flex: 1 }}>{children}</main>
+            <main style={{ flex: 1, paddingTop: 68 }}>{children}</main>
             <Footer />
           </div>
           <PrivacyModal />
