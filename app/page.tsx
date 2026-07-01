@@ -75,7 +75,6 @@ function CentralDiagram() {
         ))}
         <circle cx={cx} cy={cy} r={38} fill="var(--terraBtn)" />
         <text x={cx} y={cy - 3} textAnchor="middle" fontSize={14} fontWeight={800} fill="white" fontFamily="var(--font-schibsted)">Cenlo</text>
-        <text x={cx} y={cy + 13} textAnchor="middle" fontSize={9} fill="rgba(255,255,255,.6)" fontFamily="var(--font-hanken)">central</text>
       </svg>
     </div>
   )
