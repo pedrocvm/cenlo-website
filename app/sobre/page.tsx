@@ -33,11 +33,15 @@ export default function SobrePage() {
               <Link href="/produtos" className="cta-primary" style={{ background: 'var(--surface)', color: 'var(--ink)', border: '1px solid var(--line)', padding: '15px 22px', borderRadius: 11, fontWeight: 600, fontSize: 16 }}>Conhecer produtos →</Link>
             </div>
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-            {values.map(v => (
-              <div key={v.t} style={{ background: 'var(--surface)', border: '1px solid var(--line)', borderRadius: 13, padding: '18px 20px' }}>
-                <div style={{ fontFamily: 'var(--font-schibsted)', fontWeight: 700, fontSize: 16, color: 'var(--terra)' }}>{v.t}</div>
-                <p style={{ fontSize: 14, color: 'var(--ink2)', marginTop: 6 }}>{v.d}</p>
+          <div style={{ background: 'var(--surface)', border: '1px solid var(--line)', borderRadius: 16, overflow: 'hidden' }}>
+            <div style={{ padding: '12px 16px', borderBottom: '1px solid var(--line2)', background: 'var(--surface2)', display: 'flex', gap: 20 }}>
+              <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '.06em', flex: 1 }}>Antes</span>
+              <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--olive)', textTransform: 'uppercase', letterSpacing: '.06em', flex: 1 }}>Depois</span>
+            </div>
+            {beforeAfter.map(r => (
+              <div key={r.before} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', borderBottom: '1px solid var(--line2)' }}>
+                <div style={{ padding: '13px 16px', fontSize: 13.5, color: 'var(--muted)', borderRight: '1px solid var(--line2)' }}>{r.before}</div>
+                <div style={{ padding: '13px 16px', fontSize: 13.5, color: 'var(--ink)' }}>{r.after}</div>
               </div>
             ))}
           </div>
