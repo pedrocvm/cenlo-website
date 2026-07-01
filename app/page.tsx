@@ -4,18 +4,18 @@ import { pains, flowMini, verticals, pizzaPills } from '@/lib/data'
 
 export const metadata: Metadata = {
   title: 'Cenlo — a central inteligente para negócios locais',
-  description: 'O Cenlo organiza atendimento, pedidos, reservas e clientes de negócios locais — pelos canais onde o seu cliente já fala consigo. Menos confusão na operação, mais clareza no fecho do dia.',
+  description: 'O Cenlo organiza atendimento, pedidos, reservas e clientes de negócios locais pelos canais onde o seu cliente já fala consigo. Menos confusão na operação, mais clareza no fecho do dia.',
   alternates: { canonical: 'https://cenlo.pt' },
   openGraph: {
     title: 'Cenlo — a central inteligente para negócios locais',
-    description: 'O Cenlo organiza atendimento, pedidos, reservas e clientes de negócios locais — pelos canais onde o seu cliente já fala consigo. Menos confusão na operação, mais clareza no fecho do dia.',
+    description: 'O Cenlo organiza atendimento, pedidos, reservas e clientes de negócios locais pelos canais onde o seu cliente já fala consigo. Menos confusão na operação, mais clareza no fecho do dia.',
     url: 'https://cenlo.pt',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Cenlo — a central inteligente para negócios locais',
-    description: 'O Cenlo organiza atendimento, pedidos, reservas e clientes de negócios locais — pelos canais onde o seu cliente já fala consigo. Menos confusão na operação, mais clareza no fecho do dia.',
+    description: 'O Cenlo organiza atendimento, pedidos, reservas e clientes de negócios locais pelos canais onde o seu cliente já fala consigo. Menos confusão na operação, mais clareza no fecho do dia.',
   },
 }
 
@@ -105,7 +105,7 @@ export default function Home() {
               Pare de perder pedidos e clientes. Organize a operação num só lugar.
             </h1>
             <p style={{ fontSize: 18.5, color: 'var(--ink2)', marginTop: 20, maxWidth: 520 }}>
-              Transforma conversas, pedidos e reservas em operação clara — por mensagem, telefone ou presencialmente. Sem trocar a forma como o seu cliente já fala consigo.
+              Transforma conversas, pedidos e reservas em operação clara por mensagem, telefone ou presencialmente. Sem trocar a forma como o seu cliente já fala consigo.
             </p>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginTop: 30 }}>
               <Link href="/contacto" className="cta-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: 9, background: 'var(--terraBtn)', color: '#fff', border: 'none', padding: '15px 24px', borderRadius: 11, fontWeight: 600, fontSize: 16, boxShadow: '0 8px 20px -10px var(--terra)' }}>
@@ -235,7 +235,7 @@ export default function Home() {
           <div style={{ padding: '48px 44px' }}>
             <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'rgba(255,106,44,.22)', color: '#FFB68F', padding: '6px 13px', borderRadius: 999, fontSize: 13, fontWeight: 600 }}>Primeiro produto disponível</span>
             <h2 style={{ fontSize: 38, color: '#fff', marginTop: 18, fontFamily: 'var(--font-schibsted)' }}>Cenlo Pizza: os pedidos da sua pizzaria, finalmente organizados.</h2>
-            <p style={{ fontSize: 17, color: '#C9BCA8', marginTop: 16, maxWidth: 460 }}>Organiza o atendimento em pedidos claros, envia para a cozinha, regista clientes e mostra o que aconteceu no dia. É o primeiro produto disponível — de uma família de centrais Cenlo pensadas para cada tipo de negócio local.</p>
+            <p style={{ fontSize: 17, color: '#C9BCA8', marginTop: 16, maxWidth: 460 }}>Organiza o atendimento em pedidos claros, envia para a cozinha, regista clientes e mostra o que aconteceu no dia. É o primeiro produto disponível de uma família de centrais Cenlo pensadas para cada tipo de negócio local.</p>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginTop: 28 }}>
               <Link href="/contacto" className="cta-primary" style={{ background: 'var(--terraBtn)', color: '#fff', border: 'none', padding: '14px 22px', borderRadius: 11, fontWeight: 600, fontSize: 16 }}>Pedir demonstração</Link>
               <Link href="/pizza" className="cta-primary" style={{ background: 'transparent', color: '#fff', border: '1px solid rgba(255,255,255,.28)', padding: '14px 22px', borderRadius: 11, fontWeight: 600, fontSize: 16 }}>Ver o Cenlo Pizza →</Link>

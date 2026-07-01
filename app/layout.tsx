@@ -26,7 +26,7 @@ export const metadata: Metadata = {
     default: 'Cenlo — a central inteligente para negócios locais',
     template: '%s',
   },
-  description: 'O Cenlo organiza atendimento, pedidos, reservas e clientes de negócios locais — pelos canais onde o seu cliente já fala consigo.',
+  description: 'O Cenlo organiza atendimento, pedidos, reservas e clientes de negócios locais pelos canais onde o seu cliente já fala consigo.',
   openGraph: {
     type: 'website',
     locale: 'pt_PT',

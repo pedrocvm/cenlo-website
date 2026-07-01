@@ -190,7 +190,7 @@ export default function PizzaPage() {
           <div>
             <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'var(--oliveBg)', color: 'var(--olive)', padding: '6px 13px', borderRadius: 999, fontSize: 13, fontWeight: 700 }}>Já em operação</span>
             <h1 className="hd" style={{ fontSize: 50, marginTop: 18, fontFamily: 'var(--font-schibsted)' }}>Os pedidos da sua pizzaria, finalmente organizados.</h1>
-            <p style={{ fontSize: 18.5, color: 'var(--ink2)', marginTop: 18, maxWidth: 520 }}>Recebe o pedido no WhatsApp, estrutura-o, manda-o para a cozinha e regista o cliente — com menos enganos e menos pedidos perdidos.</p>
+            <p style={{ fontSize: 18.5, color: 'var(--ink2)', marginTop: 18, maxWidth: 520 }}>Recebe o pedido no WhatsApp, estrutura-o, manda-o para a cozinha e regista o cliente, com menos enganos e menos pedidos perdidos.</p>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginTop: 28 }}>
               <Link href="/contacto" className="cta-primary" style={{ background: 'var(--terraBtn)', color: '#fff', border: 'none', padding: '15px 24px', borderRadius: 11, fontWeight: 600, fontSize: 16, boxShadow: '0 8px 20px -10px var(--terra)' }}>Pedir demonstração</Link>
               <a href="#como-funciona" className="cta-primary" style={{ background: 'var(--surface)', border: '1px solid var(--line)', padding: '15px 22px', borderRadius: 11, fontWeight: 600, fontSize: 16, display: 'inline-flex', alignItems: 'center' }}>Ver como funciona</a>
@@ -206,7 +206,7 @@ export default function PizzaPage() {
               <span style={{ marginLeft: 'auto', fontSize: 11.5, color: 'var(--muted)' }}>há 1 min</span>
             </div>
             <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 9, background: 'var(--bg)' }}>
-              <div style={{ alignSelf: 'flex-start', maxWidth: '78%', background: '#fff', border: '1px solid var(--line2)', padding: '9px 12px', borderRadius: '13px 13px 13px 4px', fontSize: 13.5, color: '#23201C' }}>Olá! Queria pedir para entrega — prato do dia e uma laranjada natural, por favor</div>
+              <div style={{ alignSelf: 'flex-start', maxWidth: '78%', background: '#fff', border: '1px solid var(--line2)', padding: '9px 12px', borderRadius: '13px 13px 13px 4px', fontSize: 13.5, color: '#23201C' }}>Olá! Queria pedir para entrega um prato do dia e um sumo de laranja natural, por favor</div>
               <div style={{ alignSelf: 'flex-end', maxWidth: '78%', background: '#DDF3D8', padding: '9px 12px', borderRadius: '13px 13px 4px 13px', fontSize: 13.5, color: '#23201C' }}>Claro! Qual a morada de entrega?</div>
               <div style={{ alignSelf: 'flex-start', maxWidth: '78%', background: '#fff', border: '1px solid var(--line2)', padding: '9px 12px', borderRadius: '13px 13px 13px 4px', fontSize: 13.5, color: '#23201C' }}>Av. República 28, 2.º Dto</div>
             </div>
