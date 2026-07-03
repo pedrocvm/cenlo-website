@@ -6,7 +6,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const legal = ['/politica-de-privacidade', '/termos']
   return routes.map(r => ({
     url: `${base}${r}`,
-    lastModified: new Date('2026-06-27'),
+    lastModified: new Date(),
     changeFrequency: 'monthly' as const,
     priority: r === '' ? 1 : r === '/pizza' ? 0.9 : legal.includes(r) ? 0.3 : 0.7,
   }))
