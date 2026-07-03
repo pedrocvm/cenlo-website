@@ -77,7 +77,8 @@ function CentralDiagram() {
 export default function SobrePage() {
   return (
     <>
-      <section style={{ maxWidth: 1160, margin: '0 auto', padding: '64px 24px 56px' }}>
+      <section style={{ position: 'relative', maxWidth: 1160, margin: '0 auto', padding: '64px 24px 56px' }}>
+        <div aria-hidden="true" style={{ position: 'absolute', top: -40, left: -120, width: 560, height: 560, background: 'radial-gradient(ellipse 560px 420px at center, rgba(255,106,44,.09) 0%, transparent 65%)', pointerEvents: 'none' }} />
         <span style={{ fontSize: 13, fontWeight: 700, letterSpacing: '.08em', textTransform: 'uppercase', color: 'var(--terra)' }}>Sobre a Cenlo</span>
         <h1 className="hd" style={{ fontSize: 52, marginTop: 14, fontFamily: 'var(--font-schibsted)', maxWidth: 760 }}>Construído em Portugal, para quem atende clientes todos os dias.</h1>
         <p style={{ fontSize: 20, color: 'var(--ink2)', marginTop: 22, maxWidth: 680 }}>A Cenlo nasceu para resolver isso, a começar pelos canais onde esses negócios já falam com os clientes: WhatsApp, mensagens e contacto direto.</p>
@@ -124,7 +125,8 @@ export default function SobrePage() {
       </section>
 
       <section style={{ maxWidth: 1160, margin: '0 auto', padding: '0 24px 80px' }}>
-        <div style={{ background: 'var(--panel)', color: '#F4EBDC', borderRadius: 20, padding: 48, textAlign: 'center' }}>
+        <div style={{ position: 'relative', background: 'var(--panel)', color: '#F4EBDC', borderRadius: 20, padding: 48, textAlign: 'center', overflow: 'hidden' }}>
+          <div aria-hidden="true" style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse 800px 500px at 50% -20%, rgba(255,106,44,.13) 0%, transparent 65%)', pointerEvents: 'none', borderRadius: 20 }} />
           <p style={{ fontFamily: 'var(--font-schibsted)', fontSize: 26, color: '#fff', maxWidth: 680, margin: '0 auto', lineHeight: 1.25 }}>
             &ldquo;Quem atende clientes todos os dias não precisa de mais tecnologia. Precisa de ordem no que já faz, para fechar mais negócio e trazer clientes de volta.&rdquo;
           </p>

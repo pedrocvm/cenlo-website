@@ -22,7 +22,8 @@ export const metadata: Metadata = {
 export default function ProdutosPage() {
   return (
     <>
-      <section style={{ maxWidth: 1160, margin: '0 auto', padding: '64px 24px 40px' }}>
+      <section style={{ position: 'relative', maxWidth: 1160, margin: '0 auto', padding: '64px 24px 40px' }}>
+        <div aria-hidden="true" style={{ position: 'absolute', top: -60, right: -80, width: 700, height: 320, background: 'radial-gradient(ellipse 700px 320px at center, rgba(255,106,44,.10) 0%, transparent 65%)', pointerEvents: 'none' }} />
         <span style={{ fontSize: 13, fontWeight: 700, letterSpacing: '.08em', textTransform: 'uppercase', color: 'var(--terra)' }}>Produtos Cenlo</span>
         <h1 className="hd" style={{ fontSize: 46, marginTop: 14, maxWidth: 760, fontFamily: 'var(--font-schibsted)' }}>Uma central para cada tipo de negócio local. A começar pela sua pizzaria.</h1>
         <p style={{ fontSize: 18, color: 'var(--ink2)', marginTop: 16, maxWidth: 600 }}>Cada central construída a partir dos problemas reais de quem opera esse negócio todos os dias.</p>
@@ -86,7 +87,8 @@ export default function ProdutosPage() {
       </section>
 
       {/* CTA */}
-      <section style={{ maxWidth: 1160, margin: '0 auto', padding: '60px 24px 84px', textAlign: 'center' }}>
+      <section style={{ position: 'relative', maxWidth: 1160, margin: '0 auto', padding: '60px 24px 84px', textAlign: 'center' }}>
+        <div aria-hidden="true" style={{ position: 'absolute', bottom: 0, left: '50%', transform: 'translateX(-50%)', width: 800, height: 300, background: 'radial-gradient(ellipse 800px 300px at center bottom, rgba(255,106,44,.10) 0%, transparent 65%)', pointerEvents: 'none' }} />
         <h2 style={{ fontSize: 32, maxWidth: 560, margin: '0 auto', fontFamily: 'var(--font-schibsted)' }}>Precisa de uma solução à medida? Construímos para o seu negócio.</h2>
         <p style={{ fontSize: 16.5, color: 'var(--ink2)', margin: '12px auto 0', maxWidth: 480 }}>Seja qual for o seu setor, diga-nos o que faz e desenhamos uma central à medida das necessidades da sua empresa.</p>
         <Link href="/contacto" className="cta-primary" style={{ display: 'inline-block', marginTop: 24, background: 'var(--terraBtn)', color: '#fff', border: 'none', padding: '15px 26px', borderRadius: 11, fontWeight: 600, fontSize: 16 }}>Falar connosco</Link>

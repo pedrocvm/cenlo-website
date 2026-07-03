@@ -96,8 +96,8 @@ export default function Home() {
       />
 
       {/* HERO */}
-      <section style={{ position: 'relative', maxWidth: 1160, margin: '0 auto', padding: '64px 24px 40px', overflow: 'hidden' }}>
-        <div aria-hidden="true" style={{ position: 'absolute', top: -180, right: -120, width: 560, height: 560, borderRadius: '50%', background: 'radial-gradient(circle,rgba(255,106,44,.20),rgba(255,106,44,0) 65%)', pointerEvents: 'none', zIndex: 0 }} />
+      <section style={{ position: 'relative', maxWidth: 1160, margin: '0 auto', padding: '64px 24px 40px' }}>
+        <div aria-hidden="true" style={{ position: 'absolute', top: -120, right: -80, width: 560, height: 560, borderRadius: '50%', background: 'radial-gradient(circle,rgba(255,106,44,.22),rgba(255,106,44,0) 65%)', pointerEvents: 'none', zIndex: 0 }} />
         <div aria-hidden="true" style={{ position: 'absolute', inset: 0, backgroundImage: 'radial-gradient(rgba(255,255,255,.05) 1px,transparent 1px)', backgroundSize: '34px 34px', maskImage: 'radial-gradient(ellipse 80% 60% at 70% 0%,#000,transparent 70%)', WebkitMaskImage: 'radial-gradient(ellipse 80% 60% at 70% 0%,#000,transparent 70%)', pointerEvents: 'none', zIndex: 0 }} />
         <div className="grid-two" style={{ position: 'relative', zIndex: 1, display: 'grid', gridTemplateColumns: '1.05fr .95fr', gap: 54, alignItems: 'center' }}>
           <div className="animate-fade-up">
@@ -130,7 +130,8 @@ export default function Home() {
       </section>
 
       {/* PROBLEMA */}
-      <section style={{ background: 'var(--bg2)', borderTop: '1px solid var(--line)', borderBottom: '1px solid var(--line)' }}>
+      <section style={{ position: 'relative', background: 'var(--bg2)', borderTop: '1px solid var(--line)', borderBottom: '1px solid var(--line)' }}>
+        <div aria-hidden="true" style={{ position: 'absolute', top: 0, right: 0, width: '55%', height: '100%', background: 'radial-gradient(ellipse 700px 400px at 100% 0%, rgba(255,106,44,.07) 0%, transparent 65%)', pointerEvents: 'none' }} />
         <div style={{ maxWidth: 1160, margin: '0 auto', padding: '64px 24px' }}>
           <div style={{ maxWidth: 640 }}>
             <span style={{ fontSize: 13, fontWeight: 700, letterSpacing: '.08em', textTransform: 'uppercase', color: 'var(--terra)' }}>O dia a dia real</span>
@@ -149,7 +150,8 @@ export default function Home() {
       </section>
 
       {/* O QUE É */}
-      <section style={{ maxWidth: 1160, margin: '0 auto', padding: '70px 24px' }}>
+      <section style={{ position: 'relative', maxWidth: 1160, margin: '0 auto', padding: '70px 24px' }}>
+        <div aria-hidden="true" style={{ position: 'absolute', bottom: -80, left: -100, width: 480, height: 480, borderRadius: '50%', background: 'radial-gradient(circle,rgba(255,106,44,.14),rgba(255,106,44,0) 65%)', pointerEvents: 'none', zIndex: 0 }} />
         <div className="grid-two" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 48, alignItems: 'center' }}>
           <div>
             <span style={{ fontSize: 13, fontWeight: 700, letterSpacing: '.08em', textTransform: 'uppercase', color: 'var(--terra)' }}>O que é a Cenlo</span>
@@ -189,7 +191,8 @@ export default function Home() {
       </section>
 
       {/* PRODUTOS */}
-      <section style={{ background: 'var(--bg2)', borderTop: '1px solid var(--line)', borderBottom: '1px solid var(--line)' }}>
+      <section style={{ position: 'relative', background: 'var(--bg2)', borderTop: '1px solid var(--line)', borderBottom: '1px solid var(--line)' }}>
+        <div aria-hidden="true" style={{ position: 'absolute', bottom: 0, left: 0, width: '50%', height: '100%', background: 'radial-gradient(ellipse 600px 400px at 0% 100%, rgba(255,106,44,.07) 0%, transparent 65%)', pointerEvents: 'none' }} />
         <div style={{ maxWidth: 1160, margin: '0 auto', padding: '64px 24px' }}>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 16, alignItems: 'flex-end', justifyContent: 'space-between' }}>
             <div style={{ maxWidth: 560 }}>
@@ -230,8 +233,9 @@ export default function Home() {
       </section>
 
       {/* DESTAQUE PIZZA */}
-      <section style={{ maxWidth: 1160, margin: '0 auto', padding: '72px 24px 84px' }}>
-        <div className="grid-two" style={{ background: 'var(--panel)', color: '#F4EBDC', borderRadius: 22, overflow: 'hidden', display: 'grid', gridTemplateColumns: '1.05fr .95fr' }}>
+      <section style={{ position: 'relative', maxWidth: 1160, margin: '0 auto', padding: '72px 24px 84px' }}>
+        <div aria-hidden="true" style={{ position: 'absolute', top: 0, right: -40, width: 600, height: 600, background: 'radial-gradient(ellipse 600px 500px at center, rgba(255,106,44,.13) 0%, transparent 65%)', pointerEvents: 'none' }} />
+        <div className="grid-two" style={{ position: 'relative', background: 'var(--panel)', color: '#F4EBDC', borderRadius: 22, overflow: 'hidden', display: 'grid', gridTemplateColumns: '1.05fr .95fr' }}>
           <div style={{ padding: '48px 44px' }}>
             <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'rgba(255,106,44,.22)', color: '#FFB68F', padding: '6px 13px', borderRadius: 999, fontSize: 13, fontWeight: 600 }}>Primeiro produto disponível</span>
             <h2 style={{ fontSize: 38, color: '#fff', marginTop: 18, fontFamily: 'var(--font-schibsted)' }}>Cenlo Pizza: os pedidos da sua pizzaria, finalmente organizados.</h2>

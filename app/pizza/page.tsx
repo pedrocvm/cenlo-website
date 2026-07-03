@@ -184,8 +184,8 @@ export default function PizzaPage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(productSchema) }} />
 
       {/* HERO */}
-      <section style={{ position: 'relative', maxWidth: 1160, margin: '0 auto', padding: '60px 24px 40px', overflow: 'hidden' }}>
-        <div aria-hidden="true" style={{ position: 'absolute', top: -160, right: -100, width: 520, height: 520, borderRadius: '50%', background: 'radial-gradient(circle,rgba(255,106,44,.18),rgba(255,106,44,0) 65%)', pointerEvents: 'none', zIndex: 0 }} />
+      <section style={{ position: 'relative', maxWidth: 1160, margin: '0 auto', padding: '60px 24px 40px' }}>
+        <div aria-hidden="true" style={{ position: 'absolute', top: -80, right: -60, width: 640, height: 380, borderRadius: '40%', background: 'radial-gradient(ellipse at center,rgba(255,106,44,.15) 0%,rgba(255,106,44,0) 65%)', pointerEvents: 'none' }} />
         <div className="grid-two" style={{ position: 'relative', zIndex: 1, display: 'grid', gridTemplateColumns: '1.05fr .95fr', gap: 50, alignItems: 'center' }}>
           <div>
             <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'var(--oliveBg)', color: 'var(--olive)', padding: '6px 13px', borderRadius: 999, fontSize: 13, fontWeight: 700 }}>Já em operação</span>
@@ -275,7 +275,8 @@ export default function PizzaPage() {
       </section>
 
       {/* COMO FUNCIONA */}
-      <section id="como-funciona" style={{ background: 'var(--panel)', color: '#F4EBDC' }}>
+      <section id="como-funciona" style={{ position: 'relative', background: 'var(--panel)', color: '#F4EBDC' }}>
+        <div aria-hidden="true" style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse 900px 600px at 10% 120%, rgba(255,106,44,.11) 0%, transparent 65%)', pointerEvents: 'none' }} />
         <div style={{ maxWidth: 1160, margin: '0 auto', padding: '64px 24px' }}>
           <span style={{ fontSize: 13, fontWeight: 700, letterSpacing: '.08em', textTransform: 'uppercase', color: '#FFB68F' }}>Da conversa à cozinha</span>
           <h2 style={{ fontSize: 34, color: '#fff', marginTop: 12, maxWidth: 560, fontFamily: 'var(--font-schibsted)' }}>Como funciona, passo a passo</h2>
