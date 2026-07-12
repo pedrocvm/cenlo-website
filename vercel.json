@@ -3,8 +3,13 @@
   "redirects": [
     {
       "source": "/pedro",
-      "destination": "https://pedro.cenlo.pt",
-      "permanent": false
-    }
-  ]
+        "destination": "https://pedro.cenlo.pt",
+        "permanent": false
+      },
+      {
+        "source": "/contato",
+        "destination": "https://pedro.cenlo.pt",
+        "permanent": false
+      }
+    ]
 }
