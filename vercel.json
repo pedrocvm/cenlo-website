@@ -3,13 +3,23 @@
   "redirects": [
     {
       "source": "/pedro",
-        "destination": "https://pedro.cenlo.pt",
-        "permanent": false
-      },
-      {
-        "source": "/contato",
-        "destination": "https://pedro.cenlo.pt",
-        "permanent": false
-      }
-    ]
+      "destination": "https://pedro.cenlo.pt",
+      "permanent": false
+    },
+    {
+      "source": "/contato",
+      "destination": "https://pedro.cenlo.pt",
+      "permanent": false
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/food",
+      "destination": "https://pedro.cenlo.pt/food"
+    },
+    {
+      "source": "/beauty",
+      "destination": "https://pedro.cenlo.pt/beauty"
+    }
+  ]
 }
