@@ -2,7 +2,8 @@
 import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { MODULES, CORE_MODULE } from '@/lib/food-builder/catalog'
+import { BASE_MODULES, MODULES } from '@/lib/food-builder/catalog'
+import { TierBadge } from './SelectToggle'
 import { clearSelection, removeModule, useSelection } from './selection'
 
 function countLabel(n: number) {
@@ -22,20 +23,21 @@ function Panel({ onNavigate, headingId }: { onNavigate?: () => void; headingId: 
         <span>{countLabel(selected.length)}</span>
       </div>
       <div className="fb-base">
-        <span className="fb-badge" aria-hidden="true">Base</span>
-        <span><b>{CORE_MODULE.title}</b> incluído</span>
+        <span className="fb-badge fb-badge-ok" aria-hidden="true">Base</span>
+        <Link href="/food/montar#modulos" onClick={onNavigate}><b>{BASE_MODULES.length} módulos</b> já incluídos</Link>
       </div>
       {selected.length ? (
         <ul className="fb-sel-list">
           {selected.map(m => (
             <li key={m.id}>
               <Link href={`/food/montar/${m.slug}`} onClick={onNavigate}>{m.title}</Link>
+              {m.tier === 'premium' && <TierBadge tier="premium" />}
               <button type="button" className="fb-x" onClick={() => removeModule(m.id)} aria-label={`Remover ${m.title}`}>✕</button>
             </li>
           ))}
         </ul>
       ) : (
-        <p className="fb-empty">Adicione os módulos que fazem sentido para a sua operação. Pode alterar a escolha a qualquer momento.</p>
+        <p className="fb-empty">Junte à base os módulos premium e opcionais que fazem sentido para a sua operação. Pode alterar a escolha a qualquer momento.</p>
       )}
       <Link href="/food/montar/rever" className="fb-btn fb-btn-primary" onClick={onNavigate}>Rever a minha configuração</Link>
       {selected.length > 0 && (

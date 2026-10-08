@@ -15,7 +15,9 @@ function byGroup(mods: ModuleRef[]) {
 export function renderEmail(s: Submission) {
   const subject = `Nova configuração Cenlo Food | Referência ${s.reference} | ${s.business.name}`
   const when = lisbonTime(s.submittedAt)
-  const optional = s.selectedModules.filter(m => !m.required)
+  const premium = s.selectedModules.filter(m => m.tier === 'premium')
+  const optional = s.selectedModules.filter(m => m.tier === 'optional')
+  const base = s.selectedModules.filter(m => m.tier === 'base')
   const utm = Object.entries(s.attribution.utm)
 
   const rows: [string, string | null][] = [
@@ -35,11 +37,17 @@ export function renderEmail(s: Submission) {
     ...rows.map(([k, v]) => `${k}: ${v ?? '—'}`),
     `WhatsApp: https://wa.me/${s.contact.whatsappDigits}`,
     '',
-    `MÓDULOS SELECIONADOS (${optional.length} + base)`,
-    ...byGroup(s.selectedModules).flatMap(([g, ms]) => [`  ${g}`, ...ms.map(m => `   ✓ ${m.title}${m.required ? ' (base incluída)' : ''}`)]),
+    `PREMIUM ESCOLHIDOS (${premium.length})`,
+    ...(premium.length ? premium.map(m => `   ★ ${m.title}`) : ['   —']),
+    '',
+    `OPCIONAIS ESCOLHIDOS (${optional.length})`,
+    ...(optional.length ? optional.map(m => `   ✓ ${m.title}`) : ['   —']),
+    '',
+    `BASE INCLUÍDA (${base.length})`,
+    ...byGroup(base).map(([g, ms]) => `   ${g}: ${ms.map(m => m.title).join(', ')}`),
     '',
     `NÃO SELECIONADOS (${s.unselectedModules.length})`,
-    ...s.unselectedModules.map(m => `   · ${m.title}`),
+    ...s.unselectedModules.map(m => `   · ${m.title} (${m.tier === 'premium' ? 'premium' : 'opcional'})`),
     '',
     'OBSERVAÇÕES',
     s.notes ?? '—',
@@ -62,15 +70,19 @@ export function renderEmail(s: Submission) {
 <div style="font-size:12px;letter-spacing:.12em;color:#FF6A2C;font-weight:700">CENLO FOOD BUILDER</div>
 <div style="font-size:22px;font-weight:700;margin-top:6px">${esc(s.business.name)}</div>
 <div style="font-size:14px;color:#A6A6B3;margin-top:6px">Referência <strong style="color:#F4F3F7">${esc(s.reference)}</strong> · ${esc(when)}</div>
-<div style="font-size:14px;color:#A6A6B3;margin-top:4px">${optional.length} módulo${optional.length === 1 ? '' : 's'} selecionado${optional.length === 1 ? '' : 's'} + base incluída</div>
+<div style="font-size:14px;color:#A6A6B3;margin-top:4px">${premium.length} premium · ${optional.length} opciona${optional.length === 1 ? 'l' : 'is'} · base com ${base.length} módulos</div>
 </div>
 <h2 style="${h2}">Contacto</h2>
 <table style="width:100%;border-collapse:collapse">${rows.map(([k, v]) => `<tr><td style="${cell};color:#6B6B78;width:150px">${k}</td><td style="${cell}">${v ? esc(v) : '—'}</td></tr>`).join('')}</table>
 <p style="margin:14px 0 0"><a href="https://wa.me/${s.contact.whatsappDigits}" style="display:inline-block;background:#C2461A;color:#fff;text-decoration:none;padding:10px 16px;border-radius:8px;font-weight:600;font-size:14px">Abrir conversa no WhatsApp</a></p>
-<h2 style="${h2}">Módulos selecionados</h2>
-${byGroup(s.selectedModules).map(([g, ms]) => `<div style="margin-bottom:12px"><div style="font-size:13px;color:#6B6B78;margin-bottom:4px">${esc(g)}</div>${ms.map(m => `<div style="font-size:15px;padding:3px 0">✓ <strong>${esc(m.title)}</strong>${m.required ? ' <span style="font-size:12px;color:#C2461A">base incluída</span>' : ''}</div>`).join('')}</div>`).join('')}
+<h2 style="${h2}">Premium escolhidos</h2>
+${premium.length ? premium.map(m => `<div style="font-size:15px;padding:4px 0">★ <strong>${esc(m.title)}</strong> <span style="font-size:12px;color:#6B6B78">${esc(m.group)}</span></div>`).join('') : '<div style="font-size:14px;color:#6B6B78">Nenhum.</div>'}
+<h2 style="${h2}">Opcionais escolhidos</h2>
+${optional.length ? optional.map(m => `<div style="font-size:15px;padding:4px 0">✓ <strong>${esc(m.title)}</strong></div>`).join('') : '<div style="font-size:14px;color:#6B6B78">Nenhum.</div>'}
+<h2 style="${h2}">Base incluída</h2>
+<div style="font-size:14px;color:#3A3A46;line-height:1.7">${byGroup(base).map(([g, ms]) => `<span style="color:#6B6B78">${esc(g)}:</span> ${ms.map(m => esc(m.title)).join(', ')}`).join('<br>')}</div>
 <h2 style="${h2}">Não selecionados</h2>
-<div style="font-size:14px;color:#6B6B78;line-height:1.7">${s.unselectedModules.length ? s.unselectedModules.map(m => esc(m.title)).join(' · ') : 'Todos os módulos foram selecionados.'}</div>
+<div style="font-size:14px;color:#6B6B78;line-height:1.7">${s.unselectedModules.length ? s.unselectedModules.map(m => `${esc(m.title)}${m.tier === 'premium' ? ' ★' : ''}`).join(' · ') : 'Todos os módulos premium e opcionais foram escolhidos.'}</div>
 <h2 style="${h2}">Observações</h2>
 <div style="font-size:14px;white-space:pre-wrap;background:#fff;border:1px solid #ECEAF0;border-radius:10px;padding:12px 14px">${s.notes ? esc(s.notes) : '—'}</div>
 <h2 style="${h2}">Origem</h2>

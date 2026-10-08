@@ -1,10 +1,11 @@
 'use client'
 import { useSyncExternalStore } from 'react'
-import { MODULES, CORE_MODULE_ID } from '@/lib/food-builder/catalog'
+import { MODULES } from '@/lib/food-builder/catalog'
 
 const KEY = 'cenlo-food-builder:selection:v1'
 const EMPTY: readonly string[] = []
-const known = new Set(MODULES.filter(m => !m.required).map(m => m.id as string))
+const known = new Set(MODULES.filter(m => m.tier !== 'base').map(m => m.id as string))
+const base = new Set(MODULES.filter(m => m.tier === 'base').map(m => m.id as string))
 const listeners = new Set<() => void>()
 let cache: readonly string[] | null = null
 
@@ -48,7 +49,7 @@ export function useSelection(): readonly string[] {
 }
 
 export function isSelected(selection: readonly string[], id: string) {
-  return id === CORE_MODULE_ID || selection.includes(id)
+  return base.has(id) || selection.includes(id)
 }
 
 export function toggleModule(id: string) {

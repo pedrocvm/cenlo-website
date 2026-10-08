@@ -4,7 +4,7 @@ import { notFound } from 'next/navigation'
 import { GROUPS, MODULES, moduleBySlug } from '@/lib/food-builder/catalog'
 import { shotsFor } from '@/lib/food-builder/screenshots'
 import ModuleIcon from '@/components/food-builder/ModuleIcon'
-import SelectToggle, { RemoveLink } from '@/components/food-builder/SelectToggle'
+import SelectToggle, { RemoveLink, TierBadge } from '@/components/food-builder/SelectToggle'
 import Gallery from '@/components/food-builder/Gallery'
 
 export const dynamicParams = false
@@ -38,13 +38,13 @@ export default async function ModulePage({ params }: { params: Promise<{ slug: s
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
           <ModuleIcon name={m.icon} />
           <span className="fb-eyebrow">{group.title}</span>
-          {m.required && <span className="fb-badge">Base Cenlo Food incluída</span>}
+          <TierBadge tier={m.tier} />
         </div>
         <h1 className="fb-display">{m.title}</h1>
         <p className="fb-lede" style={{ maxWidth: 680, fontSize: 'clamp(18px, 2vw, 22px)', color: 'var(--ink)' }}>{m.promise}</p>
         <p className="fb-lede" style={{ maxWidth: 680 }}>{m.summary}</p>
         <div className="fb-detail-actions">
-          <SelectToggle id={m.id} title={m.title} required={m.required} />
+          <SelectToggle id={m.id} title={m.title} tier={m.tier} />
           <RemoveLink id={m.id} title={m.title} />
         </div>
       </header>
@@ -100,19 +100,19 @@ export default async function ModulePage({ params }: { params: Promise<{ slug: s
         </div>
       </section>
 
-      <section className="fb-cta-final" aria-labelledby="s-cta">
+      <section className={`fb-cta-final${m.tier === 'premium' ? ' is-premium' : ''}`} aria-labelledby="s-cta">
         <div>
-          <h2 id="s-cta">{m.required ? 'A base de qualquer Cenlo Food.' : `${m.title} faz sentido para si?`}</h2>
+          <h2 id="s-cta">{m.tier === 'base' ? 'Incluído na base do Cenlo Food.' : `${m.title} faz sentido para si?`}</h2>
           <p className="fb-lede" style={{ marginTop: 10, fontSize: 16 }}>
-            {m.required ? 'O Núcleo de Pedidos está sempre incluído. Escolha agora os módulos que quer juntar-lhe.' : 'Adicione-o à sua configuração. Pode remover a qualquer momento antes de enviar.'}
+            {m.tier === 'base' ? `${m.title} faz parte de qualquer configuração Cenlo Food. Escolha agora os módulos premium e opcionais que quer juntar à base.` : 'Adicione-o à sua configuração. Pode remover a qualquer momento antes de enviar.'}
           </p>
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-          {m.required ? (
+          {m.tier === 'base' ? (
             <Link href="/food/montar#modulos" className="fb-btn fb-btn-primary">Escolher módulos</Link>
           ) : (
             <>
-              <SelectToggle id={m.id} title={m.title} required={false} />
+              <SelectToggle id={m.id} title={m.title} tier={m.tier} />
               <RemoveLink id={m.id} title={m.title} />
             </>
           )}

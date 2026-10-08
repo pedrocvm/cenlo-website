@@ -1,12 +1,12 @@
-import { BUSINESS_TYPES, CATALOG_VERSION, CORE_MODULE_ID, GROUPS, MODULES, type ModuleId } from './catalog.ts'
+import { BUSINESS_TYPES, CATALOG_VERSION, GROUPS, MODULES, type ModuleId, type Tier } from './catalog.ts'
 
-export const SCHEMA_VERSION = 'cenlo_food_builder.submission.v1'
+export const SCHEMA_VERSION = 'cenlo_food_builder.submission.v2'
 export const SOURCE = 'cenlo_food_builder'
 export const MAX_BODY_BYTES = 16_000
 export const MIN_FILL_MS = 3_000
 const MAX_AGE_MS = 24 * 60 * 60 * 1000
 
-export type ModuleRef = { id: ModuleId; slug: string; title: string; group: string; required: boolean }
+export type ModuleRef = { id: ModuleId; slug: string; title: string; group: string; tier: Tier }
 
 export type Submission = {
   schemaVersion: typeof SCHEMA_VERSION
@@ -59,7 +59,7 @@ function text(v: unknown, max: number): string | null {
 
 function ref(id: ModuleId): ModuleRef {
   const m = MODULES.find(x => x.id === id)!
-  return { id: m.id, slug: m.slug, title: m.title, group: GROUPS.find(g => g.id === m.group)!.title, required: m.required }
+  return { id: m.id, slug: m.slug, title: m.title, group: GROUPS.find(g => g.id === m.group)!.title, tier: m.tier }
 }
 
 export async function buildSubmission(input: unknown, now: number = Date.now()): Promise<Result> {
@@ -99,7 +99,8 @@ export async function buildSubmission(input: unknown, now: number = Date.now()):
   }
   if (errors.length) return { ok: false, status: 400, errors }
 
-  const chosen = new Set<string>([CORE_MODULE_ID, ...(raw as string[])])
+  const chosen = new Set<string>(raw as string[])
+  const included = (m: (typeof MODULES)[number]) => m.tier === 'base' || chosen.has(m.id)
   const utm: Submission['attribution']['utm'] = {}
   for (const k of UTM_KEYS) {
     const v = text(attribution[k], 120)
@@ -119,8 +120,8 @@ export async function buildSubmission(input: unknown, now: number = Date.now()):
       submittedAt: new Date(now).toISOString(),
       contact: { name: name!, phone: phone!.display, whatsappDigits: phone!.digits, email },
       business: { name: businessName!, city, type },
-      selectedModules: MODULES.filter(m => chosen.has(m.id)).map(m => ref(m.id)),
-      unselectedModules: MODULES.filter(m => !chosen.has(m.id)).map(m => ref(m.id)),
+      selectedModules: MODULES.filter(included).map(m => ref(m.id)),
+      unselectedModules: MODULES.filter(m => !included(m)).map(m => ref(m.id)),
       notes,
       attribution: {
         landingPath: landingPath && landingPath.startsWith('/') ? landingPath.split(/[?#]/)[0] : null,

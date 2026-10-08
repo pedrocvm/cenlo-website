@@ -1,7 +1,7 @@
 'use client'
 import { useState, useSyncExternalStore } from 'react'
 import Link from 'next/link'
-import { CORE_MODULE, MODULES } from '@/lib/food-builder/catalog'
+import { BASE_MODULES, MODULES } from '@/lib/food-builder/catalog'
 import { SENT_KEY } from './Review'
 
 const CENLO_WHATSAPP = '351912333313'
@@ -55,12 +55,13 @@ export default function Done() {
     )
   }
 
-  const modules = [CORE_MODULE, ...MODULES.filter(m => !m.required && sent.moduleIds.includes(m.id))]
+  const modules = MODULES.filter(m => m.tier !== 'base' && sent.moduleIds.includes(m.id))
   const summary = [
     `Configuração Cenlo Food · Referência ${sent.reference}`,
     `Estabelecimento: ${sent.businessName}`,
     '',
-    ...modules.map(m => `• ${m.title}${m.required ? ' (base incluída)' : ''}`),
+    `• Base Cenlo Food (${BASE_MODULES.length} módulos incluídos)`,
+    ...modules.map(m => `• ${m.title}${m.tier === 'premium' ? ' (premium)' : ''}`),
   ].join('\n')
 
   async function copy() {
@@ -90,10 +91,11 @@ export default function Done() {
 
       <section style={{ marginTop: 28 }} aria-labelledby="done-mods">
         <h2 id="done-mods" style={{ fontSize: 13, letterSpacing: '.12em', textTransform: 'uppercase', color: 'var(--muted)' }}>
-          Módulos enviados · base + {modules.length - 1}
+          Módulos enviados · base + {modules.length}
         </h2>
         <ul className="fb-chips" style={{ listStyle: 'none', padding: 0 }}>
-          {modules.map(m => <li key={m.id} className={`fb-chip${m.required ? ' is-core' : ''}`}>{m.title}</li>)}
+          <li className="fb-chip is-core">Base Cenlo Food · {BASE_MODULES.length} módulos</li>
+          {modules.map(m => <li key={m.id} className={`fb-chip${m.tier === 'premium' ? ' is-premium' : ''}`}>{m.tier === 'premium' ? '★ ' : ''}{m.title}</li>)}
         </ul>
       </section>
 

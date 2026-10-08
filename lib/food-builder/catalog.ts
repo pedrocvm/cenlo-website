@@ -1,4 +1,4 @@
-export const CATALOG_VERSION = '2026-10-08'
+export const CATALOG_VERSION = '2026-10-08.2'
 
 export const GROUPS = [
   { id: 'operations', title: 'Atendimento e operação', intro: 'Do primeiro contacto ao pedido pronto: tudo entra no mesmo sítio e chega à cozinha sem ser copiado à mão.' },
@@ -16,13 +16,21 @@ export type IconName =
   | 'map' | 'radius' | 'scooter' | 'bell' | 'tag' | 'users' | 'refresh' | 'star'
   | 'spark' | 'trend' | 'bulb' | 'chart' | 'receipt' | 'stores' | 'shield' | 'history' | 'help'
 
+export type Tier = 'base' | 'premium' | 'optional'
+
+export const TIER_LABELS: Record<Tier, string> = {
+  base: 'Incluído na base',
+  premium: 'Premium',
+  optional: 'Opcional',
+}
+
 export type Module = {
   id: string
   slug: string
   group: GroupId
   title: string
   icon: IconName
-  required: boolean
+  tier: Tier
   promise: string
   summary: string
   problem: string[]
@@ -39,7 +47,7 @@ const modules = [
     group: 'operations',
     title: 'Núcleo de Pedidos',
     icon: 'orders',
-    required: true,
+    tier: 'base',
     promise: 'Todos os pedidos num só ecrã, do momento em que entram até serem entregues.',
     summary: 'Centraliza os pedidos de todos os canais com cliente, origem, valores e estado. É a base de qualquer configuração Cenlo Food.',
     problem: [
@@ -70,7 +78,7 @@ const modules = [
     group: 'operations',
     title: 'Assistente de WhatsApp',
     icon: 'chat',
-    required: false,
+    tier: 'base',
     promise: 'O cliente faz o pedido a conversar no WhatsApp e o pedido chega estruturado à operação.',
     summary: 'Um assistente que conhece o seu cardápio, monta o pedido com o cliente, confirma o resumo e passa a conversa a uma pessoa quando é preciso.',
     problem: [
@@ -100,7 +108,7 @@ const modules = [
     group: 'operations',
     title: 'Ecrã de Cozinha (KDS)',
     icon: 'kitchen',
-    required: false,
+    tier: 'base',
     promise: 'A cozinha vê cada pedido confirmado, por etapa, sem ninguém ter de o ditar.',
     summary: 'Um quadro de produção com colunas por estado e o tempo de espera de cada pedido sempre visível.',
     problem: [
@@ -130,7 +138,7 @@ const modules = [
     group: 'operations',
     title: 'Impressão Automática',
     icon: 'printer',
-    required: false,
+    tier: 'base',
     promise: 'A comanda sai na impressora da cozinha assim que o pedido é confirmado.',
     summary: 'O Cenlo Print Agent liga o Cenlo à impressora térmica da loja, com fila, monitorização e recuperação de falhas.',
     problem: [
@@ -161,7 +169,7 @@ const modules = [
     group: 'channels',
     title: 'Site de Pedidos',
     icon: 'globe',
-    required: false,
+    tier: 'premium',
     promise: 'Um canal próprio da marca onde o cliente vê o cardápio e faz o pedido diretamente.',
     summary: 'Página de pedidos online e site da marca, ligados ao cardápio e aos pedidos do Cenlo, sem uma operação à parte.',
     problem: [
@@ -191,7 +199,7 @@ const modules = [
     group: 'channels',
     title: 'Balcão e Telefone',
     icon: 'counter',
-    required: false,
+    tier: 'base',
     promise: 'Pedidos feitos ao balcão ou por telefone entram no mesmo sistema que os digitais.',
     summary: 'Registo manual de pedidos com o mesmo cardápio, regras de entrega e pagamento dos outros canais.',
     problem: [
@@ -220,7 +228,7 @@ const modules = [
     group: 'channels',
     title: 'Pedidos Agendados',
     icon: 'calendar',
-    required: false,
+    tier: 'base',
     promise: 'Aceite encomendas para mais tarde sem as misturar com a produção do momento.',
     summary: 'Pedidos para uma data e hora futuras ficam à parte e só entram na cozinha quando chega a altura.',
     problem: [
@@ -248,7 +256,7 @@ const modules = [
     group: 'channels',
     title: 'Atendimento de Mesa',
     icon: 'table',
-    required: false,
+    tier: 'premium',
     productArea: 'table_service',
     promise: 'O cliente vê o cardápio e pede à mesa pelo telemóvel, e a equipa mantém o controlo.',
     summary: 'Sessões por mesa com código QR, cardápio no telemóvel, pedidos aprovados pela equipa e botão para chamar o empregado.',
@@ -278,7 +286,7 @@ const modules = [
     group: 'delivery',
     title: 'Entregas por Zonas',
     icon: 'map',
-    required: false,
+    tier: 'base',
     promise: 'Cada zona com a sua taxa, definida por código postal.',
     summary: 'Configure as zonas que serve e a taxa de cada uma. O Cenlo aplica-as em todos os canais.',
     problem: [
@@ -305,7 +313,7 @@ const modules = [
     group: 'delivery',
     title: 'Entregas por Raio',
     icon: 'radius',
-    required: false,
+    tier: 'base',
     promise: 'A cobertura e a taxa definidas pela distância real até à morada do cliente.',
     summary: 'Faixas de distância a partir da morada da loja, com uma taxa por faixa e um raio máximo de entrega.',
     problem: [
@@ -332,7 +340,7 @@ const modules = [
     group: 'delivery',
     title: 'Cenlo Delivery',
     icon: 'scooter',
-    required: false,
+    tier: 'premium',
     productArea: 'delivery_management',
     promise: 'Os seus estafetas ligados aos pedidos, da atribuição à entrega.',
     summary: 'Atribuição de entregas, aplicação para estafetas no telemóvel e um painel para acompanhar as saídas em tempo real.',
@@ -362,7 +370,7 @@ const modules = [
     group: 'delivery',
     title: 'Atualizações Automáticas',
     icon: 'bell',
-    required: false,
+    tier: 'base',
     promise: 'O cliente sabe em que ponto está o pedido sem ter de perguntar.',
     summary: 'Mensagens automáticas no WhatsApp quando o pedido entra em preparação, fica pronto, sai para entrega e é entregue.',
     problem: [
@@ -389,7 +397,7 @@ const modules = [
     group: 'revenue',
     title: 'Promoções',
     icon: 'tag',
-    required: false,
+    tier: 'premium',
     promise: 'Campanhas com regras que o próprio sistema aplica, em todos os canais.',
     summary: 'Entrega grátis, percentagem, valor fixo e leve X pague Y, com produtos, canais e datas definidos.',
     problem: [
@@ -417,7 +425,7 @@ const modules = [
     group: 'revenue',
     title: 'CRM de Clientes',
     icon: 'users',
-    required: false,
+    tier: 'base',
     promise: 'Cada cliente com o seu histórico, frequência, ticket e pedido habitual.',
     summary: 'A base de clientes é construída a partir dos pedidos, sem ninguém ter de a preencher.',
     problem: [
@@ -446,7 +454,7 @@ const modules = [
     group: 'revenue',
     title: 'Reativação de Clientes',
     icon: 'refresh',
-    required: false,
+    tier: 'premium',
     promise: 'Saiba quem deixou de comprar e traga-o de volta com o pedido de sempre.',
     summary: 'Lista de clientes a reativar, mensagem sugerida com o pedido habitual e envio manual ou automático.',
     problem: [
@@ -475,7 +483,7 @@ const modules = [
     group: 'revenue',
     title: 'Fidelização',
     icon: 'star',
-    required: false,
+    tier: 'premium',
     productArea: 'loyalty',
     promise: 'Um clube próprio da marca para recompensar quem volta.',
     summary: 'Programa de pontos com recompensas, missões e campanhas, materiais QR e NFC e resultados medidos.',
@@ -505,7 +513,7 @@ const modules = [
     group: 'intelligence',
     title: 'Cenlo Intelligence',
     icon: 'spark',
-    required: false,
+    tier: 'optional',
     productArea: 'intelligence',
     promise: 'Padrões de compra e comportamento dos clientes, explicados em linguagem simples.',
     summary: 'Análise da base ativa, clientes em risco, recompra próxima e clientes inativos a partir do histórico real.',
@@ -534,7 +542,7 @@ const modules = [
     group: 'intelligence',
     title: 'Previsões',
     icon: 'trend',
-    required: false,
+    tier: 'optional',
     promise: 'Uma estimativa dos próximos dias para preparar equipa e stock.',
     summary: 'Previsão de pedidos e de faturação a partir do histórico, com o nível de confiança à vista.',
     problem: [
@@ -561,7 +569,7 @@ const modules = [
     group: 'intelligence',
     title: 'Insights e Recomendações',
     icon: 'bulb',
-    required: false,
+    tier: 'base',
     promise: 'Alertas com evidência sobre o que mudou e o que vale a pena fazer.',
     summary: 'Sinais como um produto que deixou de vender ou um dia consistentemente fraco, com a evidência e uma sugestão de ação.',
     problem: [
@@ -588,7 +596,7 @@ const modules = [
     group: 'intelligence',
     title: 'Relatórios e Desempenho',
     icon: 'chart',
-    required: false,
+    tier: 'base',
     productArea: 'reports',
     promise: 'Vendas, pedidos, ticket e recorrência por período, comparados com o anterior.',
     summary: 'Indicadores comerciais e operacionais com evolução diária e produtos mais vendidos.',
@@ -616,7 +624,7 @@ const modules = [
     group: 'intelligence',
     title: 'Fechos e Resumos',
     icon: 'receipt',
-    required: false,
+    tier: 'base',
     promise: 'O resumo do dia chega ao seu WhatsApp à hora do fecho.',
     summary: 'Fecho diário automático, resumo semanal e histórico de fechos para consulta.',
     problem: [
@@ -644,7 +652,7 @@ const modules = [
     group: 'structure',
     title: 'Multi-loja',
     icon: 'stores',
-    required: false,
+    tier: 'premium',
     productArea: 'organization',
     promise: 'Várias unidades na mesma organização, cada uma com os seus dados.',
     summary: 'Organize as lojas sob a mesma estrutura, compare unidades e mantenha a operação de cada uma separada.',
@@ -672,7 +680,7 @@ const modules = [
     group: 'structure',
     title: 'Equipa e Permissões',
     icon: 'shield',
-    required: false,
+    tier: 'base',
     promise: 'Cada pessoa da equipa vê e faz apenas o que a sua função precisa.',
     summary: 'Convites, funções definidas para a loja e para a organização, e gestão de acessos.',
     problem: [
@@ -700,7 +708,7 @@ const modules = [
     group: 'structure',
     title: 'Auditoria',
     icon: 'history',
-    required: false,
+    tier: 'base',
     productArea: 'audit',
     promise: 'Quem fez o quê, e quando, com os valores antes e depois.',
     summary: 'Trilha de alterações das ações relevantes na plataforma, para consulta pela gestão.',
@@ -727,7 +735,7 @@ const modules = [
     group: 'structure',
     title: 'Ajuda e Formação',
     icon: 'help',
-    required: false,
+    tier: 'base',
     promise: 'Guias e vídeos para que cada pessoa nova aprenda a usar o Cenlo sozinha.',
     summary: 'Centro de ajuda com vídeos tutoriais, ajuda por página e glossário dentro da plataforma.',
     problem: [
@@ -755,6 +763,7 @@ export type ModuleId = (typeof modules)[number]['id']
 export const MODULES: readonly (Module & { id: ModuleId })[] = modules
 export const CORE_MODULE_ID = 'orders-core' satisfies ModuleId
 export const CORE_MODULE = MODULES.find(m => m.id === CORE_MODULE_ID)!
+export const BASE_MODULES = MODULES.filter(m => m.tier === 'base')
 
 export function moduleBySlug(slug: string) {
   return MODULES.find(m => m.slug === slug)

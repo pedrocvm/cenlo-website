@@ -2,10 +2,11 @@
 import { useRef, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { BUSINESS_TYPES, CORE_MODULE, GROUPS, MODULES } from '@/lib/food-builder/catalog'
+import { BASE_MODULES, BUSINESS_TYPES, GROUPS, MODULES } from '@/lib/food-builder/catalog'
 import { normalizePhone, type FieldError } from '@/lib/food-builder/submission'
 import ModuleIcon from './ModuleIcon'
 import { removeModule, useSelection } from './selection'
+import { TierBadge } from './SelectToggle'
 import { readAttribution } from './CaptureAttribution'
 
 export const SENT_KEY = 'cenlo-food-builder:sent:v1'
@@ -128,15 +129,20 @@ export default function Review() {
       <div className="fb-review-grid">
         <div>
           <div className="fb-rgroup">
-            <h2>Base incluída</h2>
-            <div className="fb-ritem" style={{ borderColor: 'rgba(255,106,44,.35)' }}>
-              <ModuleIcon name={CORE_MODULE.icon} />
-              <div>
-                <h3>{CORE_MODULE.title}</h3>
-                <p>{CORE_MODULE.summary}</p>
-                <div className="fb-ritem-links"><Link href={`/food/montar/${CORE_MODULE.slug}`}>Ver detalhes</Link></div>
-              </div>
-              <span className="fb-badge">Base</span>
+            <h2>Base Cenlo Food incluída · {BASE_MODULES.length} módulos</h2>
+            <div className="fb-ritem fb-base-box">
+              {GROUPS.map(g => {
+                const items = BASE_MODULES.filter(m => m.group === g.id)
+                if (!items.length) return null
+                return (
+                  <div key={g.id} className="fb-base-row">
+                    <span>{g.title}</span>
+                    <ul className="fb-chips">
+                      {items.map(m => <li key={m.id}><Link href={`/food/montar/${m.slug}`} className="fb-chip">✓ {m.title}</Link></li>)}
+                    </ul>
+                  </div>
+                )
+              })}
             </div>
           </div>
 
@@ -147,10 +153,10 @@ export default function Review() {
               <div key={g.id} className="fb-rgroup">
                 <h2>{g.title}</h2>
                 {items.map(m => (
-                  <div key={m.id} className="fb-ritem">
+                  <div key={m.id} className={`fb-ritem${m.tier === 'premium' ? ' is-premium' : ''}`}>
                     <ModuleIcon name={m.icon} />
                     <div>
-                      <h3>{m.title}</h3>
+                      <h3>{m.title} <TierBadge tier={m.tier} /></h3>
                       <p>{m.summary}</p>
                       <div className="fb-ritem-links"><Link href={`/food/montar/${m.slug}`}>Ver detalhes</Link></div>
                     </div>
@@ -163,7 +169,7 @@ export default function Review() {
 
           {!selected.length && (
             <p className="fb-pending" style={{ marginTop: 26 }}>
-              Ainda não adicionou módulos além da base. Pode enviar assim, ou explorar os módulos e escolher os que fazem sentido para a sua operação.
+              Ainda não escolheu módulos premium ou opcionais. Pode enviar só com a base, ou explorar os módulos e escolher os que fazem sentido para a sua operação.
             </p>
           )}
           <Link href="/food/montar#modulos" className="fb-btn fb-btn-ghost" style={{ marginTop: 22 }}>← Continuar a explorar módulos</Link>
@@ -172,7 +178,7 @@ export default function Review() {
         <form ref={formRef} className="fb-form" onSubmit={submit} noValidate aria-labelledby="form-title">
           <h2 id="form-title">Enviar a configuração</h2>
           <p style={{ fontSize: 14, color: 'var(--ink2)', marginTop: 6, lineHeight: 1.55 }}>
-            Base + {selected.length} {selected.length === 1 ? 'módulo' : 'módulos'}. Não é uma contratação: é a sua preferência, que analisamos consigo antes de qualquer decisão.
+            Base + {selected.length} {selected.length === 1 ? 'módulo escolhido' : 'módulos escolhidos'}. Não é uma contratação: é a sua preferência, que analisamos consigo antes de qualquer decisão.
           </p>
           <div className="fb-fields">
             {field('name', 'Nome', { autoComplete: 'name' })}

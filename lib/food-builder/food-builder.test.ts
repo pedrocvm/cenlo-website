@@ -2,7 +2,7 @@ import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
-import { CORE_MODULE_ID, GROUPS, MODULES } from './catalog.ts'
+import { GROUPS, MODULES } from './catalog.ts'
 import { SCREENSHOTS } from './screenshots.ts'
 import { buildSubmission, normalizePhone, referenceFor } from './submission.ts'
 import { renderEmail } from './email.ts'
@@ -25,8 +25,15 @@ test('catalog: 25 modules in the expected six groups, stable unique ids and slug
   for (const m of MODULES) assert.match(m.slug, /^[a-z0-9]+(-[a-z0-9]+)*$/)
 })
 
-test('catalog: only the orders core is required and every module has full detail content', () => {
-  assert.deepEqual(MODULES.filter(m => m.required).map(m => m.id), [CORE_MODULE_ID])
+const premiumIds = ['ordering-site', 'table-service', 'cenlo-delivery', 'promotions', 'customer-reactivation', 'loyalty', 'multi-store']
+const optionalIds = ['cenlo-intelligence', 'forecasting']
+
+test('catalog: tiers match the commercial definition and every module has full detail content', () => {
+  assert.deepEqual(MODULES.filter(m => m.tier === 'premium').map(m => m.id), premiumIds)
+  assert.deepEqual(MODULES.filter(m => m.tier === 'optional').map(m => m.id), optionalIds)
+  assert.equal(MODULES.filter(m => m.tier === 'base').length, 16)
+  for (const id of ['orders-core', 'whatsapp-assistant', 'kitchen-display', 'auto-printing', 'delivery-zones', 'delivery-radius', 'reports', 'insights-recommendations', 'closings-summaries', 'team-permissions', 'audit-trail', 'help-training'])
+    assert.equal(MODULES.find(m => m.id === id)?.tier, 'base', id)
   for (const m of MODULES) {
     for (const k of ['problem', 'flow', 'deliverables', 'fit'] as const) assert.ok(m[k].length > 0, `${m.id}.${k}`)
     assert.ok(m.promise && m.summary, m.id)
@@ -82,24 +89,26 @@ function input(over: Record<string, unknown> = {}) {
     contact: { name: 'Marta Silva', phone: '912 345 678', email: '' },
     business: { name: 'Casa <Teste>', city: 'Braga', type: 'Pizzaria' },
     notes: 'Fazemos 60 pedidos <b>por noite</b>.',
-    moduleIds: ['kitchen-display', 'whatsapp-assistant'],
+    moduleIds: ['loyalty', 'ordering-site', 'forecasting'],
     attribution: { utm_source: 'whatsapp', landingPath: '/food/montar?utm_source=whatsapp', referrerHost: 'l.instagram.com' },
     ...over,
   }
 }
 
-test('submission: builds the versioned contract with core always selected and the complement unselected', async () => {
+test('submission: base modules are always selected, chosen modules added, the rest unselected', async () => {
   const r = await buildSubmission(input(), now)
   assert.ok(r.ok)
   const s = r.submission
   assert.equal(s.source, 'cenlo_food_builder')
-  assert.equal(s.schemaVersion, 'cenlo_food_builder.submission.v1')
+  assert.equal(s.schemaVersion, 'cenlo_food_builder.submission.v2')
   assert.match(s.reference, /^CFB-[A-Z0-9]{8}$/)
   assert.equal(s.reference, await referenceFor(id))
   assert.equal(s.submittedAt, '2026-10-08T10:00:00.000Z')
-  assert.deepEqual(s.selectedModules.map(m => m.id), ['orders-core', 'whatsapp-assistant', 'kitchen-display'])
+  assert.deepEqual(s.selectedModules.filter(m => m.tier !== 'base').map(m => m.id), ['ordering-site', 'loyalty', 'forecasting'])
+  assert.equal(s.selectedModules.filter(m => m.tier === 'base').length, 16)
   assert.equal(s.selectedModules.length + s.unselectedModules.length, 25)
-  assert.ok(!s.unselectedModules.some(m => m.id === 'orders-core'))
+  assert.ok(s.unselectedModules.every(m => m.tier !== 'base'))
+  assert.ok(s.unselectedModules.some(m => m.id === 'promotions' && m.tier === 'premium'))
   assert.equal(s.contact.phone, '+351912345678')
   assert.equal(s.contact.email, null)
   assert.equal(s.attribution.landingPath, '/food/montar')
@@ -108,8 +117,8 @@ test('submission: builds the versioned contract with core always selected and th
 
 test('submission: rejects untrusted input', async () => {
   const cases: [Record<string, unknown>, number, string][] = [
-    [{ moduleIds: ['kitchen-display', 'made-up'] }, 400, 'moduleIds'],
-    [{ moduleIds: 'kitchen-display' }, 400, 'moduleIds'],
+    [{ moduleIds: ['loyalty', 'made-up'] }, 400, 'moduleIds'],
+    [{ moduleIds: 'loyalty' }, 400, 'moduleIds'],
     [{ website: 'http://spam' }, 400, 'body'],
     [{ startedAt: now - 500 }, 429, 'startedAt'],
     [{ startedAt: now - 2 * 24 * 3600_000 }, 400, 'startedAt'],
@@ -143,4 +152,8 @@ test('email: subject, reference, all modules and escaped visitor text', async ()
   assert.ok(text.includes('8 de outubro de 2026') && text.includes('11:00'), 'Lisbon local time (WEST, UTC+1)')
   assert.ok(html.includes('https://wa.me/351912345678'))
   assert.ok(text.includes('utm_source: whatsapp'))
+  assert.match(text, /PREMIUM ESCOLHIDOS \(2\)\n   ★ Site de Pedidos\n   ★ Fidelização/)
+  assert.match(text, /OPCIONAIS ESCOLHIDOS \(1\)\n   ✓ Previsões/)
+  assert.match(text, /BASE INCLUÍDA \(16\)/)
+  assert.match(text, /· Promoções \(premium\)/)
 })

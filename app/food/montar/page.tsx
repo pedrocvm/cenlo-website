@@ -1,9 +1,10 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
-import { GROUPS, MODULES } from '@/lib/food-builder/catalog'
+import { BASE_MODULES, GROUPS, MODULES } from '@/lib/food-builder/catalog'
 import { HERO_SHOTS, shotsFor } from '@/lib/food-builder/screenshots'
 import ModuleCard from '@/components/food-builder/ModuleCard'
 import GroupNav from '@/components/food-builder/GroupNav'
+import { TierBadge } from '@/components/food-builder/SelectToggle'
 
 const title = 'Monte o seu Cenlo Food | Cenlo Food Builder'
 const description = 'Explore os módulos do Cenlo Food, veja a plataforma real e escolha o que faz sentido para o seu negócio.'
@@ -47,6 +48,11 @@ export default function FoodBuilderPage() {
       </section>
 
       <div id="modulos" style={{ scrollMarginTop: 68 }}>
+        <div className="fb-legend" aria-label="Legenda">
+          <span><TierBadge tier="base" /> {BASE_MODULES.length} módulos já fazem parte de qualquer configuração</span>
+          <span><TierBadge tier="premium" /> módulos de maior impacto, à sua escolha</span>
+          <span><TierBadge tier="optional" /> pode juntar se fizer sentido</span>
+        </div>
         <GroupNav groups={GROUPS.map(g => ({ id: g.id, title: g.title, count: MODULES.filter(m => m.group === g.id).length }))} />
         {GROUPS.map((g, gi) => (
           <section key={g.id} id={`grupo-${g.id}`} className="fb-group" aria-labelledby={`g-${g.id}`}>

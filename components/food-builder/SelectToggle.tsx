@@ -1,15 +1,22 @@
 'use client'
+import type { Tier } from '@/lib/food-builder/catalog'
 import { isSelected, toggleModule, useSelection } from './selection'
 
-export default function SelectToggle({ id, title, required }: { id: string; title: string; required: boolean }) {
+export function TierBadge({ tier }: { tier: Tier }) {
+  if (tier === 'premium') return <span className="fb-tier fb-tier-premium"><span aria-hidden="true">★</span> Premium</span>
+  if (tier === 'optional') return <span className="fb-tier fb-tier-optional">Opcional</span>
+  return <span className="fb-tier fb-tier-base"><span aria-hidden="true">✓</span> Incluído na base</span>
+}
+
+export default function SelectToggle({ id, title, tier }: { id: string; title: string; tier: Tier }) {
   const selection = useSelection()
   const on = isSelected(selection, id)
 
-  if (required) {
+  if (tier === 'base') {
     return (
       <div className="fb-core-note">
-        <span className="fb-badge">Base</span>
-        <span>Base Cenlo Food incluída</span>
+        <span className="fb-toggle-mark is-base" aria-hidden="true">✓</span>
+        <span>Já incluído em qualquer configuração Cenlo Food</span>
       </div>
     )
   }
@@ -17,7 +24,7 @@ export default function SelectToggle({ id, title, required }: { id: string; titl
   return (
     <button
       type="button"
-      className="fb-toggle"
+      className={`fb-toggle${tier === 'premium' ? ' is-premium' : ''}`}
       aria-pressed={on}
       aria-label={on ? `${title}: incluído na minha configuração. Carregar para remover.` : `Adicionar ${title} à minha configuração`}
       onClick={() => toggleModule(id)}
