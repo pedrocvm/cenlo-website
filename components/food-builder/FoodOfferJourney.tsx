@@ -215,7 +215,7 @@ export default function FoodOfferJourney({ entry = 'builder' }: { entry?: 'build
   const promotionExpired = !!s?.promotion && (promotionRejected || (!!serverNow && serverNow >= Date.parse(s.promotion.endsAt)))
   const promotionChecking = !!s?.promotion && !serverNow
   const campaignActive = !!campaign && serverNow >= Date.parse(campaign.startsAt) && serverNow < Date.parse(campaign.endsAt)
-  const availableGift = campaignActive && s && s.composition.units === 1 && s.composition.integration === 'none' && s.composition.moduleIds.every(id => BASE_SELECTION_IDS.includes(id) || id === 'loyalty') ? campaign : null
+  const availableGift = campaignActive && s && s.plan === 'essential' && s.composition.units === 1 && s.composition.integration === 'none' && s.composition.moduleIds.every(id => BASE_SELECTION_IDS.includes(id) || id === 'loyalty') ? campaign : null
   const cash = journey.payment !== 'split'
   const total = s ? (cash ? s.payment.cash?.cents ?? s.setupCents : s.setupCents) : 0
   const amounts = s ? cash ? [total] : [...(s.payment.split?.upfrontCents ? [s.payment.split.upfrontCents] : []), ...(s.payment.split?.restCents || [])] : []
@@ -312,6 +312,7 @@ export default function FoodOfferJourney({ entry = 'builder' }: { entry?: 'build
     {s && !editing && promotionExpired && <section className="fl-expired" role="status"><ModuleIcon name="calendar" /><h2>A condição especial do Clube terminou.</h2><p>Seu diagnóstico e suas escolhas continuam salvos. Confira o Essential sem o presente, ou ajuste a seleção para incluir o Clube nas condições atuais.</p><div className="fo-actions"><button type="button" className="fb-btn fb-btn-primary" disabled={busy} onClick={() => void issue(journey, { ...s.composition, moduleIds: s.composition.moduleIds.filter(id => id !== 'loyalty') }, true)}>Conferir Essential sem o presente</button><button type="button" className="fb-btn fb-btn-ghost" onClick={() => { setEditing(true); setChangedConfirmed(false) }}>Ajustar minha seleção</button></div><p>O prazo não reinicia ao atualizar a página. Nenhum valor é alterado ou cobrado sem sua confirmação.</p></section>}
     {s && !editing && !promotionExpired && <>
       <p className="fb-lede">{s.reason}</p>
+      {availableGift && !s.promotion && <p className="fo-assurance">Há um presente disponível para uma nova versão da sua oferta. Confira o Essential com o Clube antes de enviar o pedido.</p>}
       <p className="fo-route">Suas escolhas <span aria-hidden="true">→</span> <strong>Sua oferta</strong> <span aria-hidden="true">→</span> Pedido de implantação</p>
       {(s.promotion || availableGift) && <LoyaltyGift promotion={(s.promotion || availableGift)!} now={serverNow} busy={busy} onDemo={() => event('food_demo_opened')} onContinue={() => {
         if (!s.promotion) { void issue(journey, s.composition, true); return }
@@ -329,7 +330,7 @@ export default function FoodOfferJourney({ entry = 'builder' }: { entry?: 'build
         <p className="fo-calendar-note">A mensalidade é cobrada separadamente das parcelas da implantação.</p>
       </section>
       <p className="fo-offer-validity">{s.policy.validityText}</p>
-      {!received && !review && <div className="fo-actions"><button className="fb-btn fb-btn-primary" disabled={promotionChecking} onClick={() => { setReview('implementation'); event('food_review_started') }}>Avançar com esta solução</button><button className="fb-btn fb-btn-ghost" onClick={() => { setEditing(true); setChangedConfirmed(false) }}>Ajustar os recursos</button><button className="fb-link-btn" onClick={() => { setReview('question'); event('food_review_started') }}>Ainda tenho uma dúvida</button></div>}
+      {!received && !review && <div className="fo-actions"><button className="fb-btn fb-btn-primary" disabled={promotionChecking || busy} onClick={() => { if (availableGift && !s.promotion) { void issue(journey, s.composition, true); return } setReview('implementation'); event('food_review_started') }}>{availableGift && !s.promotion ? 'Conferir Essential com o Clube' : 'Avançar com esta solução'}</button><button className="fb-btn fb-btn-ghost" onClick={() => { setEditing(true); setChangedConfirmed(false) }}>Ajustar os recursos</button><button className="fb-link-btn" onClick={() => { setReview('question'); event('food_review_started') }}>Ainda tenho uma dúvida</button></div>}
       {!review && <p className="fo-assurance">Você confere os dados no próximo passo. O pedido não realiza cobrança nem ativa uma conta.</p>}
       {!review && <OfferValue selected={s.included.filter(c => s.composition.moduleIds.includes(c.id))} priority={s.composition.priority} diagnostic={journey.entry === 'diagnostic'} onDemo={() => event('food_demo_opened')} />}
       {review && !received && <form className="fo-review" onSubmit={submit}>
