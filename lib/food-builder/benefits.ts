@@ -2,7 +2,7 @@
 export const MODULE_BENEFITS: Record<string, string> = {
   'orders-core': 'Reúna os pedidos em um só lugar e acompanhe o que falta preparar, entregar ou concluir.',
   'whatsapp-assistant': 'Organize as conversas e deixe sua equipe assumir o atendimento com o histórico à mão.',
-  'conversation-order': 'Leve a escolha do cliente até o pedido pela conversa. O atendimento é validado com seu cardápio antes de ativar.',
+  'conversation-order': 'Leve a escolha do cliente até o pedido pela conversa. O atendimento usa o cardápio e as regras da sua loja.',
   'kitchen-display': 'Mostre à cozinha o que preparar e em qual ordem, com cada pedido na etapa certa.',
   'auto-printing': 'Leve os pedidos para a impressora da cozinha, reduzindo a necessidade de copiar comandas à mão.',
   'online-ordering': 'Dê ao cliente um link para escolher os itens e enviar o pedido, sem depender de uma troca de mensagens.',
@@ -16,7 +16,7 @@ export const MODULE_BENEFITS: Record<string, string> = {
   'customer-updates': 'Deixe o cliente acompanhar o pedido e reduza as interrupções para perguntar se já saiu.',
   'promotions': 'Crie ofertas para os produtos e momentos que você quer destacar, com prazo e condições definidos.',
   'customer-crm': 'Conheça o histórico e os pedidos favoritos de cada cliente para atender com mais contexto.',
-  'customer-reactivation': 'Identifique quem deixou de comprar e prepare o convite para voltar, com regras de envio a validar.',
+  'customer-reactivation': 'Identifique quem deixou de comprar e prepare o convite para voltar, com frequência e regras de envio configuradas para sua operação.',
   'loyalty': 'Dê ao cliente motivos para voltar, com pontos, metas e recompensas que fazem sentido para seu negócio.',
   'cenlo-intelligence': 'Transforme o histórico da operação em sinais que ajudam a decidir onde concentrar sua atenção.',
   'forecasting': 'Use o histórico disponível para antecipar a procura e apoiar o planejamento da equipe e da produção.',

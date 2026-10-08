@@ -2,7 +2,7 @@
 /* eslint-disable react-hooks/set-state-in-effect -- Restore this tab's saved external session after hydration. */
 import { useEffect, useRef, useState } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
-import { readSelection, replaceSelection, mergeSelectionIntoComposition } from './selection'
+import { BASE_SELECTION_IDS, readSelection, replaceSelection, mergeSelectionIntoComposition } from './selection'
 import ModuleIcon from './ModuleIcon'
 import AnimatedDetails from './AnimatedDetails'
 import OfferValue from './OfferValue'
@@ -15,13 +15,28 @@ const API = '/api/food-builder/autonomous'
 const money = (n: number) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'EUR' }).format(n / 100)
 type Cap = { id: string; label: string; plan: string; state: string; condition?: string }
 type Composition = { moduleIds: string[]; preferences: string[]; units: number; integration: string; priority: string }
-type Snapshot = { state: string; label: string; plan: string; version: string; setupCents: number; monthlyCents: number; sessions: number; reason: string; removalExplanation: string; composition: Composition; included: Cap[]; conditions: { id: string; text: string; state: string }[]; payment: { cash: { cents: number; discountPercent: number } | null; split: { upfrontCents: number; restCents: number[] } | null }; policy: { monthlyStart: string; installmentDue: string[]; validityText: string; taxText: string } }
+type Snapshot = { state: string; label: string; plan: string; version: string; setupCents: number; monthlyCents: number; sessions: number; reason: string; removalExplanation: string; composition: Composition; included: Cap[]; benefits?: { baseIds: string[]; courtesyIds: string[] }; conditions: { id: string; text: string; state: string }[]; payment: { cash: { cents: number; discountPercent: number } | null; split: { upfrontCents: number; restCents: number[] } | null }; policy: { monthlyStart: string; installmentDue: string[]; validityText: string; taxText: string } }
 type Offer = { id: string; reference: string; snapshot: Snapshot; expiresAt: string | null; isTest: boolean }
 type Receipt = { saved: boolean; id: string; reference: string; kind: string; whatsappUrl: string; snapshot: { offer: Snapshot; payment: { totalCents: number; amounts: number[]; due: string[]; option: string } } }
 type EvaluationReceipt = { saved: boolean; id: string; reference: string; whatsappUrl: string }
 type Journey = { selectionSyncVersion?: number; compositionEdited?: boolean; evaluationSubmissionId?: string; evaluationReceipt?: EvaluationReceipt; evaluation?: { reasons: string[]; composition: Composition }; sessionKey: string; entry: 'diagnostic' | 'builder'; previousOfferId?: string; builderSelection?: string; answers?: Record<string, unknown>; composition?: Composition; offer?: Offer; receipt?: Receipt; payment?: 'cash' | 'split'; isTest: boolean; attribution: Record<string, string>; submissionId?: string; contact?: { name: string; business: string; phone: string; email: string }; decision?: string; desiredStart?: string; question?: string }
 function load(): Journey | null { try { return JSON.parse(sessionStorage.getItem(KEY) || 'null') } catch { return null } }
 function save(j: Journey) { try { sessionStorage.setItem(KEY, JSON.stringify(j)) } catch { /* This tab still works without storage. */ } }
+
+function OfferBenefits({ snapshot: s }: { snapshot: Snapshot }) {
+  if (!s.benefits) return null
+  const extras = s.included.filter(c => s.benefits!.courtesyIds.includes(c.id))
+  const items = extras.length ? extras : s.included.filter(c => s.benefits!.baseIds.includes(c.id))
+  if (!items.length) return null
+  const item = (c: Cap) => <li key={c.id}><ModuleIcon name={MODULES.find(m => m.id === c.id)?.icon || 'orders'} /><span>{c.label}</span><span aria-hidden="true">✓</span></li>
+  return <section className="fo-gift" aria-label="Benefícios incluídos no plano">
+    <div className="fo-gift-heading"><span className="fo-gift-icon" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><path d="M5 15h22v13H5zM3 10h26v5H3zM16 10v18" /><path d="M16 10C6 10 7 3 11 4c3 .5 5 6 5 6Zm0 0c10 0 9-7 5-6-3 .5-5 6-5 6Z" /></svg></span><div><span className="fc-kicker">{extras.length ? 'Cortesias para sua operação' : 'Sua base completa, incluída'}</span><h2>{extras.length ? 'Você escolheu. E ganhou mais.' : 'Mais recursos. Nenhum adicional.'}</h2></div><span className="fo-gift-badge">{extras.length ? "+" : ""}{items.length} benefícios</span></div>
+    <p>{extras.length ? `Além da sua seleção, você recebe estes recursos do ${s.label} sem pagar a mais. Eles já ficam registrados na sua oferta.` : `Todos os recursos básicos fazem parte do seu ${s.label}, incluindo atendimento, cozinha, auditoria e treinamento.`}</p>
+    <ul className="fo-gift-items">{items.slice(0, 4).map(item)}</ul>
+    {items.length > 4 && <AnimatedDetails className="fo-gift-more"><summary>Ver mais {items.length - 4} benefícios incluídos <span aria-hidden="true">+</span></summary><ul className="fo-gift-items">{items.slice(4).map(item)}</ul></AnimatedDetails>}
+    <div className="fo-gift-footer"><span><strong>Sem acréscimo à mensalidade</strong><small>Recursos do plano, sujeitos às condições de implantação abaixo.</small></span><strong>{money(s.monthlyCents)}<small>/mês por unidade</small></strong></div>
+  </section>
+}
 
 function FoodReceipt({ receipt, offerReference, isTest, onWhatsApp }: { receipt: Receipt; offerReference?: string; isTest: boolean; onWhatsApp: () => void }) {
   const s = receipt.snapshot.offer
@@ -47,8 +62,9 @@ function FoodReceipt({ receipt, offerReference, isTest, onWhatsApp }: { receipt:
           <p className="fr-unpaid"><span aria-hidden="true">○</span> Nenhum pagamento realizado nesta etapa.</p>
         </section>
 
+        <OfferBenefits snapshot={s} />
         <section className="fr-scope" aria-labelledby="fr-scope-title"><div className="fr-section-heading"><div><span className="fr-kicker">O que você escolheu</span><h2 id="fr-scope-title">Sua operação, conectada.</h2></div><span>{s.included.length} recursos incluídos</span></div>
-          <ul className="fr-features">{s.included.map(c => <li key={c.id}><ModuleIcon name={MODULES.find(m => m.id === c.id)?.icon || 'orders'} /><div><h3>{c.label}</h3>{c.condition ? <p>{c.condition}</p> : <span className="fr-included">{s.composition.moduleIds.includes(c.id) ? 'Escolhido por você' : 'Incluído sem custo adicional'}</span>}</div></li>)}</ul>
+          <ul className="fr-features">{s.included.map(c => <li key={c.id}><ModuleIcon name={MODULES.find(m => m.id === c.id)?.icon || 'orders'} /><div><h3>{c.label}</h3>{c.condition ? <p>{c.condition}</p> : <span className="fr-included">{s.benefits?.baseIds.includes(c.id) ? 'Básico incluído' : s.composition.moduleIds.includes(c.id) ? 'Escolhido por você' : 'Incluído sem custo adicional'}</span>}</div></li>)}</ul>
           <div className="fr-support"><ModuleIcon name="users" /><p><strong>Acompanhamento inicial</strong><span>{s.sessions} {s.sessions === 1 ? 'sessão estratégica' : 'sessões estratégicas'} de 1 hora, no total. Treinamento operacional separado.</span></p></div>
         </section>
 
@@ -67,7 +83,7 @@ export default function FoodOfferJourney({ entry = 'builder' }: { entry?: 'build
   const pathname = usePathname()
   const [journey, setJourney] = useState<Journey | null>(null)
   const [caps, setCaps] = useState<Cap[]>([])
-  const [composition, setComposition] = useState<Composition>({ moduleIds: ['orders-core'], preferences: [], units: 1, integration: 'none', priority: 'pedidos' })
+  const [composition, setComposition] = useState<Composition>({ moduleIds: BASE_SELECTION_IDS, preferences: [], units: 1, integration: 'none', priority: 'pedidos' })
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
   const [reasons, setReasons] = useState<string[]>([])
@@ -85,6 +101,7 @@ export default function FoodOfferJourney({ entry = 'builder' }: { entry?: 'build
     const next = { ...ref.current!, ...value }; ref.current = next; setJourney(next); save(next); return next
   }
   function editComposition(next: Composition) {
+    next = { ...next, moduleIds: [...new Set([...BASE_SELECTION_IDS, ...next.moduleIds])] }
     replaceSelection(next.moduleIds)
     setComposition(next)
     update({ composition: next, compositionEdited: true })
@@ -114,6 +131,7 @@ export default function FoodOfferJourney({ entry = 'builder' }: { entry?: 'build
       }
       const next = update({ compositionEdited: false, evaluation: undefined, offer: result.offer, composition: result.offer.snapshot.composition, receipt: undefined, previousOfferId: undefined, submissionId: undefined, builderSelection: JSON.stringify(readSelection()) })
       setComposition(result.offer.snapshot.composition); setEditing(false); setReview(null); setConfirmed(false)
+      if (pathname === '/configurar/avaliacao') router.replace('/configurar/oferta')
       event('food_offer_viewed', next); window.scrollTo({ top: 0, behavior: 'instant' })
     } catch (e) { setError((e as Error).message); if (!j.offer) setEditing(true) }
     finally { lock.current = false; setBusy(false) }
@@ -139,7 +157,7 @@ export default function FoodOfferJourney({ entry = 'builder' }: { entry?: 'build
     const changedInBuilder = j.builderSelection !== undefined && j.builderSelection !== JSON.stringify(currentSelection) && !j.receipt
     const draft = savedComposition ? changedInBuilder
       ? { ...savedComposition, moduleIds: mergeSelectionIntoComposition(savedComposition.moduleIds, currentSelection) }
-      : savedComposition : { ...composition, moduleIds: ['orders-core', ...currentSelection] }
+      : { ...savedComposition, moduleIds: [...new Set([...BASE_SELECTION_IDS, ...savedComposition.moduleIds])] } : { ...composition, moduleIds: [...BASE_SELECTION_IDS, ...currentSelection] }
     if (j.evaluation && pathname === '/configurar/avaliacao') { setComposition(draft); setEditing(false) }
     else if (j.offer) {
       setComposition(draft)
@@ -152,7 +170,13 @@ export default function FoodOfferJourney({ entry = 'builder' }: { entry?: 'build
     else if (j.entry === 'diagnostic' && j.answers && Array.isArray(j.answers.f16) && j.answers.f16.includes('demo')) { setComposition(draft); setEditing(true) }
     else if (j.entry === 'diagnostic' && j.answers) void issue(j)
     else { setComposition(draft); setEditing(true) }
-    void call('/catalog', undefined, j.sessionKey).then(d => setCaps(d.snapshot.capabilities)).catch(e => setError(e.message))
+    void call('/catalog', undefined, j.sessionKey).then(d => {
+      const published = d.snapshot.capabilities as Cap[]
+      setCaps(published)
+      // Retry only an unissued evaluation whose old blockers have been released.
+      // Confirmed offers and requests always keep their frozen version.
+      if (d.snapshot.selectionPolicy === 'complete-essential' && j.evaluation && !j.offer && !j.previousOfferId && !j.evaluationReceipt && !editRequested && !j.compositionEdited && !changedInBuilder && draft.units === 1 && draft.integration === 'none' && draft.moduleIds.every(id => published.some(c => c.id === id && c.state !== 'evaluation'))) void issue(j, draft)
+    }).catch(e => setError(e.message))
     // Restore a frozen offer, never recalculate it on refresh.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
@@ -234,11 +258,11 @@ export default function FoodOfferJourney({ entry = 'builder' }: { entry?: 'build
           const selected = items.filter(c => composition.moduleIds.includes(c.id)).length
           return <AnimatedDetails className="fc-group" key={group.id} open={index === 0}><summary><ModuleIcon name={MODULES.find(m => m.group === group.id)?.icon || 'orders'} /><span className="fc-group-title">{group.title}<small>{items.length} recursos disponíveis para escolher</small></span><span className={`fc-group-count${selected ? ' has-selection' : ''}`}>{selected ? `${selected} ${selected === 1 ? 'selecionado' : 'selecionados'}` : 'Explorar'}</span><span className="fc-chevron" aria-hidden="true">⌄</span></summary><div className="fc-cards">{items.map(c => {
             const checked = composition.moduleIds.includes(c.id)
-            return <article className={`fc-card${checked ? ' is-selected' : ''}`} key={c.id}><label><ModuleIcon name={MODULES.find(m => m.id === c.id)?.icon || 'orders'} /><span className="fc-card-title">{c.label}<span className="fc-card-benefit">{MODULE_BENEFITS[c.id]}</span><small>{c.id === 'orders-core' ? 'A base da sua solução' : c.state === 'evaluation' ? 'Sujeito a confirmação' : checked ? 'Na sua seleção' : 'Adicionar à solução'}</small></span><input type="checkbox" checked={checked} disabled={c.id === 'orders-core'} onChange={e => editComposition({ ...composition, moduleIds: e.target.checked ? [...composition.moduleIds, c.id] : composition.moduleIds.filter(x => x !== c.id) })} /></label>{c.condition && <AnimatedDetails className="fc-card-detail"><summary>O que considerar <span aria-hidden="true">+</span></summary><p>{c.condition}</p></AnimatedDetails>}</article>
+            return <article className={`fc-card${checked ? ' is-selected' : ''}`} key={c.id}><label><ModuleIcon name={MODULES.find(m => m.id === c.id)?.icon || 'orders'} /><span className="fc-card-title">{c.label}<span className="fc-card-benefit">{MODULE_BENEFITS[c.id]}</span><small>{c.plan === 'essential' ? 'Básico · já incluído em todos os planos' : c.state === 'evaluation' ? 'Sujeito a confirmação' : checked ? 'Na sua seleção' : 'Adicionar à solução'}</small></span><input type="checkbox" checked={checked} disabled={c.plan === 'essential'} onChange={e => editComposition({ ...composition, moduleIds: e.target.checked ? [...composition.moduleIds, c.id] : composition.moduleIds.filter(x => x !== c.id) })} /></label>{c.condition && <AnimatedDetails className="fc-card-detail"><summary>O que considerar <span aria-hidden="true">+</span></summary><p>{c.condition}</p></AnimatedDetails>}</article>
           })}</div></AnimatedDetails>
         })}</div>
       </div>
-      <aside className={`fc-selection${cartOpen ? ' is-open' : ''}`} aria-label="Sua seleção" onKeyDown={e => { if (e.key === 'Escape') { setCartOpen(false); cartToggle.current?.focus() } }}><div className="fc-cart-panel" id="fc-cart-details"><div className="fc-cart-content"><span className="fc-kicker">Montado por você</span><div className="fc-selection-title"><h2 id="fc-selection-title">Sua seleção</h2><span aria-live="polite">{composition.moduleIds.length}</span></div><p>Escolha os itens indispensáveis. Vamos encontrar o menor plano que atende à sua operação.</p><ul className="fc-selected-list">{composition.moduleIds.map(id => <li key={id}><span aria-hidden="true">✓</span>{caps.find(c => c.id === id)?.label || MODULES.find(m => m.id === id)?.title || 'Recurso selecionado'}</li>)}</ul>
+      <aside className={`fc-selection${cartOpen ? ' is-open' : ''}`} aria-label="Sua seleção" onKeyDown={e => { if (e.key === 'Escape') { setCartOpen(false); cartToggle.current?.focus() } }}><div className="fc-cart-panel" id="fc-cart-details"><div className="fc-cart-content"><span className="fc-kicker">Montado por você</span><div className="fc-selection-title"><h2 id="fc-selection-title">Sua seleção</h2><span aria-live="polite">{composition.moduleIds.length}</span></div><p>A base completa já está incluída. Adicione o que precisa e veja o menor plano que atende à sua operação.</p><ul className="fc-selected-list">{composition.moduleIds.map(id => <li key={id}><span aria-hidden="true">✓</span>{caps.find(c => c.id === id)?.label || MODULES.find(m => m.id === id)?.title || 'Recurso selecionado'}</li>)}</ul>
       {journey.offer && removed.length > 0 && <AnimatedDetails className="fc-changes"><summary>{removed.length} {removed.length === 1 ? 'item retirado' : 'itens retirados'} nesta revisão <span aria-hidden="true">+</span></summary><p>{removed.map(id => caps.find(c => c.id === id)?.label || id).join(', ')}.</p></AnimatedDetails>}
       {(journey.offer || journey.previousOfferId) && <label className="fc-confirm"><input type="checkbox" checked={changedConfirmed} onChange={e => setChangedConfirmed(e.target.checked)} /><span>Confirmo minhas alterações e quero conferir a nova oferta.</span></label>}
       <button className="fc-continue fc-desktop-continue" disabled={busy || !caps.length || (!!(journey.offer || journey.previousOfferId) && !changedConfirmed)} onClick={() => void issue(journey, composition, changedConfirmed)}>{busy ? 'Preparando sua oferta…' : <>Ver minha oferta <span aria-hidden="true">→</span></>}</button>
@@ -259,6 +283,7 @@ export default function FoodOfferJourney({ entry = 'builder' }: { entry?: 'build
       <p className="fb-lede">{s.reason}</p>
       <p className="fo-route">Suas escolhas <span aria-hidden="true">→</span> <strong>Sua oferta</strong> <span aria-hidden="true">→</span> Pedido de implantação</p>
       <div className="fo-prices"><div><span>Implantação · {cash ? 'à vista' : 'parcelada'}</span><strong>{money(received ? received.snapshot.payment.totalCents : total)}</strong><small>Base: {money(s.setupCents)}{cash && s.payment.cash ? ` · ${s.payment.cash.discountPercent}% à vista` : ''}</small></div><div><span>Mensalidade por unidade</span><strong>{money(s.monthlyCents)}</strong><small>{s.policy.monthlyStart}</small></div></div>
+      <OfferBenefits snapshot={s} />
       <p>{s.policy.taxText}</p>
       {!received && <fieldset className="fo-payment"><legend>Escolha como prefere pagar a implantação</legend><label><input type="radio" name="payment" checked={cash} onChange={() => { update({ payment: 'cash', submissionId: undefined }); setConfirmed(false) }} />À vista: {money(s.payment.cash?.cents ?? s.setupCents)}</label>{s.payment.split && <label><input type="radio" name="payment" checked={!cash} onChange={() => { update({ payment: 'split', submissionId: undefined }); setConfirmed(false) }} />Parcelado: total de {money(s.setupCents)}</label>}</fieldset>}
       <section className="fo-calendar" aria-labelledby="fo-calendar-title">

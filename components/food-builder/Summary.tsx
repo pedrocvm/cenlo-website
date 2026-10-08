@@ -2,9 +2,9 @@
 import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { BASE_MODULES, MODULES } from '@/lib/food-builder/catalog'
+import { MODULES } from '@/lib/food-builder/catalog'
 import { TierBadge } from './SelectToggle'
-import { clearSelection, removeModule, useSelection, EXTRA_SELECTION_MODULES } from './selection'
+import { clearSelection, removeModule, useSelection, EXTRA_SELECTION_MODULES, BASE_SELECTION_MODULES } from './selection'
 
 function countLabel(n: number) {
   return n === 1 ? 'módulo selecionado' : 'módulos selecionados'
@@ -24,7 +24,7 @@ function Panel({ onNavigate, headingId }: { onNavigate?: () => void; headingId: 
       </div>
       <div className="fb-base">
         <span className="fb-badge fb-badge-ok" aria-hidden="true">Base</span>
-        <Link href="/configurar#modulos" onClick={onNavigate}><b>{BASE_MODULES.length} módulos</b> já incluídos</Link>
+        <Link href="/configurar#modulos" onClick={onNavigate}><b>{BASE_SELECTION_MODULES.length} módulos</b> já incluídos</Link>
       </div>
       {selected.length ? (
         <ul className="fb-sel-list">

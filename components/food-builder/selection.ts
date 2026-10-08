@@ -5,12 +5,14 @@ import { MODULES } from '@/lib/food-builder/catalog'
 const KEY = 'cenlo-food-builder:selection:v1'
 const EMPTY: readonly string[] = []
 export const EXTRA_SELECTION_MODULES = [
-  { id: 'conversation-order', title: 'Fechar pedidos na conversa', tier: 'optional' as const, slug: null },
-  { id: 'online-ordering', title: 'Página de pedidos online', tier: 'optional' as const, slug: null },
+  { id: 'conversation-order', title: 'Fechar pedidos na conversa', tier: 'base' as const, slug: null },
+  { id: 'online-ordering', title: 'Página de pedidos online', tier: 'base' as const, slug: null },
   { id: 'menu-import', title: 'Importação de cardápio com IA', tier: 'optional' as const, slug: null },
 ]
-const known = new Set([...MODULES.filter(m => m.tier !== 'base').map(m => m.id as string), ...EXTRA_SELECTION_MODULES.map(m => m.id)])
-const base = new Set(MODULES.filter(m => m.tier === 'base').map(m => m.id as string))
+const known = new Set([...MODULES.filter(m => m.tier !== 'base').map(m => m.id as string), ...EXTRA_SELECTION_MODULES.filter(m => m.tier !== 'base').map(m => m.id)])
+export const BASE_SELECTION_MODULES = [...MODULES, ...EXTRA_SELECTION_MODULES].filter(m => m.tier === 'base')
+export const BASE_SELECTION_IDS = BASE_SELECTION_MODULES.map(m => m.id as string)
+const base = new Set(BASE_SELECTION_IDS)
 const listeners = new Set<() => void>()
 let cache: readonly string[] | null = null
 
@@ -78,5 +80,5 @@ export function readSelection() { return read() }
 export function replaceSelection(ids: readonly string[]) { write(ids) }
 
 export function mergeSelectionIntoComposition(ids: readonly string[], selection: readonly string[]) {
-  return [...new Set(['orders-core', ...ids.filter(id => base.has(id)), ...selection])]
+  return [...new Set([...BASE_SELECTION_IDS, ...ids.filter(id => base.has(id)), ...selection])]
 }
