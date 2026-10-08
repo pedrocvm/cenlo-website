@@ -2,6 +2,8 @@
 /* eslint-disable react-hooks/set-state-in-effect -- Restore this tab's saved external session after hydration. */
 import { useEffect, useRef, useState } from 'react'
 import { readSelection } from './selection'
+import ModuleIcon from './ModuleIcon'
+import { MODULES } from '@/lib/food-builder/catalog'
 import { readAttribution } from './CaptureAttribution'
 
 const KEY = 'cenlo-food-autonomous:v1'
@@ -15,6 +17,45 @@ type Receipt = { saved: boolean; id: string; reference: string; kind: string; wh
 type Journey = { sessionKey: string; entry: 'diagnostic' | 'builder'; previousOfferId?: string; builderSelection?: string; answers?: Record<string, unknown>; composition?: Composition; offer?: Offer; receipt?: Receipt; payment?: 'cash' | 'split'; isTest: boolean; attribution: Record<string, string>; submissionId?: string; contact?: { name: string; business: string; phone: string; email: string }; decision?: string; desiredStart?: string; question?: string }
 function load(): Journey | null { try { return JSON.parse(sessionStorage.getItem(KEY) || 'null') } catch { return null } }
 function save(j: Journey) { try { sessionStorage.setItem(KEY, JSON.stringify(j)) } catch { /* This tab still works without storage. */ } }
+
+function FoodReceipt({ receipt, offerReference, isTest, onWhatsApp }: { receipt: Receipt; offerReference?: string; isTest: boolean; onWhatsApp: () => void }) {
+  const s = receipt.snapshot.offer
+  const payment = receipt.snapshot.payment
+  const cash = payment.option === 'cash'
+  const question = receipt.kind === 'question'
+  return <section className="fr" aria-labelledby="offer-heading">
+    {isTest && <p className="fr-test"><span /> Ambiente de teste <small>Sem cobrança ou ativação.</small></p>}
+    <header className="fr-hero">
+      <div className="fr-check" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none"><path d="m8 16 5.5 5.5L25 10" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" /></svg></div>
+      <div><span className="fr-kicker">Tudo registrado por aqui</span><h1 id="offer-heading">{question ? 'Sua dúvida foi recebida.' : 'Seu pedido foi recebido.'}</h1><p>{question ? 'Pedro vai conferir sua dúvida e retornar com o próximo passo.' : 'Sua escolha está salva. Agora, vamos organizar o próximo passo com você.'}</p></div>
+    </header>
+
+    <div className="fr-grid">
+      <div className="fr-main">
+        <section className="fr-plan" aria-labelledby="fr-plan-title">
+          <div className="fr-plan-heading"><div><span className="fr-kicker">Sua solução</span><h2 id="fr-plan-title">Cenlo Food <span>{s.label}</span></h2></div><span className="fr-saved">✓ Oferta registrada</span></div>
+          <div className="fr-prices">
+            <div className="fr-price fr-price-setup"><div className="fr-price-label">Implantação <span>{cash ? 'À vista' : 'Parcelada'}</span></div><strong>{money(payment.totalCents)}</strong><p>{cash && s.payment.cash ? <><s>{money(s.setupCents)}</s><span className="fr-discount">{s.payment.cash.discountPercent}% de desconto</span></> : 'Pagamento conforme as parcelas abaixo'}</p></div>
+            <div className="fr-price"><div className="fr-price-label">Mensalidade <span>Por unidade</span></div><strong>{money(s.monthlyCents)}<small>/mês</small></strong><p>{s.policy.monthlyStart}</p></div>
+          </div>
+          <div className="fr-schedule"><h3>Quando será pago</h3><ol>{payment.amounts.map((amount, i) => <li key={i}><span className="fr-step-number">{String(i + 1).padStart(2, '0')}</span><span>{payment.due[i]}</span><strong>{money(amount)}</strong></li>)}</ol></div>
+          <p className="fr-unpaid"><span aria-hidden="true">○</span> Nenhum pagamento realizado nesta etapa.</p>
+        </section>
+
+        <section className="fr-scope" aria-labelledby="fr-scope-title"><div className="fr-section-heading"><div><span className="fr-kicker">O que você escolheu</span><h2 id="fr-scope-title">Sua operação, conectada.</h2></div><span>{s.included.length} recursos incluídos</span></div>
+          <ul className="fr-features">{s.included.map(c => <li key={c.id}><ModuleIcon name={MODULES.find(m => m.id === c.id)?.icon || 'orders'} /><div><h3>{c.label}</h3>{c.condition ? <p>{c.condition}</p> : <span className="fr-included">Incluído na sua solução</span>}</div></li>)}</ul>
+          <div className="fr-support"><ModuleIcon name="users" /><p><strong>Acompanhamento inicial</strong><span>{s.sessions} {s.sessions === 1 ? 'sessão estratégica' : 'sessões estratégicas'} de 1 hora, no total. Treinamento operacional separado.</span></p></div>
+        </section>
+
+        <details className="fr-details"><summary><ModuleIcon name="calendar" /><span>Preparação e condições de implantação<small>O que vamos organizar juntos</small></span><b aria-hidden="true">+</b></summary><div className="fr-details-body"><ul>{s.conditions.map(c => <li key={c.id}>{c.text}</li>)}</ul><p>A Cenlo configura a unidade e os recursos contratados, prepara os acessos e treina a equipe. O restaurante fornece cardápio, horários, regras de entrega e um responsável pela implantação. Os testes e o início são combinados com você.</p></div></details>
+        <details className="fr-details"><summary><ModuleIcon name="receipt" /><span>Condições e referência da oferta<small>Consulte os detalhes que ficaram registrados</small></span><b aria-hidden="true">+</b></summary><div className="fr-details-body"><p>{s.policy.taxText}</p><p>{s.policy.validityText}</p><p>{s.reason}</p><p>{s.removalExplanation}</p><p className="fr-reference">Pedido {receipt.reference}<br />Oferta {offerReference}<br />Publicação {s.version}</p></div></details>
+        <button className="fr-print" onClick={() => window.print()}><ModuleIcon name="printer" /> Salvar resumo sem dados pessoais <span aria-hidden="true">↗</span></button>
+      </div>
+
+      <aside className="fr-next" aria-labelledby="fr-next-title"><span className="fr-kicker">E agora?</span><h2 id="fr-next-title">Vamos ao próximo passo.</h2><p>Pedro vai conferir os dados e falar com você {question ? 'para esclarecer sua dúvida.' : 'para organizar a implantação.'}</p><ol className="fr-progress"><li className="is-complete"><span aria-hidden="true">✓</span><div><strong>{question ? 'Dúvida registrada' : 'Pedido recebido'}</strong><small>Oferta e pagamento escolhidos estão salvos.</small></div></li><li><span aria-hidden="true">2</span><div><strong>Conferência com Pedro</strong><small>{question ? 'Esclarecer o que falta para decidir.' : 'Alinhar os dados e combinar o início.'}</small></div></li></ol><a className="fr-whatsapp" href={receipt.whatsappUrl} target="_blank" rel="noreferrer" onClick={onWhatsApp}><ModuleIcon name="chat" /> Continuar no WhatsApp <span aria-hidden="true">↗</span></a><p className="fr-reassurance">Pode fechar esta página. Seu pedido continua salvo, mesmo sem enviar uma mensagem.</p><div className="fr-request-reference"><span>Referência do pedido</span><code>{receipt.reference}</code></div></aside>
+    </div>
+  </section>
+}
 
 export default function FoodOfferJourney({ entry = 'builder' }: { entry?: 'builder' | 'diagnostic' }) {
   const [journey, setJourney] = useState<Journey | null>(null)
@@ -95,6 +136,7 @@ export default function FoodOfferJourney({ entry = 'builder' }: { entry?: 'build
     } catch (e) { setError((e as Error).message) }
     finally { lock.current = false; setBusy(false) }
   }
+  if (journey.receipt) return <FoodReceipt receipt={journey.receipt} offerReference={journey.offer?.reference} isTest={journey.isTest} onWhatsApp={() => event('food_whatsapp_opened')} />
   return <section className="fo-journey" aria-labelledby="offer-heading">
     {journey.isTest && <p className="fo-test">Teste controlado. Sem cobrança, ativação ou evento de compra.</p>}
     <span className="fb-eyebrow">Cenlo Food · {received ? 'Pedido recebido' : editing ? 'Sua composição' : 'Sua oferta'}</span>
