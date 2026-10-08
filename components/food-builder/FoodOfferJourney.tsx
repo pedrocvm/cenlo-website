@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
 import { readSelection } from './selection'
 import ModuleIcon from './ModuleIcon'
-import { MODULES } from '@/lib/food-builder/catalog'
+import { GROUPS, MODULES } from '@/lib/food-builder/catalog'
 import { readAttribution } from './CaptureAttribution'
 
 const KEY = 'cenlo-food-autonomous:v1'
@@ -164,21 +164,33 @@ export default function FoodOfferJourney({ entry = 'builder' }: { entry?: 'build
     </section>
   }
   if (journey.receipt) return <FoodReceipt receipt={journey.receipt} offerReference={journey.offer?.reference} isTest={journey.isTest} onWhatsApp={() => event('food_whatsapp_opened')} />
-  return <section className="fo-journey" aria-labelledby="offer-heading">
+  return <section className={`fo-journey${editing ? ' fc-journey' : ''}`} aria-labelledby="offer-heading">
     {journey.isTest && <p className="fo-test">Teste controlado. Sem cobrança, ativação ou evento de compra.</p>}
     <span className="fb-eyebrow">Cenlo Food · {received ? 'Pedido recebido' : editing ? 'Sua composição' : 'Sua oferta'}</span>
-    <h1 id="offer-heading" className="fb-display">{received ? received.kind === 'implementation' ? 'Seu pedido foi recebido.' : 'Sua dúvida foi recebida.' : editing ? 'O que precisa estar incluído?' : s ? `Cenlo Food ${s.label}` : 'Preparando sua oferta'}</h1>
+    <h1 id="offer-heading" className="fb-display">{received ? received.kind === 'implementation' ? 'Seu pedido foi recebido.' : 'Sua dúvida foi recebida.' : editing ? 'Sua operação. Sua solução.' : s ? `Cenlo Food ${s.label}` : 'Preparando sua oferta'}</h1>
     {error && <p className="fo-error" role="alert">{error}</p>}
     {received && <div className="fo-confirm"><p>A oferta e a forma de pagamento estão registradas. Pedro vai conferir os dados para organizar o próximo passo com você. Nenhum pagamento foi realizado nesta etapa.</p><p className="fo-reference">Referência: <strong>{received.reference}</strong></p><a className="fb-btn fb-btn-primary" href={received.whatsappUrl} target="_blank" rel="noreferrer" onClick={() => event('food_whatsapp_opened')}>Continuar no WhatsApp</a><p>O pedido continua salvo mesmo se você não enviar a mensagem.</p></div>}
-    {editing && !received && <div className="fo-editor">
-      <p>Marque somente o que é indispensável. Você recebe o plano de menor valor que cobre esses itens.</p>
-      {reasons.length > 0 && <div className="fo-error" role="status"><strong>Esta configuração precisa de avaliação.</strong><ul>{reasons.map(r => <li key={r}>{r}</li>)}</ul><p>Não há preço fechado para esse conjunto. Você pode rever os requisitos ou falar com Pedro sobre a compatibilidade.</p><a href="https://pedro.cenlo.pt/food">Pedir avaliação</a></div>}
-      <div className="fo-fields"><label>Quantas unidades?<input type="number" min="1" max="200" value={composition.units} onChange={e => setComposition({ ...composition, units: Number(e.target.value) })} /></label><label>Precisa conectar outro sistema?<select value={composition.integration} onChange={e => setComposition({ ...composition, integration: e.target.value })}><option value="none">Não, posso usar sem integração</option><option value="required">Sim, a integração é indispensável</option><option value="unknown">Ainda não sei</option></select></label></div>
-      <fieldset><legend>Itens indispensáveis</legend><div className="fo-modules">{caps.map(c => <label key={c.id}><input type="checkbox" checked={composition.moduleIds.includes(c.id)} disabled={c.id === 'orders-core'} onChange={e => setComposition({ ...composition, moduleIds: e.target.checked ? [...composition.moduleIds, c.id] : composition.moduleIds.filter(x => x !== c.id) })} /><span>{c.label}<small>{c.plan === 'essential' ? 'Essential' : c.plan === 'pro' ? 'Pro' : 'Ultra'}{c.condition ? ` · ${c.condition}` : ''}</small></span></label>)}</div></fieldset>
-      {journey.offer && removed.length > 0 && <p>Você retirou dos itens indispensáveis: {removed.map(id => caps.find(c => c.id === id)?.label || id).join(', ')}. A nova oferta vai mostrar o plano resultante, seus valores e tudo o que fica incluído antes de você confirmar o pedido.</p>}
-      {(journey.offer || journey.previousOfferId) && <label className="fo-check"><input type="checkbox" checked={changedConfirmed} onChange={e => setChangedConfirmed(e.target.checked)} />Confirmo os itens que adicionei ou retirei e quero conferir a nova oferta.</label>}
-      <button className="fb-btn fb-btn-primary" disabled={busy || !caps.length || (!!(journey.offer || journey.previousOfferId) && !changedConfirmed)} onClick={() => void issue(journey, composition, changedConfirmed)}>{busy ? 'Conferindo…' : 'Ver minha oferta e os valores'}</button>
-      {journey.offer && <button className="fb-btn fb-btn-ghost" onClick={() => { setEditing(false); setReasons([]) }}>Voltar à oferta anterior</button>}
+    {editing && !received && <div className="fc-editor">
+      <p className="fc-intro">Escolha o que faz sentido para o seu restaurante. Na próxima etapa, você confere a solução e os valores.</p>
+      <div className="fc-layout"><div className="fc-main">
+        <section className="fc-operation" aria-labelledby="fc-operation-title"><div className="fc-section-label"><ModuleIcon name="stores" /><div><span>01 · Sua operação</span><h2 id="fc-operation-title">Vamos começar pelo básico.</h2></div></div><div className="fo-fields"><label>Quantas unidades?<input type="number" min="1" max="200" value={composition.units} onChange={e => setComposition({ ...composition, units: Number(e.target.value) })} /></label><label>Precisa conectar outro sistema?<select value={composition.integration} onChange={e => setComposition({ ...composition, integration: e.target.value })}><option value="none">Não preciso de integração</option><option value="required">Sim, é indispensável</option><option value="unknown">Ainda não sei</option></select></label></div></section>
+        <div className="fc-section-label fc-resource-heading"><span className="fc-section-number">02</span><div><span>Os recursos da sua solução</span><h2>O que não pode faltar?</h2></div></div>
+        <div className="fc-groups">{GROUPS.map((group, index) => {
+          const items = caps.filter(c => (MODULES.find(m => m.id === c.id)?.group || (c.id === 'menu-import' ? 'structure' : 'operations')) === group.id)
+          if (!items.length) return null
+          const selected = items.filter(c => composition.moduleIds.includes(c.id)).length
+          return <details className="fc-group" key={group.id} open={index === 0}><summary><ModuleIcon name={MODULES.find(m => m.group === group.id)?.icon || 'orders'} /><span className="fc-group-title">{group.title}<small>{items.length} recursos disponíveis para escolher</small></span><span className={`fc-group-count${selected ? ' has-selection' : ''}`}>{selected ? `${selected} ${selected === 1 ? 'selecionado' : 'selecionados'}` : 'Explorar'}</span><span className="fc-chevron" aria-hidden="true">⌄</span></summary><div className="fc-cards">{items.map(c => {
+            const checked = composition.moduleIds.includes(c.id)
+            return <article className={`fc-card${checked ? ' is-selected' : ''}`} key={c.id}><label><ModuleIcon name={MODULES.find(m => m.id === c.id)?.icon || 'orders'} /><span className="fc-card-title">{c.label}<small>{c.id === 'orders-core' ? 'A base da sua solução' : c.state === 'evaluation' ? 'Sujeito a confirmação' : checked ? 'Na sua seleção' : 'Adicionar à solução'}</small></span><input type="checkbox" checked={checked} disabled={c.id === 'orders-core'} onChange={e => setComposition({ ...composition, moduleIds: e.target.checked ? [...composition.moduleIds, c.id] : composition.moduleIds.filter(x => x !== c.id) })} /></label>{c.condition && <details className="fc-card-detail"><summary>O que considerar <span aria-hidden="true">+</span></summary><p>{c.condition}</p></details>}</article>
+          })}</div></details>
+        })}</div>
+      </div>
+      <aside className="fc-selection" aria-labelledby="fc-selection-title"><span className="fc-kicker">Montado por você</span><div className="fc-selection-title"><h2 id="fc-selection-title">Sua seleção</h2><span aria-live="polite">{composition.moduleIds.length}</span></div><p>Escolha os itens indispensáveis. Vamos encontrar o menor plano que atende à sua operação.</p><ul className="fc-selected-list">{composition.moduleIds.map(id => <li key={id}><span aria-hidden="true">✓</span>{caps.find(c => c.id === id)?.label || MODULES.find(m => m.id === id)?.title || 'Recurso selecionado'}</li>)}</ul>
+      {journey.offer && removed.length > 0 && <details className="fc-changes"><summary>{removed.length} {removed.length === 1 ? 'item retirado' : 'itens retirados'} nesta revisão <span aria-hidden="true">+</span></summary><p>{removed.map(id => caps.find(c => c.id === id)?.label || id).join(', ')}.</p></details>}
+      {(journey.offer || journey.previousOfferId) && <label className="fc-confirm"><input type="checkbox" checked={changedConfirmed} onChange={e => setChangedConfirmed(e.target.checked)} /><span>Confirmo minhas alterações e quero conferir a nova oferta.</span></label>}
+      <button className="fc-continue" disabled={busy || !caps.length || (!!(journey.offer || journey.previousOfferId) && !changedConfirmed)} onClick={() => void issue(journey, composition, changedConfirmed)}>{busy ? 'Preparando sua oferta…' : <>Ver minha oferta <span aria-hidden="true">→</span></>}</button>
+      {journey.offer && <button className="fc-previous" onClick={() => { setEditing(false); setReasons([]) }}>Voltar à oferta anterior</button>}
+      <p className="fc-footnote">Você confere os valores antes de decidir. Nada é cobrado nesta etapa.</p></aside></div>
     </div>}
     {s && !editing && <>
       <p className="fb-lede">{s.reason}</p>
