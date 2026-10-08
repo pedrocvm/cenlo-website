@@ -2,6 +2,7 @@ import { Resend } from 'resend'
 import { NextRequest, NextResponse } from 'next/server'
 import { buildSubmission, MAX_BODY_BYTES } from '@/lib/food-builder/submission'
 import { renderEmail } from '@/lib/food-builder/email'
+import { loadFoodPricing, suggestPrice } from '@/lib/food-builder/pricing'
 
 // ponytail: per-instance limiter, resets on cold start; loose limit because cenlofood.cenlo.pt proxies here and may share an IP. Move to a shared store if abuse shows up
 const hits = new Map<string, number[]>()
@@ -36,7 +37,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'O envio está temporariamente indisponível.' }, { status: 503 })
   }
 
-  const { subject, text, html } = renderEmail(s)
+  const { subject, text, html } = renderEmail(s, suggestPrice(s, await loadFoodPricing()))
   const resend = new Resend(process.env.RESEND_API_KEY)
   const { data, error } = await resend.emails.send(
     {

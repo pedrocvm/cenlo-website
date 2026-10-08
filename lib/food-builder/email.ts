@@ -1,3 +1,4 @@
+import type { PriceSuggestion } from './pricing.ts'
 import type { ModuleRef, Submission } from './submission.ts'
 
 const esc = (s: string) => s.replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!)
@@ -12,7 +13,19 @@ function byGroup(mods: ModuleRef[]) {
   return [...groups]
 }
 
-export function renderEmail(s: Submission) {
+const euro = (c: number) => `${Math.floor(c / 100)},${String(c % 100).padStart(2, '0')} €`
+
+function suggestionLines(p: PriceSuggestion): string[] {
+  const split = p.split ? `${euro(p.split.upfrontCents)} de entrada + ${p.split.restCents.map(euro).join(' + ')}` : null
+  return [
+    `Mensalidade sugerida: ${euro(p.monthlyCents)} por unidade`,
+    `Implantação sugerida: ${euro(p.setupCents)}${p.cashSetupCents !== null ? ` (à vista ${euro(p.cashSetupCents)})` : ''}${split ? ` · em ${p.split!.restCents.length + (p.split!.upfrontCents > 0 ? 1 : 0)}x: ${split}` : ''}`,
+    `Plano de referência do diagnóstico: ${p.reference.label} (${euro(p.reference.setupCents)} + ${euro(p.reference.monthlyCents)}/mês)`,
+    `Base: ${p.points} pontos (premium 2, opcional 1)${p.source === 'fallback' ? ' · CRM sem resposta, valores de 08/10' : ' · preços do CRM'}`,
+  ]
+}
+
+export function renderEmail(s: Submission, suggestion?: PriceSuggestion) {
   const subject = `Nova configuração Cenlo Food | Referência ${s.reference} | ${s.business.name}`
   const when = lisbonTime(s.submittedAt)
   const premium = s.selectedModules.filter(m => m.tier === 'premium')
@@ -37,6 +50,7 @@ export function renderEmail(s: Submission) {
     ...rows.map(([k, v]) => `${k}: ${v ?? '—'}`),
     `WhatsApp: https://wa.me/${s.contact.whatsappDigits}`,
     '',
+    ...(suggestion ? ['SUGESTÃO DE VALORES (INTERNA, NÃO MOSTRADA AO CLIENTE)', ...suggestionLines(suggestion).map(l => `   ${l}`), ''] : []),
     `PREMIUM ESCOLHIDOS (${premium.length})`,
     ...(premium.length ? premium.map(m => `   ★ ${m.title}`) : ['   —']),
     '',
@@ -75,6 +89,7 @@ export function renderEmail(s: Submission) {
 <h2 style="${h2}">Contacto</h2>
 <table style="width:100%;border-collapse:collapse">${rows.map(([k, v]) => `<tr><td style="${cell};color:#6B6B78;width:150px">${k}</td><td style="${cell}">${v ? esc(v) : '—'}</td></tr>`).join('')}</table>
 <p style="margin:14px 0 0"><a href="https://wa.me/${s.contact.whatsappDigits}" style="display:inline-block;background:#C2461A;color:#fff;text-decoration:none;padding:10px 16px;border-radius:8px;font-weight:600;font-size:14px">Abrir conversa no WhatsApp</a></p>
+${suggestion ? `<div style="margin-top:20px;border:1px solid #F3C9B6;background:#FFF6F1;border-radius:12px;padding:14px 16px"><div style="font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#C2461A;font-weight:700">Sugestão de valores · só para você</div><div style="font-size:22px;font-weight:700;margin-top:6px">${euro(suggestion.monthlyCents)}<span style="font-size:14px;font-weight:500;color:#6B6B78">/mês por unidade</span> · ${euro(suggestion.setupCents)} <span style="font-size:14px;font-weight:500;color:#6B6B78">de implantação</span></div>${suggestionLines(suggestion).slice(1).map(l => `<div style="font-size:13px;color:#3A3A46;margin-top:4px">${esc(l)}</div>`).join('')}<div style="font-size:12px;color:#9B9BAA;margin-top:8px">O cliente não vê estes valores. Faixas: mensalidade do Essential ao Ultra, implantação idem.</div></div>` : ''}
 <h2 style="${h2}">Premium escolhidos</h2>
 ${premium.length ? premium.map(m => `<div style="font-size:15px;padding:4px 0">★ <strong>${esc(m.title)}</strong> <span style="font-size:12px;color:#6B6B78">${esc(m.group)}</span></div>`).join('') : '<div style="font-size:14px;color:#6B6B78">Nenhum.</div>'}
 <h2 style="${h2}">Opcionais escolhidos</h2>

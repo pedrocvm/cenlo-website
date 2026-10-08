@@ -157,3 +157,45 @@ test('email: subject, reference, all modules and escaped visitor text', async ()
   assert.match(text, /BASE INCLUÍDA \(10\)/)
   assert.match(text, /· Promoções \(premium\)/)
 })
+
+test('internal price suggestion: within Pedro’s ranges, base at the floor, everything at the ceiling', async () => {
+  const { FALLBACK_PRICING, suggestPrice } = await import('./pricing.ts')
+  const sub = async (moduleIds: string[]) => {
+    const r = await buildSubmission(input({ moduleIds }), now)
+    assert.ok(r.ok)
+    return r.submission
+  }
+  const base = suggestPrice(await sub([]), FALLBACK_PRICING)
+  assert.equal(base.monthlyCents, 4990)
+  assert.equal(base.setupCents, 24900)
+  assert.equal(base.reference.key, 'essential')
+  const all = suggestPrice(await sub(MODULES.filter(m => m.tier !== 'base').map(m => m.id)), FALLBACK_PRICING)
+  assert.equal(all.monthlyCents, 11990)
+  assert.equal(all.setupCents, 59900)
+  assert.equal(all.reference.key, 'ultra')
+  const optional = MODULES.filter(m => m.tier !== 'base').map(m => m.id)
+  for (let i = 0; i < optional.length; i++) {
+    const s = suggestPrice(await sub(optional.slice(0, i + 1)), FALLBACK_PRICING)
+    assert.ok(s.monthlyCents >= 4990 && s.monthlyCents <= 11990 && s.monthlyCents % 100 === 90, String(s.monthlyCents))
+    assert.ok(s.setupCents >= 24900 && s.setupCents <= 59900 && (s.setupCents % 10000 === 4900 || s.setupCents % 10000 === 9900), String(s.setupCents))
+    assert.equal(s.split!.upfrontCents + s.split!.restCents.reduce((a, b) => a + b, 0), s.setupCents)
+    assert.equal(s.cashSetupCents, s.setupCents - Math.round(s.setupCents / 5))
+  }
+  assert.equal(suggestPrice(await sub(['promotions']), FALLBACK_PRICING).reference.key, 'pro')
+  assert.equal(suggestPrice(await sub(['forecasting']), FALLBACK_PRICING).reference.key, 'essential')
+})
+
+test('pricing falls back when the CRM does not answer, and the e-mail flags it; the visitor never gets it', async () => {
+  const { loadFoodPricing, suggestPrice } = await import('./pricing.ts')
+  const pricing = await loadFoodPricing(300, 'http://127.0.0.1:9/pricing')
+  assert.equal(pricing.source, 'fallback')
+  const r = await buildSubmission(input({ moduleIds: ['loyalty'] }), now)
+  assert.ok(r.ok)
+  const { text, html } = renderEmail(r.submission, suggestPrice(r.submission, pricing))
+  assert.match(text, /SUGESTÃO DE VALORES \(INTERNA, NÃO MOSTRADA AO CLIENTE\)/)
+  assert.match(text, /Plano de referência do diagnóstico: Ultra \(599,00 € \+ 119,90 €\/mês\)/)
+  assert.match(text, /CRM sem resposta/)
+  assert.ok(html.includes('só para você'))
+  assert.ok(!JSON.stringify(r.submission).includes('monthlyCents'), 'the contract (JSON attachment) carries no price')
+  assert.doesNotMatch(renderEmail(r.submission).text, /SUGESTÃO/)
+})
