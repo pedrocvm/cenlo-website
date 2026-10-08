@@ -34,7 +34,7 @@ export default function FoodBuilderPage() {
           <ol className="fb-steps">
             <li>Explore os módulos e veja o Cenlo a funcionar.</li>
             <li>Adicione à sua configuração o que faz sentido.</li>
-            <li>Envie-nos a seleção para a analisarmos consigo.</li>
+            <li>Confira a oferta, escolha como pagar e envie seu pedido de implantação.</li>
           </ol>
         </div>
         <div className="fb-hero-media">

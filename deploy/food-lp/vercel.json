@@ -1,0 +1,204 @@
+{
+  "rewrites": [
+    {
+      "source": "/configurar",
+      "has": [
+        {
+          "type": "host",
+          "value": "cenlofood.cenlo.pt"
+        }
+      ],
+      "destination": "https://cenlo.pt/configurar"
+    },
+    {
+      "source": "/configurar/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "cenlofood.cenlo.pt"
+        }
+      ],
+      "destination": "https://cenlo.pt/configurar/:path*"
+    },
+    {
+      "source": "/api/food-builder/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "cenlofood.cenlo.pt"
+        }
+      ],
+      "destination": "https://cenlo.pt/api/food-builder/:path*"
+    },
+    {
+      "source": "/food-builder/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "cenlofood.cenlo.pt"
+        }
+      ],
+      "destination": "https://cenlo.pt/food-builder/:path*"
+    },
+    {
+      "source": "/_next/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "cenlofood.cenlo.pt"
+        }
+      ],
+      "destination": "https://cenlo.pt/_next/:path*"
+    },
+    {
+      "source": "/diagnostico",
+      "has": [
+        {
+          "type": "host",
+          "value": "cenlobeauty.cenlo.pt"
+        }
+      ],
+      "destination": "/beauty/diagnostico.html"
+    },
+    {
+      "source": "/diagnostico",
+      "destination": "/food/diagnostico.html"
+    },
+    {
+      "source": "/beauty/diagnostico",
+      "destination": "/beauty/diagnostico.html"
+    },
+    {
+      "source": "/food/diagnostico",
+      "destination": "/food/diagnostico.html"
+    },
+    {
+      "source": "/",
+      "has": [
+        {
+          "type": "host",
+          "value": "cenlobeauty.cenlo.pt"
+        }
+      ],
+      "destination": "/beauty/index.dc.html"
+    },
+    {
+      "source": "/",
+      "destination": "/food/index.dc.html"
+    },
+    {
+      "source": "/food",
+      "destination": "/food/index.dc.html"
+    },
+    {
+      "source": "/beauty",
+      "destination": "/beauty/index.dc.html"
+    },
+    {
+      "source": "/demo",
+      "has": [
+        {
+          "type": "host",
+          "value": "cenlobeauty.cenlo.pt"
+        }
+      ],
+      "destination": "https://beauty.cenlo.pt/demo"
+    },
+    {
+      "source": "/demo/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "cenlobeauty.cenlo.pt"
+        }
+      ],
+      "destination": "https://beauty.cenlo.pt/demo/:path*"
+    },
+    {
+      "source": "/_next/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "cenlobeauty.cenlo.pt"
+        }
+      ],
+      "destination": "https://beauty.cenlo.pt/_next/:path*"
+    },
+    {
+      "source": "/api/demo/beauty/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "cenlobeauty.cenlo.pt"
+        }
+      ],
+      "destination": "https://beauty.cenlo.pt/api/demo/beauty/:path*"
+    },
+    {
+      "source": "/fonts/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "cenlobeauty.cenlo.pt"
+        }
+      ],
+      "destination": "https://beauty.cenlo.pt/fonts/:path*"
+    },
+    {
+      "source": "/icon.svg",
+      "has": [
+        {
+          "type": "host",
+          "value": "cenlobeauty.cenlo.pt"
+        }
+      ],
+      "destination": "https://beauty.cenlo.pt/icon.svg"
+    }
+  ],
+  "redirects": [
+    {
+      "source": "/demo",
+      "has": [
+        {
+          "type": "host",
+          "value": "cenlofood.cenlo.pt"
+        }
+      ],
+      "destination": "https://food.cenlo.pt/demo/food",
+      "permanent": false
+    },
+    {
+      "source": "/montar",
+      "has": [
+        {
+          "type": "host",
+          "value": "cenlofood.cenlo.pt"
+        }
+      ],
+      "destination": "/configurar",
+      "permanent": false
+    },
+    {
+      "source": "/food/montar",
+      "has": [
+        {
+          "type": "host",
+          "value": "cenlofood.cenlo.pt"
+        }
+      ],
+      "destination": "/configurar",
+      "permanent": false
+    },
+    {
+      "source": "/food/montar/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "cenlofood.cenlo.pt"
+        }
+      ],
+      "destination": "/configurar/:path*",
+      "permanent": false
+    }
+  ]
+}

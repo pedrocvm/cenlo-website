@@ -1,0 +1,1207 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Diagnóstico · Cenlo Food</title>
+<meta name="description" content="Responda sobre o seu restaurante e veja o plano indicado e o investimento, incluindo a implantação.">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#F7F5F1">
+<link rel="canonical" href="https://cenlofood.cenlo.pt/diagnostico">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Crect width='48' height='48' rx='10' fill='%230B0B0F'/%3E%3Cpath d='M35.4 17.1 A13.2 13.2 0 1 0 35.4 30.9' fill='none' stroke='%23F4F3F7' stroke-width='5.1' stroke-linecap='round'/%3E%3Ccircle cx='26.6' cy='24' r='5.7' fill='%23FF6A2C'/%3E%3C/svg%3E">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Cenlo Food">
+<meta property="og:locale" content="pt_BR">
+<meta property="og:url" content="https://cenlofood.cenlo.pt/diagnostico">
+<meta property="og:title" content="Diagnóstico · Cenlo Food">
+<meta property="og:description" content="Veja qual plano faz sentido para o seu restaurante.">
+<meta property="og:image" content="https://cenlofood.cenlo.pt/food/assets/og-cenlo-food.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@600;700;800&family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/motion@11.18.2/dist/motion.js" defer></script>
+<!-- Meta Pixel Code: the Food pixel, with the same events as the other diagnostic, never with personal data. -->
+<script>
+!function(f,b,e,v,n,t,s)
+{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];
+s.parentNode.insertBefore(t,s)}(window, document,'script',
+'https://connect.facebook.net/en_US/fbevents.js');
+fbq('init', '2329285277604829');
+fbq('track', 'PageView');
+</script>
+<noscript><img height="1" width="1" style="display:none" alt="" src="https://www.facebook.com/tr?id=2329285277604829&ev=PageView&noscript=1"></noscript>
+<style>
+  :root {
+    --bg: #F7F5F1;
+    --surface: #FFFFFF;
+    --ink: #16181D;
+    --ink-2: #3A3D44;
+    --muted: #6B7280;
+    --line: #E9E7E1;
+    --line-2: #DEDBD4;
+    --accent: #B9471F;
+    --accent-hover: #9E3C1A;
+    --ok: #2F6B4F;
+    --err: #B3261E;
+    color-scheme: light;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0; min-height: 100vh;
+    color: var(--ink);
+    background: var(--bg);
+    font-family: 'Hanken Grotesk', system-ui, -apple-system, 'Segoe UI', sans-serif;
+    font-size: 16.5px; line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+  ::selection { background: rgba(214,86,40,.22); }
+  :focus-visible { outline: 3px solid #D65628; outline-offset: 2px; border-radius: 4px; }
+  a { color: var(--accent); }
+  .top { position: sticky; top: 0; z-index: 2; background: rgba(247,245,241,.9); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border-bottom: 1px solid var(--line); }
+  .top-in { max-width: 900px; margin: 0 auto; padding: 0 20px; height: 64px; display: flex; align-items: center; gap: 16px; }
+  .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+  .brand b { font-family: 'Schibsted Grotesk', sans-serif; font-size: 17px; font-weight: 800; letter-spacing: -0.5px; color: var(--ink); }
+  .brand b span { color: var(--accent); }
+  .stage { font-size: 13px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+  .close { margin-left: auto; display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 10px; color: var(--muted); }
+  .close:hover { background: #F2F0EA; color: var(--ink); }
+  .segs { max-width: 900px; margin: 0 auto; padding: 0 20px 12px; display: flex; gap: 4px; }
+  .segs span { flex: 1; height: 3px; border-radius: 99px; background: var(--line); transition: background .4s ease; }
+  .segs span.on { background: var(--accent); }
+  main { max-width: 900px; margin: 0 auto; padding: clamp(28px,5vw,52px) 20px calc(40px + env(safe-area-inset-bottom)); min-height: calc(100vh - 210px); display: flex; flex-direction: column; justify-content: center; }
+  main > * { max-width: 100%; }
+  #app { position: relative; isolation: isolate; }
+  .ghost { position: absolute; margin: 0 !important; pointer-events: none; z-index: -1; }
+  h1, h2, legend { font-family: 'Schibsted Grotesk', sans-serif; font-weight: 700; letter-spacing: -0.02em; line-height: 1.1; text-wrap: balance; }
+  h1, legend.big { font-size: clamp(25px, 3.4vw, 38px); margin: 0 0 10px; }
+  h2 { font-size: clamp(21px, 2.6vw, 27px); margin: 0 0 10px; }
+  h1:focus, h2:focus, legend:focus { outline: none; }
+  p { margin: 0 0 12px; }
+  .counter { margin: 0 0 12px; font-size: 12.5px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--accent); }
+  .lead { font-size: 17px; color: var(--ink-2); max-width: 640px; text-wrap: pretty; }
+  fieldset { border: 0; margin: 0 0 22px; padding: 0; min-width: 0; }
+  legend { padding: 0; }
+  fieldset.sub legend { font-size: 19px; margin-bottom: 6px; }
+  .type { margin: 0 0 4px; font-size: 13px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+  .help { margin: 0 0 6px; font-size: 16.5px; color: var(--ink-2); max-width: 640px; }
+  .opts { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 10px; margin-top: 18px; }
+  .opt { position: relative; display: flex; align-items: flex-start; gap: 13px; padding: 17px 18px; cursor: pointer; background: var(--surface); border: 1px solid var(--line); border-radius: 13px; transition: background .2s ease, border-color .2s ease, box-shadow .2s ease; }
+  .opt:hover { border-color: rgba(214,86,40,.55); box-shadow: 0 12px 28px rgba(22,24,29,.08); }
+  .opt input { position: absolute; opacity: 0; width: 1px; height: 1px; margin: 0; pointer-events: none; }
+  .mark { width: 21px; height: 21px; flex: none; margin-top: 1px; border-radius: 50%; border: 1.5px solid var(--line-2); background: var(--surface); display: grid; place-items: center; }
+  .opt input[type=checkbox] + .mark { border-radius: 6px; }
+  .mark svg { opacity: 0; }
+  .opt .txt { flex: 1; min-width: 0; font-family: 'Hanken Grotesk', sans-serif; font-size: 16.5px; font-weight: 500; letter-spacing: 0; line-height: 1.3; color: var(--ink); }
+  .opt:has(input:checked) { background: rgba(214,86,40,.07); border-color: var(--accent); }
+  .opt:has(input:checked) .txt { color: var(--ink); font-weight: 600; }
+  .opt input:checked + .mark { background: var(--accent); border-color: var(--accent); }
+  .opt input:checked + .mark svg { opacity: 1; }
+  .opt:has(input:focus-visible) { outline: 3px solid #D65628; outline-offset: 2px; }
+  .field { display: flex; flex-direction: column; gap: 7px; margin-bottom: 20px; max-width: 560px; }
+  .field > label, .field .label { font-size: 14px; font-weight: 600; color: var(--ink-2); }
+  .field h1 { margin-bottom: 4px; }
+  input[type=text], input[type=tel], input[type=number], input[type=month], select, textarea {
+    width: 100%; min-height: 50px; padding: 13px 16px; background: var(--surface); color: var(--ink);
+    border: 1px solid var(--line); border-radius: 11px; font: inherit; font-size: 16px; transition: border-color .18s ease;
+  }
+  input:focus, select:focus, textarea:focus { border-color: rgba(214,86,40,.6); }
+  textarea { min-height: 120px; resize: vertical; }
+  [aria-invalid=true] { border-color: var(--err) !important; }
+  .err { color: var(--err); font-size: 15px; font-weight: 600; margin: 6px 0 0; }
+  .count { font-size: 13.5px; color: var(--muted); text-align: right; margin: 0; }
+  .row { display: flex; gap: 10px; }
+  .row select { flex: none; width: 168px; font-size: 15px; }
+  .check { display: flex; gap: 12px; align-items: flex-start; font-size: 15px; color: var(--ink-2); line-height: 1.5; cursor: pointer; }
+  .check input { width: 18px; height: 18px; margin: 2px 0 0; flex: none; accent-color: var(--accent); }
+  .boxed { padding: 16px 18px; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; }
+  .actions { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin-top: 6px; }
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-height: 52px; padding: 0 30px; border-radius: 11px; border: 1px solid transparent; font: inherit; font-size: 16.5px; font-weight: 600; cursor: pointer; text-decoration: none; transition: background .18s ease, transform .18s ease, border-color .18s ease; }
+  .btn:hover { transform: translateY(-2px); }
+  .btn:active { transform: scale(0.98); }
+  .btn-primary { background: var(--accent); color: #FFFFFF; }
+  .btn-primary:hover { background: var(--accent-hover); }
+  .btn-primary[disabled] { opacity: .6; cursor: progress; transform: none; }
+  .btn-secondary { background: var(--surface); color: var(--ink-2); border-color: var(--line); padding: 0 22px; font-size: 16px; }
+  .btn-secondary:hover { border-color: var(--line-2); color: var(--ink); }
+  .btn-wa { background: var(--ok); color: #FFFFFF; font-weight: 600; min-height: 56px; padding: 0 28px; }
+  .btn-wa:hover { background: #275A42; }
+  .link { background: none; border: 0; margin-top: 22px; padding: 8px 0; min-height: 44px; font: inherit; font-size: 14.5px; color: var(--muted); text-decoration: underline; cursor: pointer; align-self: flex-start; }
+  .link:hover { color: var(--ink-2); }
+  .note { font-size: 14px; color: var(--muted); }
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 20px 22px; margin-bottom: 14px; }
+  .card.hero { padding: clamp(24px,4vw,34px); background: linear-gradient(135deg, #FDF4EE, #FFFFFF 55%); border-color: rgba(214,86,40,.35); border-radius: 16px; }
+  .eyebrow { margin: 0 0 8px; font-size: 12px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+  .card.hero .eyebrow { color: var(--accent); }
+  .plan-name { font-family: 'Schibsted Grotesk', sans-serif; font-size: clamp(22px, 2.6vw, 27px); font-weight: 600; letter-spacing: -0.015em; margin: 0 0 8px; }
+  .limit { padding: 14px 16px; background: rgba(224,179,65,.10); border: 1px solid rgba(224,179,65,.45); border-radius: 12px; font-size: 15.5px; }
+  .quote { white-space: pre-wrap; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 16px 18px; font-size: 15.5px; color: var(--ink-2); margin-bottom: 18px; }
+  .status { padding: 13px 16px; border-radius: 12px; margin-bottom: 16px; font-size: 15.5px; }
+  .status.ok { background: rgba(52,211,153,.10); border: 1px solid rgba(52,211,153,.35); }
+  .status.bad { background: #FDECEA; border: 1px solid #F1B8B3; }
+  .hp { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
+  @media (max-width: 560px) {
+    .opts { grid-template-columns: 1fr; }
+    .row { flex-direction: column; }
+    .row select { width: 100%; }
+    .btn { flex: 1 1 auto; }
+  }
+  /* ── o diagnóstico: leitura, antes e depois, sessão ── */
+  .dx { margin: 22px 0 18px; }
+  .dx-insight { margin: 0 0 18px; padding: 4px 0 4px 18px; border-left: 3px solid var(--accent); font-family: 'Schibsted Grotesk', sans-serif; font-size: clamp(18px, 2.2vw, 21px); font-weight: 500; line-height: 1.45; letter-spacing: -0.01em; color: var(--ink); max-width: 760px; }
+  .dx-rows { list-style: none; margin: 0 0 14px; padding: 0; background: var(--surface); border: 1px solid var(--line); border-radius: 16px; overflow: hidden; }
+  .dx-head, .dx-rows li { display: grid; grid-template-columns: 1fr 34px 1.15fr; gap: 14px; align-items: center; padding: 14px 20px; }
+  .dx-head { padding-top: 12px; padding-bottom: 12px; background: #FBFAF7; border-bottom: 1px solid var(--line); font-size: 12px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+  .dx-head span:last-child { color: var(--accent); }
+  .dx-rows li + li { border-top: 1px solid #F1EFEA; }
+  .dx-today { display: flex; gap: 10px; align-items: flex-start; font-size: 15.5px; line-height: 1.45; color: var(--muted); }
+  .dx-today::before { content: ''; flex: none; width: 7px; height: 7px; margin-top: 8px; border-radius: 50%; background: #CFCAC1; }
+  .dx-arrow { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; background: rgba(214,86,40,.08); }
+  .dx-with { display: flex; gap: 10px; align-items: flex-start; font-size: 15.5px; font-weight: 500; line-height: 1.45; color: var(--ink); }
+  .dx-with .ck { flex: none; width: 20px; height: 20px; margin-top: 1px; border-radius: 50%; display: grid; place-items: center; background: var(--accent); }
+  .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .dx-session { padding: 20px 22px; border-radius: 16px; background: linear-gradient(135deg, #FDF4EE, #FFFFFF 70%); border: 1px solid rgba(214,86,40,.28); }
+  .dx-session-head { display: flex; gap: 14px; align-items: center; margin-bottom: 14px; }
+  .dx-clock { flex: none; width: 48px; height: 48px; border-radius: 50%; display: grid; place-items: center; background: var(--accent); color: #FFF; font-family: 'Schibsted Grotesk', sans-serif; font-weight: 600; font-size: 15px; box-shadow: 0 8px 22px rgba(185,71,31,.28); }
+  .dx-session-t { margin: 0; font-family: 'Schibsted Grotesk', sans-serif; font-size: 18px; font-weight: 600; color: var(--ink); }
+  .dx-session-s { margin: 2px 0 0; font-size: 14.5px; color: var(--muted); }
+  .dx-session ol { list-style: none; counter-reset: s; margin: 0; padding: 0; display: grid; gap: 10px; }
+  .dx-session li { counter-increment: s; display: flex; gap: 12px; align-items: flex-start; font-size: 15.5px; line-height: 1.45; color: var(--ink-2); }
+  .dx-session li::before { content: counter(s); flex: none; width: 24px; height: 24px; border-radius: 8px; display: grid; place-items: center; background: #FFFFFF; border: 1px solid rgba(214,86,40,.35); color: var(--accent); font-size: 13px; font-weight: 600; }
+  @media (max-width: 640px) {
+    .dx-rows .dx-head { display: none; }
+    .dx-rows li { grid-template-columns: 1fr; gap: 8px; }
+    .dx-arrow { width: 26px; height: 26px; transform: rotate(90deg); }
+  }
+
+  /* ── the organization score ── */
+  .org { margin: 0 0 18px; padding: 20px 22px; background: var(--surface); border: 1px solid var(--line); border-radius: 16px; }
+  .org-top { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+  .org-score { font-family: 'Schibsted Grotesk', sans-serif; font-size: clamp(30px, 4vw, 38px); font-weight: 700; letter-spacing: -0.02em; line-height: 1; }
+  .org-score small { font-size: .45em; font-weight: 500; color: var(--muted); margin-left: 3px; }
+  .org-label { margin: 0; font-family: 'Schibsted Grotesk', sans-serif; font-size: 18px; font-weight: 600; color: var(--ink); }
+  .org-meter { position: relative; height: 8px; margin: 14px 0 12px; border-radius: 99px; background: #EFECE6; overflow: hidden; }
+  .org-meter i { position: absolute; inset: 0 auto 0 0; border-radius: 99px; background: linear-gradient(90deg, #B9471F, #FF6A2C); transform-origin: left center; }
+  .org-text { margin: 0; font-size: 15.5px; color: var(--ink-2); max-width: 680px; }
+
+  /* ── premium plan card ── */
+  .plan { position: relative; overflow: hidden; isolation: isolate; margin: 4px 0 16px; padding: clamp(24px, 4vw, 36px); border-radius: 20px; color: #F7F3EF;
+    background: radial-gradient(120% 140% at 100% 0%, rgba(214,86,40,.30), transparent 55%), radial-gradient(90% 120% at 0% 100%, rgba(140,60,30,.35), transparent 60%), linear-gradient(160deg, #1C130F, #120E0C 62%);
+    border: 1px solid rgba(214,86,40,.35); box-shadow: 0 30px 70px -28px rgba(22,24,29,.55), inset 0 1px 0 rgba(255,255,255,.06); }
+  .plan::after { content: ''; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(105deg, transparent 35%, rgba(255,255,255,.10) 50%, transparent 65%); transform: translateX(-130%); }
+  .plan.sheen::after { animation: sheen 1.6s .6s cubic-bezier(.2,.7,.2,1) both; }
+  .plan-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; }
+  .plan-kicker { margin: 0; font-size: 12px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: #FF9A6B; }
+  .plan-badge { display: inline-flex; align-items: center; gap: 7px; padding: 6px 12px; border-radius: 99px; font-size: 12.5px; font-weight: 600; color: #F7F3EF; background: rgba(214,86,40,.18); border: 1px solid rgba(255,122,61,.35); }
+  .plan-badge::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: #FF7A3D; box-shadow: 0 0 0 4px rgba(255,122,61,.18); }
+  .plan-title { margin: 0; font-family: 'Schibsted Grotesk', sans-serif; font-size: clamp(30px, 4.6vw, 44px); font-weight: 600; letter-spacing: -0.025em; line-height: 1.05; color: #FFFFFF; }
+  .plan-struct { margin: 8px 0 0; font-size: 15.5px; color: #CFC4BC; }
+  .plan-prices { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; margin: 24px 0 16px; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.08); border-radius: 16px; overflow: hidden; }
+  .pp { display: flex; flex-direction: column; gap: 4px; padding: 18px 20px; background: rgba(14,11,9,.55); }
+  .pp-l { font-size: 12.5px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: #B3A79E; }
+  .pp-v { font-family: 'Schibsted Grotesk', sans-serif; font-size: clamp(30px, 4.4vw, 42px); font-weight: 600; letter-spacing: -0.02em; line-height: 1.05; color: #FFFFFF; white-space: nowrap; }
+  .pp-v small { font-size: .42em; font-weight: 500; letter-spacing: 0; color: #CFC4BC; margin-left: 2px; }
+  .pp-s { font-size: 13.5px; color: #B3A79E; }
+  .plan-chip { display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px; border-radius: 99px; font-size: 14px; font-weight: 600; color: #0F2A1F; background: linear-gradient(135deg, #B8F0D2, #8FE3B8); }
+  .plan-sep { height: 1px; margin: 22px 0 18px; background: linear-gradient(90deg, rgba(255,255,255,.14), rgba(255,255,255,.02)); }
+  .plan-inc-h { margin: 0 0 12px; font-size: 12.5px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: #B3A79E; }
+  .plan-inc { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px 18px; }
+  .plan-inc li { display: flex; gap: 10px; align-items: flex-start; font-size: 15.5px; line-height: 1.4; color: #EFE7E1; }
+  .plan-inc li span.ck { flex: none; width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; background: rgba(255,122,61,.16); border: 1px solid rgba(255,122,61,.35); margin-top: -1px; }
+  .plan-note { margin: 18px 0 0; font-size: 13.5px; color: #A3978E; }
+  .pay { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: -4px 0 16px; }
+  .pay-opt { display: flex; flex-direction: column; gap: 3px; padding: 14px 16px; border-radius: 14px; background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.1); }
+  .pay-cash { background: rgba(143,227,184,.08); border-color: rgba(143,227,184,.45); }
+  .pay-l { font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: #B3A79E; display: flex; align-items: center; gap: 8px; }
+  .pay-cash .pay-l { color: #8FE3B8; }
+  .pay-tag { font-size: 11px; letter-spacing: .02em; text-transform: none; padding: 2px 8px; border-radius: 99px; color: #0F2A1F; background: #8FE3B8; }
+  .pay-v { font-family: 'Schibsted Grotesk', sans-serif; font-size: 24px; font-weight: 600; letter-spacing: -0.01em; color: #FFFFFF; }
+  .pay-v small { font-size: 13px; font-weight: 500; color: #CFC4BC; margin-left: 4px; }
+  .pay-s { font-size: 13.5px; color: #CFC4BC; }
+  @media (max-width: 520px) { .pay { grid-template-columns: 1fr; } }
+  .setup-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 4px; }
+  .setup-col { padding: 16px; border-radius: 14px; background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08); }
+  .setup-col h4 { margin: 0 0 10px; font-size: 14px; font-weight: 700; color: #FFFFFF; }
+  .setup-col ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+  .setup-col li { display: flex; gap: 8px; font-size: 14px; line-height: 1.45; color: #EFE7E1; }
+  .setup-col p { margin: 0; font-size: 14px; line-height: 1.5; color: #EFE7E1; }
+  .setup-sub { margin: -4px 0 12px; font-size: 14px; color: #B3A79E; }
+  @media (max-width: 760px) { .setup-grid { grid-template-columns: 1fr; } }
+  @media (max-width: 520px) { .plan-prices { grid-template-columns: 1fr; } }
+  .plan-scope { display: inline-block; margin: 12px 0 2px; padding: 5px 12px; border-radius: 99px; font-size: 13px; font-weight: 600; letter-spacing: .02em; color: #EFE7E1; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.12); }
+  .plan-layers { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 22px; }
+  .layer { padding: 18px 18px 16px; border-radius: 16px; background: rgba(255,255,255,.035); border: 1px solid rgba(255,255,255,.08); }
+  .layer-h { display: flex; align-items: center; gap: 10px; margin: 0 0 14px; font-family: 'Hanken Grotesk', sans-serif; font-size: 12.5px; font-weight: 600; letter-spacing: .09em; text-transform: uppercase; line-height: 1.3; color: #CFC4BC; }
+  .layer-n { flex: none; width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; font-size: 12px; letter-spacing: 0; color: #FF9A6B; border: 1px solid rgba(255,122,61,.45); }
+  .layer-base { margin: -4px 0 10px; font-size: 14px; font-weight: 600; color: #FF9A6B; }
+  .layer .plan-inc { grid-template-columns: 1fr; gap: 10px; }
+  .plan-inc .go { flex: none; width: 22px; height: 22px; display: grid; place-items: center; margin-top: -1px; }
+  .layer-on { margin-top: 12px; }
+  .on-chips { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+  .on-chips li { padding: 7px 12px; border-radius: 99px; font-size: 14px; line-height: 1.3; color: #EFE7E1; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.1); }
+  @media (max-width: 760px) { .plan-layers { grid-template-columns: 1fr; } }
+  @media (max-width: 520px) { .on-chips li { border-radius: 12px; } }
+  .cmp { margin: 28px 0 24px; }
+  .cmp-t { font-size: clamp(20px, 2.4vw, 24px); margin: 0 0 6px; }
+  .cmp-s { font-size: 15px; color: var(--muted); margin: 0 0 16px; max-width: 640px; }
+  .cmp-row { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; align-items: stretch; }
+  .cmp-row:focus-visible { outline: 3px solid #D65628; outline-offset: 4px; border-radius: 16px; }
+  .cmp-card { position: relative; display: flex; flex-direction: column; padding: 20px 20px 18px; background: var(--surface); border: 1px solid var(--line); border-radius: 16px; }
+  .cmp-card.on { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent), 0 22px 44px -26px rgba(185,71,31,.5); }
+  .cmp-badge { align-self: flex-start; margin-bottom: 10px; padding: 4px 10px; border-radius: 99px; font-size: 12px; font-weight: 600; color: #FFFFFF; background: var(--accent); }
+  .cmp-name { margin: 0; font-family: 'Schibsted Grotesk', sans-serif; font-size: 22px; font-weight: 600; letter-spacing: -0.015em; }
+  .cmp-scope { margin: 2px 0 14px; font-size: 13px; font-weight: 600; color: var(--muted); }
+  .cmp-price { margin: 0; font-size: 15px; color: var(--ink-2); }
+  .cmp-price b { font-family: 'Schibsted Grotesk', sans-serif; font-size: 28px; font-weight: 600; letter-spacing: -0.02em; color: var(--ink); }
+  .cmp-setup { margin: 2px 0 14px; font-size: 13.5px; color: var(--muted); }
+  .cmp-tag { margin: 0 0 14px; padding-top: 14px; border-top: 1px solid var(--line); font-size: 14.5px; line-height: 1.45; color: var(--ink-2); }
+  .cmp-base { margin: 0 0 8px; font-size: 13px; font-weight: 600; color: var(--accent); }
+  .cmp-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+  .cmp-list li { display: flex; gap: 9px; font-size: 14px; line-height: 1.4; color: var(--ink-2); }
+  .cmp-list li::before { content: ''; flex: none; width: 6px; height: 6px; margin-top: 7px; border-radius: 50%; background: var(--accent); opacity: .55; }
+  @media (max-width: 760px) {
+    .cmp-row { grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: 84%; overflow-x: auto; scroll-snap-type: x mandatory; margin: 0 -20px; padding: 2px 20px 10px; scroll-padding-left: 20px; }
+    .cmp-card { scroll-snap-align: start; }
+  }
+  .more summary { display: flex; align-items: center; min-height: 44px; cursor: pointer; font-weight: 600; list-style: none; }
+  .more summary::-webkit-details-marker { display: none; }
+  .more summary::after { content: '+'; margin-left: 10px; font-size: 20px; font-weight: 500; line-height: 1; }
+  .more[open] summary::after { content: '–'; }
+  .more { margin: 2px 0 22px; padding: 4px 20px; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; }
+  .more summary { color: var(--accent); font-size: 16px; }
+  .more-in { padding: 6px 0 16px; }
+  .link.clear { margin: -12px 0 18px; }
+  .more-in .dx-rows { margin-bottom: 14px; }
+
+  /* ── motion layer ── */
+  .aura { position: fixed; inset: -10%; z-index: -1; pointer-events: none; overflow: hidden; }
+  .aura i { position: absolute; border-radius: 50%; opacity: .75; will-change: transform; }
+  .aura i:nth-child(1) { width: 46vmax; height: 46vmax; left: 58%; top: -12%; background: radial-gradient(circle, rgba(214,86,40,.32), transparent 65%); }
+  .aura i:nth-child(2) { width: 38vmax; height: 38vmax; left: -8%; top: 55%; background: radial-gradient(circle, rgba(185,71,31,.18), transparent 65%); }
+  .aura i:nth-child(3) { width: 30vmax; height: 30vmax; left: 30%; top: 30%; background: radial-gradient(circle, rgba(255,122,61,.16), transparent 65%); }
+  .segs span { position: relative; overflow: hidden; }
+  .segs span i { position: absolute; inset: 0; background: var(--accent); transform: scaleX(0); transform-origin: left center; }
+  .segs span.on i { transform: scaleX(1); }
+  .segs span.now::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, transparent, rgba(255,255,255,.85), transparent); transform: translateX(-100%); animation: segShine 2.4s ease-in-out infinite; }
+  @keyframes segShine { 60%, 100% { transform: translateX(100%); } }
+  .w { display: inline-block; overflow: hidden; vertical-align: bottom; padding-bottom: .08em; margin-bottom: -.08em; }
+  .w > span { display: inline-block; will-change: transform; }
+  .opt { overflow: hidden; isolation: isolate; }
+  .opt .ripple { position: absolute; width: 16px; height: 16px; margin: -8px 0 0 -8px; border-radius: 50%; background: radial-gradient(circle, rgba(214,86,40,.35), rgba(214,86,40,0) 70%); pointer-events: none; z-index: -1; }
+  .mark path, .plan-inc path, .dx-with path, .done-mark path, .done-mark circle { stroke-dasharray: 60; stroke-dashoffset: 0; }
+  .btn .arr { transition: transform .25s cubic-bezier(.2,.7,.2,1); }
+  .btn:hover .arr { transform: translateX(3px); }
+  .btn-secondary:hover .arr { transform: translateX(-3px); }
+  .dots { display: inline-flex; gap: 4px; margin-left: 2px; }
+  .dots i { width: 5px; height: 5px; border-radius: 50%; background: currentColor; animation: dot 1s ease-in-out infinite; }
+  .dots i:nth-child(2) { animation-delay: .15s; }
+  .dots i:nth-child(3) { animation-delay: .3s; }
+  @keyframes dot { 0%, 100% { opacity: .3; transform: translateY(0); } 50% { opacity: 1; transform: translateY(-3px); } }
+  .card.hero { position: relative; overflow: hidden; }
+  .card.hero::after { content: ''; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(105deg, transparent 35%, rgba(255,255,255,.75) 50%, transparent 65%); transform: translateX(-130%); }
+  .card.hero.sheen::after { animation: sheen 1.5s .55s cubic-bezier(.2,.7,.2,1) both; }
+  @keyframes sheen { to { transform: translateX(130%); } }
+  .done-mark { position: relative; width: 64px; height: 64px; margin-bottom: 18px; }
+  .done-mark::after { content: ''; position: absolute; inset: 0; border-radius: 50%; border: 2px solid rgba(47,107,79,.45); animation: ring 2.2s ease-out .6s infinite; }
+  @keyframes ring { from { transform: scale(1); opacity: .9; } to { transform: scale(1.6); opacity: 0; } }
+  .btn-wa { animation: breathe 2.8s ease-in-out 1.2s infinite; }
+  @keyframes breathe { 0%, 100% { box-shadow: 0 0 0 0 rgba(47,107,79,.0); } 50% { box-shadow: 0 10px 34px 0 rgba(47,107,79,.32); } }
+  @media (prefers-reduced-motion: reduce) {
+    .btn, .opt, .segs span { transition: none; } .btn:hover { transform: none; }
+    .segs span.now::after, .card.hero.sheen::after, .plan.sheen::after, .done-mark::after, .btn-wa, .dots i { animation: none; }
+    .aura { display: none; }
+  }
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="top-in">
+    <a class="brand" href="/" aria-label="Cenlo Food, página inicial">
+      <svg width="27" height="27" viewBox="0 0 48 48" aria-hidden="true"><path d="M35.4 17.1 A13.2 13.2 0 1 0 35.4 30.9" fill="none" stroke="#16181D" stroke-width="5.1" stroke-linecap="round"></path><circle cx="26.6" cy="24" r="5.7" fill="#FF6A2C"></circle></svg>
+      <b>Cenlo<span> Food</span></b>
+    </a>
+    <span class="stage" id="step" aria-live="polite">Diagnóstico</span>
+    <a class="close" href="/" aria-label="Fechar o diagnóstico">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 5L19 19M19 5L5 19" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path></svg>
+    </a>
+  </div>
+  <div class="segs" id="segs" aria-hidden="true"></div>
+</header>
+<div class="aura" aria-hidden="true"><i></i><i></i><i></i></div>
+<main id="app" tabindex="-1">
+  <noscript><p>Para responder ao diagnóstico, ative o JavaScript neste navegador.</p></noscript>
+  <p>A carregar o diagnóstico…</p>
+</main>
+<script>
+(function () {
+  'use strict';
+  var LOCAL = /^(localhost|127\.0\.0\.1)$/.test(location.hostname);
+  var API = LOCAL ? 'http://localhost:4010/crm/public/diagnostics/food' : 'https://api-crm.cenlo.pt/crm/public/diagnostics/food';
+  var PRIVACY = 'https://pedro.cenlo.pt/privacidade.html';
+  var WA_FALLBACK = '351912333313';
+  var STORE = 'cenlo_food_diag_v2';
+  var CONTACT_STORE = 'cenlo_food_diag_v2_contact';
+  var SCREENS = [1, 2, 3, 4, 5];
+  try { localStorage.removeItem('cenlo_diag_v1'); } catch (e) {}
+
+  function track(name, data) { if (new URLSearchParams(location.search).get('test') === '1') return; try { if (window.fbq) window.fbq('track', name, data || {}); } catch (e) {} }
+  function trackCustom(name, data) { if (new URLSearchParams(location.search).get('test') === '1') return; try { if (window.fbq) window.fbq('trackCustom', name, data || {}); } catch (e) {} }
+  function read(key, storage) { try { return JSON.parse((storage || localStorage).getItem(key)); } catch (e) { return null; } }
+  function write(key, value, storage) { try { (storage || localStorage).setItem(key, JSON.stringify(value)); } catch (e) {} }
+  function id(len) {
+    var a = new Uint8Array(len || 18);
+    (window.crypto || window.msCrypto).getRandomValues(a);
+    return Array.prototype.map.call(a, function (b) { return 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'[b % 62]; }).join('');
+  }
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+
+  var saved = read(STORE) || {};
+  var state = {
+    contract: null,
+    view: saved.view || 'intro',
+    screen: saved.screen || 1,
+    answers: saved.answers || {},
+    sessionKey: saved.sessionKey || id(24),
+    token: saved.token || null,
+    result: saved.result || null,
+    clarification: saved.clarification || null,
+    c1: saved.c1 || null,
+    followUp: saved.followUp || {},
+    contact: { country: '351' },
+    receipt: saved.receipt || null,
+    captured: saved.captured || null,
+    errors: {},
+    banner: null,
+    busy: false,
+  };
+  if (['clarify', 'result', 'contact', 'done', 'ended'].indexOf(state.view) < 0 && state.view !== 'q') state.view = 'intro';
+  if (state.view !== 'intro' && state.view !== 'q' && !state.token) state.view = 'intro';
+  var keptContact = read(CONTACT_STORE, sessionStorage);
+  if (keptContact && keptContact.sessionKey === state.sessionKey) ['firstName', 'business', 'phone', 'country'].forEach(function (k) { if (keptContact[k] !== undefined) state.contact[k] = keptContact[k]; });
+
+  function persist() {
+    write(STORE, { view: state.view, screen: state.screen, answers: state.answers, sessionKey: state.sessionKey, token: state.token, result: state.result, clarification: state.clarification, c1: state.c1, followUp: state.followUp, receipt: state.receipt, captured: state.captured });
+    var c = { sessionKey: state.sessionKey };
+    ['firstName', 'business', 'phone', 'country'].forEach(function (k) { c[k] = state.contact[k]; });
+    write(CONTACT_STORE, c, sessionStorage);
+  }
+
+  function utm() {
+    var q = new URLSearchParams(location.search), out = {};
+    ['source', 'medium', 'campaign', 'content', 'term'].forEach(function (k) {
+      var v = q.get('utm_' + k);
+      if (v && /^[\w .:\/|+-]{1,120}$/.test(v)) out[k] = v;
+    });
+    return out;
+  }
+
+  /* ───── the contract, as the API serves it ───── */
+  function holds(cond) {
+    if (!cond) return true;
+    var v = state.answers[cond.q];
+    if (cond['in']) return typeof v === 'string' && cond['in'].indexOf(v) >= 0;
+    return Array.isArray(v) && v.indexOf(cond.includes) >= 0;
+  }
+  function visibleOptions(q) { return (q.options || []).filter(function (o) { return holds(o.showIf); }); }
+  /** Drops answers of questions that no longer apply, in order, like the server. */
+  function prune() {
+    var kept = {};
+    var original = state.answers;
+    state.answers = kept;
+    state.contract.questions.forEach(function (q) {
+      if (!holds(q.showIf)) return;
+      var v = original[q.id];
+      if (q.kind === 'single') { if (visibleOptions(q).some(function (o) { return o.value === v; })) kept[q.id] = v; }
+      else if (q.kind === 'multi') {
+        var allowed = visibleOptions(q).map(function (o) { return o.value; });
+        var list = Array.isArray(v) ? v.filter(function (x) { return allowed.indexOf(x) >= 0; }) : [];
+        if (list.length) kept[q.id] = list;
+      } else if (v !== undefined && v !== '') kept[q.id] = v;
+      if (q.unknownLabel && original[q.id + 'Unknown'] === true) kept[q.id + 'Unknown'] = true;
+    });
+  }
+  function questionsOn(screen) { return state.contract.questions.filter(function (q) { return q.screen === screen && holds(q.showIf); }); }
+  function visibleScreens() { return SCREENS.filter(function (s) { return questionsOn(s).length > 0; }); }
+
+  /* ───── rendering ───── */
+  var app = document.getElementById('app');
+  function progress() {
+    var el = document.getElementById('step'), segs = document.getElementById('segs');
+    if (!state.contract) return;
+    var screens = visibleScreens();
+    var total = screens.length + 1;
+    var at = state.view === 'q' ? screens.indexOf(state.screen) + 1 : state.view === 'intro' ? 0 : total;
+    el.textContent = state.view === 'q' || state.view === 'intro' || state.view === 'clarify' ? 'Diagnóstico' : state.view === 'contact' || state.view === 'plan' || state.view === 'done' ? 'Os seus dados' : 'Resultado';
+    var html = '';
+    var before = segs.querySelectorAll('span.on').length;
+    for (var i = 1; i <= total; i++) html += '<span class="' + (i <= at ? 'on' : '') + (i === at && at < total ? ' now' : '') + '"><i></i></span>';
+    segs.innerHTML = html;
+    fx.segments(segs, before, at);
+  }
+  var ARROW = '<svg class="arr" width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14m0 0-5.5-5.5M19 12l-5.5 5.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>';
+  var BACK = '<svg class="arr" width="17" height="17" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M19 12H5m0 0 5.5-5.5M5 12l5.5 5.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>';
+  var TICK = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path pathLength="60" d="M5 12.5l4.5 4.5L19 7.5" stroke="#F7F5F1" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"></path></svg>';
+  function primary(act, label, extra) {
+    var busy = /…$/.test(label);
+    return '<button type="button" class="btn btn-primary" data-act="' + act + '"' + (extra || '') + '>' + (busy ? label.replace('…', '') + '<span class="dots" aria-hidden="true"><i></i><i></i><i></i></span>' : label + ARROW) + '</button>';
+  }
+  function back(act, label) { return '<button type="button" class="btn btn-secondary" data-act="' + act + '">' + BACK + (label || 'Voltar') + '</button>'; }
+  function focusHeading() {
+    var h = app.querySelector('[data-focus]');
+    if (h) { h.setAttribute('tabindex', '-1'); h.focus({ preventScroll: false }); }
+    window.scrollTo(0, 0);
+  }
+  function errorFor(key) {
+    return state.errors[key] ? '<p class="err" id="err-' + key + '">' + esc(state.errors[key]) + '</p>' : '';
+  }
+  function described(key, extra) {
+    var ids = [];
+    if (extra) ids.push(extra);
+    if (state.errors[key]) ids.push('err-' + key);
+    return (ids.length ? ' aria-describedby="' + ids.join(' ') + '"' : '') + (state.errors[key] ? ' aria-invalid="true"' : '');
+  }
+
+  function renderChoice(q, value, first, scope) {
+    var name = (scope || '') + q.id;
+    var multi = q.kind === 'multi';
+    var opts = visibleOptions(q).map(function (o) {
+      var on = multi ? Array.isArray(value) && value.indexOf(o.value) >= 0 : value === o.value;
+      return '<label class="opt"><input type="' + (multi ? 'checkbox' : 'radio') + '" name="' + name + '" value="' + esc(o.value) + '"' +
+        (on ? ' checked' : '') + ' data-q="' + q.id + '"' + (o.exclusive ? ' data-exclusive="1"' : '') + '><span class="mark" aria-hidden="true">' + TICK + '</span><span class="txt">' + esc(o.label) + '</span></label>';
+    }).join('');
+    return '<fieldset data-block="' + q.id + '" class="' + (first ? '' : 'sub') + '"' + described(q.id, 'type-' + q.id) + '>' +
+      '<legend' + (first ? ' class="big" data-focus' : '') + '>' + esc(q.title) + '</legend>' +
+      '<p class="type" id="type-' + q.id + '">' + esc(q.typeLabel) + '</p>' +
+      (q.help ? '<p class="help">' + esc(q.help) + '</p>' : '') +
+      '<div class="opts">' + opts + '</div>' + errorFor(q.id) + '</fieldset>';
+  }
+  function renderText(q, first) {
+    var value = state.answers[q.id] || '';
+    var unknown = state.answers[q.id + 'Unknown'] === true;
+    var input = q.kind === 'number'
+      ? '<input id="f-' + q.id + '" type="number" inputmode="numeric" min="' + (q.min || 0) + '" max="' + (q.max || 999) + '" step="1" value="' + esc(value) + '" data-q="' + q.id + '"' + described(q.id, 'type-' + q.id) + '>'
+      : (q.maxLength || 0) > 150
+        ? '<textarea id="f-' + q.id + '" maxlength="' + q.maxLength + '" data-q="' + q.id + '"' + described(q.id, 'type-' + q.id) + '>' + esc(value) + '</textarea><p class="count" id="count-' + q.id + '">' + String(value).length + ' de ' + q.maxLength + '</p>'
+        : '<input id="f-' + q.id + '" type="text" maxlength="' + (q.maxLength || 120) + '" value="' + esc(value) + '" data-q="' + q.id + '"' + (unknown ? ' disabled' : '') + (q.placeholder ? ' placeholder="' + esc(q.placeholder) + '"' : '') + described(q.id, 'type-' + q.id) + '>';
+    var unknownBox = q.unknownLabel
+      ? '<label class="check"><input type="checkbox" data-unknown="' + q.id + '"' + (unknown ? ' checked' : '') + '><span>' + esc(q.unknownLabel) + '</span></label>'
+      : '';
+    return '<div class="field" data-block="' + q.id + '">' +
+      (first ? '<h1 data-focus class="label" style="font-size:clamp(21px,4vw,26px)"><label for="f-' + q.id + '">' + esc(q.title) + '</label></h1>' : '<label for="f-' + q.id + '">' + esc(q.title) + '</label>') +
+      '<p class="type" id="type-' + q.id + '">' + esc(q.typeLabel) + '</p>' + (q.help ? '<p class="help">' + esc(q.help) + '</p>' : '') +
+      input + unknownBox + errorFor(q.id) + '</div>';
+  }
+
+  function viewIntro() {
+    return '<h1 data-focus>Veja qual plano faz sentido para o seu restaurante.</h1>' +
+      '<p class="lead">Responda sobre como os pedidos chegam e saem hoje, e veja o plano indicado e o investimento, com a implantação. Leva uns três minutos, e você não precisa deixar o seu contato para ver o resultado.</p>' +
+      '<div class="actions">' + primary('start', 'Começar') + '</div>';
+  }
+
+  function viewQuestions() {
+    var qs = questionsOn(state.screen);
+    var screens = visibleScreens();
+    var html = '<p class="counter">Passo ' + (screens.indexOf(state.screen) + 1) + ' de ' + screens.length + '</p>' + qs.map(function (q, i) {
+      return q.kind === 'single' || q.kind === 'multi' ? renderChoice(q, state.answers[q.id], i === 0) : renderText(q, i === 0);
+    }).join('');
+    var last = state.screen === screens[screens.length - 1];
+    if (last) html += '<p class="note">As suas respostas são analisadas automaticamente para preparar a recomendação. Ninguém lê as respostas antes de você pedir contato. <a href="' + PRIVACY + '" target="_blank" rel="noopener">Informação de privacidade</a>.</p>';
+    if (state.banner) html += '<div class="status bad" role="alert">' + esc(state.banner) + '</div>';
+    html += '<div class="actions">' + back('back') + primary('next', last ? (state.busy ? 'Preparando a recomendação…' : 'Ver a minha recomendação') : 'Continuar', state.busy ? ' disabled' : '') + '</div>';
+    return html;
+  }
+
+  function viewClarify() {
+    var c = state.clarification;
+    var html = renderChoice({ id: 'c1', kind: 'single', title: c.title, typeLabel: c.typeLabel, options: c.options }, state.c1 && state.c1.value, true);
+    if (state.banner) html += '<div class="status bad" role="alert">' + esc(state.banner) + '</div>';
+    return '<p class="counter">Confirmação de um detalhe</p>' + html +
+      '<p class="note">Este detalhe muda a configuração indicada, por isso confirmamos antes de mostrar o resultado.</p>' +
+      '<div class="actions">' + back('edit', 'Voltar às respostas') + primary('clarify', state.busy ? 'Preparando a recomendação…' : 'Ver a minha recomendação', state.busy ? ' disabled' : '') + '</div>';
+  }
+
+  function viewResult() {
+    var r = state.result, a = r.advice || { insight: null, changes: [], session: [] };
+    var html = '<p class="counter">A sua prioridade</p><h1 data-focus>' + esc(r.priority.label) + '</h1>';
+    if (a.insight) html += '<p class="dx-insight">' + esc(a.insight) + '</p>';
+    if (r.organization) html += orgBlock(r.organization);
+    if (a.changes.length) html += changeRows(a.changes.slice(0, 1));
+    if (r.plan) html += planCard(r);
+    else html += '<section class="card hero" aria-labelledby="plan-h"><p class="eyebrow">Indicação</p><h2 id="plan-h" class="plan-name">' + esc(r.headline) + '</h2><p style="color:#3A3D44">' + esc(r.reason) + '</p>' +
+      '<p style="color:#3A3D44;margin:0">O valor depende dessa avaliação. Não tem orçamento automático para este caso.</p></section>';
+    r.limitations.forEach(function (l) { html += '<p class="limit">' + esc(l) + '</p>'; });
+    html += captureCard();
+    html += compareBlock(r);
+    var more = a.changes.slice(1), detail = '';
+    if (r.analysis) detail += '<p><span class="note">Leitura automática das suas respostas.</span> ' + esc(r.analysis) + '</p>';
+    if (more.length) detail += changeRows(more);
+    if (a.session.length) detail += sessionBlock(a.session, r.plan ? r.plan.sessions : 1);
+    if (detail) html += '<details class="more"><summary>Ver como se aplica ao meu caso</summary><div class="more-in">' + detail + '</div></details>';
+    var f = state.followUp, scope = r.nextStepKind === 'scope';
+    var p1 = scope ? state.contract.followUp[2] : state.contract.followUp[0];
+    html += '<div id="p1">' + renderChoice(p1, f.choice, false, 'fu-');
+    if (!scope && f.choice === 'valor') html += renderChoice(state.contract.followUp[1], f.pv, false, 'fu-');
+    html += '</div>';
+    if (state.banner) html += '<div class="status bad" role="alert">' + esc(state.banner) + '</div>';
+    html += '<div class="actions">' + primary('p1', 'Continuar') + '</div>' +
+      '<button type="button" class="link" data-act="edit">Ajustar as minhas respostas</button>';
+    return html;
+  }
+
+  function captureCard() {
+    if (state.captured) {
+      return '<section class="card" aria-labelledby="cap-h"><h2 id="cap-h" style="margin:0 0 6px;font-size:19px">Pronto, o seu número ficou com a gente.</h2>' +
+        '<p style="margin:0;color:#3A3D44">A gente te chama no WhatsApp com este resultado. Se quiser, já pode seguir abaixo.</p></section>';
+    }
+    var c = state.contact;
+    var countries = state.contract.countries.map(function (x) { return '<option value="' + x.code + '"' + ((c.country || '351') === x.code ? ' selected' : '') + '>' + esc(x.label) + '</option>'; }).join('');
+    return '<section class="card" aria-labelledby="cap-h"><h2 id="cap-h" style="margin:0 0 6px;font-size:19px">Quer receber este resultado no WhatsApp?</h2>' +
+      '<p style="margin:0 0 14px;color:#3A3D44">Deixe o seu número e a gente te manda o resumo por lá. Se ficar alguma dúvida, é só responder.</p>' +
+      '<div class="field"><label for="f-capName">Primeiro nome</label><input id="f-capName" type="text" autocomplete="given-name" maxlength="60" value="' + esc(c.firstName || '') + '" data-c="firstName"></div>' +
+      '<div class="field"><label for="f-capPhone">WhatsApp</label><div class="row"><select id="f-capCountry" aria-label="País do número" data-c="country">' + countries + '</select>' +
+      '<input id="f-capPhone" type="tel" inputmode="tel" autocomplete="tel" maxlength="24" value="' + esc(c.phone || '') + '" data-c="phone"' + described('capPhone') + '></div>' + errorFor('capPhone') + '</div>' +
+      '<div class="field"><label class="check boxed"><input id="f-capConsent" type="checkbox" data-c="captureConsent"' + (c.captureConsent ? ' checked' : '') + described('capConsent') + '><span>Autorizo o Cenlo a me chamar no WhatsApp sobre este diagnóstico.</span></label>' + errorFor('capConsent') +
+      '<p class="note">Não usamos o seu número em campanhas. <a href="' + PRIVACY + '" target="_blank" rel="noopener">Informação de privacidade</a>.</p></div>' +
+      '<div class="actions" style="margin-top:6px">' + primary('capture', state.capturing ? 'Salvando…' : 'Quero receber') + '</div></section>';
+  }
+
+  function sendCapture() {
+    var c = state.contact, errs = {};
+    if (!c.phone || c.phone.replace(/\D/g, '').length < 6) errs.capPhone = 'Informe o número de WhatsApp.';
+    if (!c.captureConsent) errs.capConsent = 'Marque a autorização para a gente poder te chamar.';
+    if (Object.keys(errs).length) return showErrors(errs);
+    state.capturing = true; state.errors = {}; render(false);
+    var body = { phone: c.phone, country: c.country || '351', consent: true };
+    if (c.firstName && c.firstName.trim()) body.firstName = c.firstName.trim();
+    post('/result/' + encodeURIComponent(state.token) + '/lead', body).then(function (r) {
+      state.capturing = false;
+      if (r.status === 201) {
+        state.captured = { at: Date.now() };
+        trackCustom('DiagnosticoWhatsApp', { plano: state.result && state.result.plan ? state.result.plan.key : 'avaliacao', produto: 'food' });
+        persist(); render(false);
+        return;
+      }
+      if (r.status === 422 && r.data.field === 'phone') return showErrors({ capPhone: r.data.message });
+      showErrors({ capPhone: 'Não deu para salvar agora. Confira a internet e tente de novo.' });
+    }).catch(function () {
+      state.capturing = false;
+      showErrors({ capPhone: 'Sem conexão. Confira a internet e tente de novo.' });
+    });
+  }
+
+  function viewContact() {
+    var c = state.contact;
+    var countries = state.contract.countries.map(function (x) { return '<option value="' + x.code + '"' + (c.country === x.code ? ' selected' : '') + '>' + esc(x.label) + '</option>'; }).join('');
+    var html = '<p class="counter">Último passo</p><h1 data-focus>Para quem enviamos a resposta?</h1>' +
+      '<p class="lead">Os seus dados servem para responder a este pedido. Eles não são usados em campanhas.</p>' +
+      '<form id="contact-form" novalidate>' +
+      '<input class="hp" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">' +
+      '<div class="field"><label for="f-firstName">Primeiro nome</label><p class="type" id="type-firstName">Texto livre curto.</p><input id="f-firstName" type="text" autocomplete="given-name" maxlength="60" value="' + esc(c.firstName || '') + '" data-c="firstName"' + described('firstName', 'type-firstName') + '>' + errorFor('firstName') + '</div>' +
+      '<div class="field"><label for="f-business">Nome do restaurante</label><p class="type" id="type-business">Texto livre curto.</p><input id="f-business" type="text" autocomplete="organization" maxlength="120" value="' + esc(c.business || '') + '" data-c="business"' + described('business', 'type-business') + '>' + errorFor('business') + '</div>' +
+      '<div class="field"><label for="f-phone">WhatsApp</label><p class="type" id="type-phone">Um telefone. Escolha o país e digite o número.</p><div class="row"><select id="f-country" aria-label="País do número" data-c="country">' + countries + '</select>' +
+      '<input id="f-phone" type="tel" inputmode="tel" autocomplete="tel" maxlength="24" value="' + esc(c.phone || '') + '" data-c="phone"' + described('phone', 'type-phone') + '></div>' + errorFor('phone') + '</div>' +
+      renderChoice(state.contract.followUp[5], state.followUp.decision, false, 'fu-') +
+      renderChoice(state.contract.followUp[6], state.followUp.implementer, false, 'fu-') +
+      startFields() +
+      '<div class="field" style="max-width:660px"><label class="check boxed"><input type="checkbox" data-c="consent"' + (c.consent ? ' checked' : '') + described('consent') + '><span>Autorizo o Cenlo a usar estes dados para responder a este pedido pelo WhatsApp.</span></label>' + errorFor('consent') +
+      '<p class="note">Isso não autoriza campanhas nem outros contatos. <a href="' + PRIVACY + '" target="_blank" rel="noopener">Informação de privacidade</a>.</p></div>';
+    if (state.banner) html += '<div class="status bad" role="alert">' + esc(state.banner) + '</div>';
+    html += '<div class="actions">' + back('toResult') + '<button type="submit" class="btn btn-primary"' + (state.busy ? ' disabled' : '') + '>' + (state.busy ? 'Salvando o pedido…' : 'Enviar pedido') + ARROW + '</button></div></form>' +
+      '<button type="button" class="link" data-act="end">Terminar sem deixar contato</button>';
+    if (state.fallback) {
+      html += '<section class="card" style="margin-top:18px"><p><strong>Alternativa.</strong> Você pode abrir o WhatsApp com a mensagem já escrita. Nesse caso o pedido não fica registrado automaticamente.</p>' +
+        '<a class="btn btn-secondary" href="' + esc(state.fallback) + '" target="_blank" rel="noopener">Abrir o WhatsApp mesmo assim</a></section>';
+    }
+    return html;
+  }
+
+  function startFields() {
+    var p2 = state.contract.followUp[3], p2a = state.contract.followUp[4];
+    var html = renderChoice(p2, state.followUp.start, false, 'fu-');
+    if (state.followUp.start === 'adiante') {
+      html += '<div class="field" data-block="p2a"><label for="f-p2a">' + esc(p2a.title) + '</label><p class="type" id="type-p2a">' + esc(p2a.typeLabel) + '</p>' +
+        '<input id="f-p2a" type="month" value="' + esc(state.followUp.startMonth || '') + '" data-fu="startMonth"' + described('p2a', 'type-p2a') + '>' + errorFor('p2a') + '</div>';
+    }
+    if (state.followUp.start) html += '<button type="button" class="link clear" data-act="clearStart" data-block="clearStart">Limpar esta resposta</button>';
+    return html;
+  }
+
+  function viewDone() {
+    var r = state.receipt;
+    return '<div class="done-mark" aria-hidden="true"><svg width="64" height="64" viewBox="0 0 64 64" fill="none"><circle cx="32" cy="32" r="29" stroke="#2F6B4F" stroke-width="3" pathLength="60"></circle><path d="M20 33l8 8 16-17" stroke="#2F6B4F" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round" pathLength="60"></path></svg></div>' +
+      '<div class="status ok" role="status"><strong>Pedido salvo.</strong> Referência ' + esc(r.reference) + '.</div>' +
+      '<h1 data-focus>Falta só enviar a mensagem.</h1>' +
+      '<p class="lead">A mensagem abaixo já tem o que você respondeu e o que pediu. Você pode revisar antes de enviar no WhatsApp.</p>' +
+      '<div class="quote">' + esc(r.message) + '</div>' +
+      '<div class="actions"><a class="btn btn-wa" href="' + esc(r.whatsappUrl) + '" target="_blank" rel="noopener" data-act="wa"><svg width="21" height="21" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.47 14.38c-.3-.15-1.76-.87-2.03-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.16-.17.2-.35.22-.64.07-.3-.15-1.26-.46-2.39-1.47-.88-.79-1.48-1.76-1.65-2.06-.17-.3-.02-.46.13-.6.13-.14.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.03-.52-.07-.15-.67-1.61-.92-2.2-.24-.58-.49-.5-.67-.51h-.57c-.2 0-.52.07-.79.37-.27.3-1.04 1.02-1.04 2.48s1.07 2.88 1.21 3.07c.15.2 2.1 3.2 5.08 4.49.71.31 1.26.49 1.7.63.71.23 1.36.19 1.87.12.57-.09 1.76-.72 2-1.41.25-.7.25-1.29.18-1.41-.08-.13-.28-.2-.57-.35M12.05 21.79h-.01a9.87 9.87 0 0 1-5.03-1.38l-.36-.21-3.74.98 1-3.65-.24-.37a9.86 9.86 0 0 1-1.51-5.26c0-5.45 4.44-9.88 9.89-9.88 2.64 0 5.12 1.03 6.99 2.9a9.83 9.83 0 0 1 2.89 6.99c0 5.45-4.44 9.88-9.88 9.88m8.41-18.3A11.82 11.82 0 0 0 12.05 0C5.5 0 .16 5.34.16 11.89c0 2.1.55 4.14 1.59 5.95L.06 24l6.3-1.65a11.88 11.88 0 0 0 5.69 1.45h.01c6.55 0 11.89-5.34 11.89-11.89 0-3.18-1.24-6.17-3.48-8.41"/></svg>Abrir o WhatsApp com a mensagem</a></div>' +
+      '<button type="button" class="link" data-act="restart">Fazer um diagnóstico novo</button>';
+  }
+
+  function viewEnded() {
+    var kept = state.receipt
+      ? 'O pedido que você enviou antes continua salvo, com a referência ' + esc(state.receipt.reference) + '. Desta vez não salvamos nenhum contato novo.'
+      : 'Não salvamos o seu nome nem o seu telefone. As respostas e o resultado ficam guardados sem identificação no nosso servidor por alguns dias, e neste aparelho até você fazer um diagnóstico novo.';
+    return '<h1 data-focus>Obrigado por responder.</h1><p class="lead">' + kept + '</p>' +
+      '<div class="actions"><button type="button" class="btn btn-secondary" data-act="toResult">Ver o resultado outra vez</button><a class="btn btn-secondary" href="https://food.cenlo.pt/demo/food">Ver o Cenlo Food por dentro</a></div>';
+  }
+
+  function render(focus) {
+    if (!state.contract) return;
+    var views = { intro: viewIntro, q: viewQuestions, clarify: viewClarify, result: viewResult, contact: viewContact, done: viewDone, ended: viewEnded };
+    var build = function () {
+      app.innerHTML = (views[state.view] || viewIntro)();
+      var on = app.querySelector('.cmp-card.on');
+      if (on && on.parentNode.scrollWidth > on.parentNode.clientWidth) on.parentNode.scrollLeft = on.offsetLeft - on.parentNode.offsetLeft - 20;
+      progress();
+      persist();
+      if (focus) { focusHeading(); fx.enter(state.view); } else fx.afterPick();
+    };
+    if (focus) fx.leave(build);
+    else { var before = fx.snapshot(); build(); fx.morph(before); }
+  }
+
+  var DX_ARROW = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path pathLength="60" d="M5 12h14m0 0-5.5-5.5M19 12l-5.5 5.5" stroke="#B9471F" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"></path></svg>';
+  var DX_CK = '<span class="ck" aria-hidden="true"><svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path pathLength="60" d="M5 12.5l4.5 4.5L19 7.5" stroke="#FFFFFF" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"></path></svg></span>';
+  function changeRows(list) {
+    return '<ul class="dx-rows" aria-label="O que muda no restaurante"><li class="dx-head" aria-hidden="true"><span>Hoje</span><span></span><span>Com o Cenlo Food</span></li>' +
+      list.map(function (c) {
+        return '<li><span class="dx-today"><span class="sr">Hoje: </span>' + esc(c.today) + '</span><span class="dx-arrow" aria-hidden="true">' + DX_ARROW + '</span><span class="dx-with">' + DX_CK + '<span><span class="sr">Com o Cenlo Food: </span>' + esc(c.withCenlo) + '</span></span></li>';
+      }).join('') + '</ul>';
+  }
+  function sessionBlock(items, n) {
+    var count = n > 1 ? n + ' sessões de 1 hora, uma por mês no começo, incluídas' : 'Uma sessão de 1 hora no primeiro mês, incluída';
+    return '<div class="dx-session"><div class="dx-session-head"><span class="dx-clock" aria-hidden="true">1 h</span><div><p class="dx-session-t">Nas sessões estratégicas, a gente trabalha com você</p>' +
+      '<p class="dx-session-s">' + count + ' no plano indicado. A primeira começa por aqui.</p></div></div>' +
+      '<ol>' + items.map(function (t) { return '<li>' + esc(t) + '</li>'; }).join('') + '</ol></div>';
+  }
+  function orgBlock(o) {
+    return '<section class="org" aria-labelledby="org-h"><div class="org-top"><p class="eyebrow" id="org-h" style="margin:0">Como a operação está hoje</p>' +
+      '<span class="org-score" aria-label="Nota ' + o.score + ' de ' + o.max + '"><span class="num" data-to="' + o.score + '" aria-hidden="true">' + o.score + '</span><small aria-hidden="true">/ ' + o.max + '</small></span></div>' +
+      '<div class="org-meter" aria-hidden="true"><i style="width:' + Math.max(2, o.score) + '%"></i></div>' +
+      '<p class="org-label">' + esc(o.label) + '</p><p class="org-text">' + esc(o.text) + '</p>' +
+      '<p class="note" style="margin:10px 0 0">Mede quanto do pedido corre sem alguém precisar lembrar ou repassar. Mais alto é operação mais organizada.</p></section>';
+  }
+  function eur(c) { return (c % 100 ? Math.floor(c / 100) + ',' + String(c % 100).padStart(2, '0') : String(c / 100)) + ' €'; }
+  function payBlock(pay) {
+    if (!pay || (!pay.cash && !pay.split)) return '';
+    var s = pay.split, rest = s ? s.restCents : [];
+    var same = rest.every(function (c) { return c === rest[0]; });
+    var tail = same ? rest.length + ' de ' + eur(rest[0]) : rest.map(eur).join(' e ');
+    return '<div class="pay" role="group" aria-label="Como pagar a implantação">' +
+      (pay.cash ? '<div class="pay-opt pay-cash"><span class="pay-l">À vista <span class="pay-tag">' + pay.cash.discountPercent + '% de desconto</span></span>' +
+        '<span class="pay-v">' + eur(pay.cash.cents) + '</span><span class="pay-s">Você economiza ' + eur(pay.cash.savedCents) + ' na implantação</span></div>' : '') +
+      (s ? '<div class="pay-opt"><span class="pay-l">Em ' + s.installments + ' vezes</span>' +
+        (s.upfrontCents > 0 ? '<span class="pay-v">' + eur(s.upfrontCents) + '<small>de entrada</small></span><span class="pay-s">e mais ' + tail + ' nos meses seguintes</span>'
+          : '<span class="pay-v">' + tail + '</span><span class="pay-s">Sem entrada</span>') + '</div>' : '') +
+      '</div>';
+  }
+  function amount(text) { var m = /(\d+(?:,\d{2})?) €/.exec(text); return m ? m[1] : ''; }
+  var PINK_CK = '<span class="ck"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path pathLength="60" d="M5 12.5l4.5 4.5L19 7.5" stroke="#FF9A6B" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></path></svg></span>';
+  function badgeOf(r) { return r.state === 'recommended' ? 'Indicado para você' : r.state === 'provisional' ? 'Referência para avaliar' : 'Ponto de partida'; }
+  var DAILY = '<span class="go" aria-hidden="true"><svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M5 12h14m0 0-5-5m5 5-5 5" stroke="#FF9A6B" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"></path></svg></span>';
+  function planCard(r) {
+    var p = r.plan, setup = amount(p.setupText), monthly = amount(p.monthlyText), d = p.deliverables;
+    var list = function (items, mark) { return items.map(function (t) { return '<li>' + mark + '<span>' + esc(t) + '</span></li>'; }).join(''); };
+    return '<section class="plan" aria-labelledby="inv-h">' +
+      '<div class="plan-top"><p class="plan-kicker" id="inv-h">Indicação e investimento</p><span class="plan-badge">' + badgeOf(r) + '</span></div>' +
+      '<h2 class="plan-title">' + esc(r.headline) + '</h2>' +
+      '<p class="plan-scope">' + esc(p.scope) + '</p>' +
+      '<p class="plan-struct">' + esc(r.reason) + '</p>' +
+      '<div class="plan-prices">' +
+        '<div class="pp" aria-label="' + esc(p.setupText) + '"><span class="pp-l" aria-hidden="true">Implantação</span><span class="pp-v" aria-hidden="true"><span class="num" data-to="' + setup + '">' + setup + '</span> €</span><span class="pp-s" aria-hidden="true">Cobrança única</span></div>' +
+        '<div class="pp" aria-label="' + esc(p.monthlyText) + '"><span class="pp-l" aria-hidden="true">Mensalidade</span><span class="pp-v" aria-hidden="true"><span class="num" data-to="' + monthly + '">' + monthly + '</span> €<small>/mês</small></span><span class="pp-s" aria-hidden="true">' + (p.units > 1 ? 'Por unidade, ' + esc(totalOf(p)) + ' com ' + p.units + ' unidades' : 'Por unidade') + '</span></div>' +
+      '</div>' + payBlock(p.payment) +
+      '<span class="plan-chip"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3l2.2 5.6L20 9.3l-4.4 3.9L17 19l-5-3-5 3 1.4-5.8L4 9.3l5.8-.7z" fill="#0F2A1F"/></svg>' + (p.sessions > 1 ? p.sessions + ' sessões estratégicas de 1 hora' : '1 sessão estratégica de 1 hora') + '</span>' +
+      '<div class="plan-layers">' +
+        '<div class="layer"><h3 class="layer-h"><span class="layer-n" aria-hidden="true">1</span>O que fica pronto para você</h3>' +
+          (p.base ? '<p class="layer-base">Tudo do ' + esc(p.base) + ', mais:</p>' : '') +
+          '<ul class="plan-inc">' + list(d.ready, PINK_CK) + '</ul></div>' +
+        '<div class="layer"><h3 class="layer-h"><span class="layer-n" aria-hidden="true">2</span>O que você passa a fazer</h3>' +
+          '<ul class="plan-inc daily">' + list(d.daily, DAILY) + '</ul></div>' +
+      '</div>' +
+      (p.setup ? setupBlock(p.setup) :
+      '<div class="layer layer-on"><h3 class="layer-h"><span class="layer-n" aria-hidden="true">3</span>Implantação e acompanhamento</h3>' +
+        '<ul class="on-chips">' + d.onboarding.map(function (t) { return '<li>' + esc(t) + '</li>'; }).join('') + '</ul></div>') +
+      '<p class="plan-note">Os planos se somam. Você pode mudar de plano quando a operação pedir.</p>' +
+    '</section>';
+  }
+  function setupBlock(s) {
+    var col = function (title, items) { return '<div class="setup-col"><h4>' + title + '</h4><ul>' + items.map(function (t) { return '<li>' + PINK_CK + '<span>' + esc(t) + '</span></li>'; }).join('') + '</ul></div>'; };
+    return '<div class="layer layer-on"><h3 class="layer-h"><span class="layer-n" aria-hidden="true">3</span>O que a implantação inclui</h3>' +
+      '<p class="setup-sub">A gente faz tudo isso com você, durante a implantação.</p>' +
+      '<div class="setup-grid">' + col('Configuração inicial', s.config) + col('Aplicativos criados e configurados', s.apps) +
+      '<div class="setup-col"><h4>Sessões estratégicas</h4><p>' + esc(s.sessions) + '.</p></div></div></div>';
+  }
+  function totalOf(p) { var c = p.monthlyTotalCents; return (c % 100 ? (c / 100).toFixed(2).replace('.', ',') : String(c / 100)) + ' € por mês'; }
+  function compareBlock(r) {
+    if (!r.plans || !r.plans.length) return '';
+    return '<section class="cmp" aria-labelledby="cmp-h"><h2 id="cmp-h" class="cmp-t">Os três planos</h2>' +
+      '<p class="cmp-s">O plano indicado está em destaque. Os planos se somam: o Pro tem tudo do Essential, e o Ultra tem tudo do Pro. A mensalidade é por unidade.</p>' +
+      '<ul class="cmp-row" tabindex="0" aria-label="Comparação dos três planos">' + r.plans.map(function (p) {
+        return '<li class="cmp-card' + (p.indicated ? ' on' : '') + '"' + (p.indicated ? ' aria-current="true"' : '') + '>' +
+          (p.indicated ? '<span class="cmp-badge">' + badgeOf(r) + '</span>' : '') +
+          '<h3 class="cmp-name">' + esc(p.label) + '</h3><p class="cmp-scope">' + esc(p.scope) + '</p>' +
+          '<p class="cmp-price"><b>' + amount(p.monthlyText) + ' €</b>/mês por unidade</p>' +
+          '<p class="cmp-setup">' + esc(p.setupText) + ', cobrança única' + (p.payment && p.payment.cash ? ', ou ' + eur(p.payment.cash.cents) + ' à vista' : '') + '. ' + (p.sessions > 1 ? p.sessions + ' sessões estratégicas.' : '1 sessão estratégica.') + '</p>' +
+          '<p class="cmp-tag">' + esc(p.tagline) + '</p>' +
+          (p.base ? '<p class="cmp-base">Tudo do ' + esc(p.base) + ', mais:</p>' : '') +
+          '<ul class="cmp-list">' + p.ready.map(function (t) { return '<li>' + esc(t) + '</li>'; }).join('') + '</ul></li>';
+      }).join('') + '</ul></section>';
+  }
+
+
+  /* ───── motion: GSAP for timelines, Motion for springs. Nothing here blocks a click. ───── */
+  var REDUCED = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var FINE = window.matchMedia && matchMedia('(pointer: fine)').matches;
+  var fx = (function () {
+    var G = function () { return !REDUCED && window.gsap; };
+    var M = function () { return !REDUCED && window.Motion && window.Motion.animate; };
+    var leaving = null, lastPick = null, first = true;
+    function words(el) {
+      if (el.dataset.split) return;
+      el.dataset.split = '1';
+      var walk = function (node) {
+        Array.prototype.slice.call(node.childNodes).forEach(function (n) {
+          if (n.nodeType === 3) {
+            var frag = document.createDocumentFragment();
+            n.textContent.split(/(\s+)/).forEach(function (part) {
+              if (!part) return;
+              if (/^\s+$/.test(part)) { frag.appendChild(document.createTextNode(part)); return; }
+              var w = document.createElement('span'); w.className = 'w';
+              var inner = document.createElement('span'); inner.textContent = part;
+              w.appendChild(inner); frag.appendChild(w);
+            });
+            n.parentNode.replaceChild(frag, n);
+          } else if (n.nodeType === 1 && !/^(SVG|INPUT)$/i.test(n.tagName)) walk(n);
+        });
+      };
+      walk(el);
+    }
+    function q(sel) { return Array.prototype.slice.call(app.querySelectorAll(sel)); }
+    function keyed() {
+      var count = {};
+      return q('[data-block], .field, .actions, .note, .link, .status, .counter, h1, .plan, .cmp, .card, .limit, .more, .dx-rows, .dx-insight, #p1').filter(function (el) { return !el.classList.contains('ghost') && el.parentNode; }).map(function (el) {
+        var inner = el.querySelector('[id]');
+        var cls = el.tagName + '.' + (el.className.split(' ')[0] || '');
+        count[cls] = (count[cls] || 0) + 1;
+        return { el: el, key: el.dataset.block ? 'b:' + el.dataset.block : inner ? 'id:' + inner.id : el.id ? 'self:' + el.id : cls + ':' + count[cls] };
+      });
+    }
+    return {
+      leave: function (done) {
+        var g = G();
+        if (leaving) { leaving.kill(); leaving = null; }
+        if (!g || first || !app.children.length) { first = false; done(); return; }
+        leaving = g.to(app.children, { opacity: 0, y: -14, filter: 'blur(6px)', duration: 0.2, stagger: 0.015, ease: 'power2.in', onComplete: function () { leaving = null; g.set(app.children, { clearProps: 'all' }); done(); } });
+      },
+      enter: function (view) {
+        var g = G();
+        if (!g) return;
+        q('h1, legend.big, .plan-name').forEach(words);
+        var tl = g.timeline({ defaults: { ease: 'expo.out' } });
+        tl.from(q('.counter, .eyebrow'), { y: 10, opacity: 0, duration: 0.5, stagger: 0.05 })
+          .from(q('.w > span'), { yPercent: 115, rotate: 2, duration: 0.8, stagger: 0.028 }, '<0.05')
+          .from(q('.type, .help, .lead, main > .note, .counter + p'), { y: 12, opacity: 0, duration: 0.6, stagger: 0.05 }, '<0.15')
+          .from(q('.opt'), { y: 26, opacity: 0, scale: 0.965, duration: 0.7, stagger: 0.045, clearProps: 'transform,opacity' }, '<0.05')
+          .from(q('.card, .plan, .limit, .field, .quote, .status, .done-mark'), { y: 28, opacity: 0, duration: 0.8, stagger: 0.09, clearProps: 'transform,opacity' }, '<0.1')
+          .from(q('.actions, .link'), { y: 14, opacity: 0, duration: 0.5, clearProps: 'transform,opacity' }, '<0.15');
+        if (view === 'result') {
+          q('.card.hero, .plan').forEach(function (c) { c.classList.add('sheen'); });
+          tl.from(q('.dx-insight'), { x: -14, opacity: 0, duration: 0.7, clearProps: 'transform,opacity' }, 0.35)
+            .from(q('.dx-rows li:not(.dx-head)'), { y: 14, opacity: 0, duration: 0.6, stagger: 0.1, clearProps: 'transform,opacity' }, 0.5)
+            .from(q('.dx-arrow'), { scale: 0.4, opacity: 0, duration: 0.6, stagger: 0.1, ease: 'back.out(2.2)', clearProps: 'transform,opacity' }, 0.6)
+            .from(q('.dx-with .ck path'), { strokeDashoffset: 60, duration: 0.45, stagger: 0.1, ease: 'power2.out' }, 0.75)
+            .from(q('.dx-clock'), { scale: 0.5, rotate: -90, opacity: 0, duration: 0.8, ease: 'back.out(1.8)', clearProps: 'transform,opacity' }, 0.8)
+            .from(q('.dx-session li'), { x: -10, opacity: 0, duration: 0.5, stagger: 0.08, clearProps: 'transform,opacity' }, 0.9);
+          tl.from(q('.plan-inc li'), { x: -10, opacity: 0, duration: 0.5, stagger: 0.07, clearProps: 'transform,opacity' }, 1.1);
+          tl.from(q('.layer, .cmp-card'), { y: 18, opacity: 0, duration: 0.7, stagger: 0.08, clearProps: 'transform,opacity' }, 1.0);
+          tl.from(q('.plan-inc path'), { strokeDashoffset: 60, duration: 0.5, stagger: 0.07, ease: 'power2.out' }, 1.2);
+          tl.from(q('.plan-chip'), { scale: 0.85, opacity: 0, duration: 0.6, ease: 'back.out(2)', clearProps: 'transform,opacity' }, 1.0);
+          q('.num').forEach(function (el, i) {
+            var target = el.dataset.to, cents = /,/.test(target), val = Number(target.replace(',', '.'));
+            var o = { v: 0 };
+            tl.to(o, { v: val, duration: 1.1, ease: 'power3.out', onUpdate: function () {
+              el.textContent = cents ? o.v.toFixed(2).replace('.', ',') : String(Math.round(o.v));
+            }, onComplete: function () { el.textContent = target; } }, 0.9 + i * 0.12);
+          });
+        }
+        if (view === 'done') {
+          tl.from(q('.done-mark circle'), { strokeDashoffset: 60, duration: 0.9, ease: 'power2.inOut' }, 0.1)
+            .from(q('.done-mark path'), { strokeDashoffset: 60, duration: 0.5, ease: 'power3.out' }, 0.7);
+        }
+      },
+      pick: function (e) {
+        var label = e.target.closest && e.target.closest('.opt');
+        if (!label) return;
+        var r = label.getBoundingClientRect(), input = label.querySelector('input');
+        lastPick = { q: input.dataset.q, v: input.value, x: e.clientX - r.left, y: e.clientY - r.top, w: r.width };
+      },
+      snapshot: function () {
+        if (!G()) return null;
+        var out = {};
+        keyed().forEach(function (k) { var r = k.el.getBoundingClientRect(); out[k.key] = { el: k.el, top: r.top, left: r.left, width: r.width }; });
+        return out;
+      },
+      morph: function (before) {
+        var g = G();
+        if (!g || !before) return;
+        var box = app.getBoundingClientRect(), now = keyed(), seen = {};
+        var moves = now.map(function (k) { seen[k.key] = 1; return { k: k, old: before[k.key], top: k.el.getBoundingClientRect().top }; });
+        var moving = [];
+        var inside = function (el) { return moving.some(function (p) { return p !== el && p.contains(el); }); };
+        moves.forEach(function (m) {
+          if (inside(m.k.el)) return;
+          if (!m.old) {
+            moving.push(m.k.el);
+            if (m.k.key.indexOf('b:') !== 0) return;
+            g.fromTo(m.k.el, { opacity: 0, y: -10 }, { opacity: 1, y: 0, duration: 0.45, ease: 'power3.out', clearProps: 'transform,opacity' });
+            g.fromTo(m.k.el.querySelectorAll('.opt, .type, .help, input, textarea, label'), { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.4, stagger: 0.035, delay: 0.06, ease: 'power2.out', clearProps: 'transform,opacity' });
+            return;
+          }
+          var dy = m.old.top - m.top;
+          if (Math.abs(dy) > 1) { moving.push(m.k.el); g.fromTo(m.k.el, { y: dy }, { y: 0, duration: 0.45, ease: 'power3.out', clearProps: 'transform' }); }
+        });
+        Object.keys(before).forEach(function (key) {
+          if (seen[key] || key.indexOf('b:') !== 0) return;
+          var gone = before[key].el;
+          ['id', 'for', 'name', 'data-q', 'data-act', 'data-c', 'data-fu', 'data-block', 'aria-describedby'].forEach(function (a) {
+            Array.prototype.forEach.call(gone.querySelectorAll('[' + a + ']'), function (n) { n.removeAttribute(a); });
+            gone.removeAttribute(a);
+          });
+          gone.setAttribute('aria-hidden', 'true'); gone.setAttribute('inert', '');
+          gone.classList.add('ghost');
+          gone.style.top = (before[key].top - box.top) + 'px'; gone.style.left = (before[key].left - box.left) + 'px'; gone.style.width = before[key].width + 'px';
+          app.appendChild(gone);
+          g.to(gone, { opacity: 0, y: -8, duration: 0.25, ease: 'power2.in', onComplete: function () { gone.remove(); } });
+        });
+      },
+      afterPick: function () {
+        var pick = lastPick; lastPick = null;
+        if (!pick) return;
+        var input = app.querySelector('input[data-q="' + pick.q + '"][value="' + pick.v + '"]');
+        if (!input) return;
+        var label = input.closest('.opt'), mark = label.querySelector('.mark'), m = M(), g = G();
+        if (m) {
+          window.Motion.animate(label, { scale: [0.975, 1] }, { type: 'spring', stiffness: 420, damping: 22 });
+          if (input.checked) window.Motion.animate(mark, { scale: [0.3, 1.18, 1] }, { duration: 0.45, ease: [0.2, 0.9, 0.3, 1.2] });
+        }
+        if (g && input.checked) {
+          g.fromTo(mark.querySelector('path'), { strokeDashoffset: 60 }, { strokeDashoffset: 0, duration: 0.4, ease: 'power2.out' });
+          var ripple = document.createElement('span'); ripple.className = 'ripple';
+          ripple.style.left = pick.x + 'px'; ripple.style.top = pick.y + 'px';
+          label.appendChild(ripple);
+          g.fromTo(ripple, { scale: 0, opacity: 1 }, { scale: (pick.w / 16) * 2.2, opacity: 0, duration: 0.9, ease: 'power2.out', onComplete: function () { ripple.remove(); } });
+        }
+      },
+      segments: function (segs, before, at) {
+        var g = G();
+        if (!g) return;
+        var spans = segs.querySelectorAll('span.on i');
+        for (var i = before; i < at && i < spans.length; i++) g.fromTo(spans[i], { scaleX: 0 }, { scaleX: 1, duration: 0.7, ease: 'expo.out', delay: (i - before) * 0.06 });
+      },
+      ambient: function () {
+        var g = G();
+        if (!g) return;
+        var blobs = document.querySelectorAll('.aura i');
+        Array.prototype.forEach.call(blobs, function (b, i) {
+          g.to(b, { xPercent: i % 2 ? -14 : 12, yPercent: i === 1 ? -10 : 9, scale: 1.12, duration: 12 + i * 4, ease: 'sine.inOut', yoyo: true, repeat: -1 });
+        });
+        if (!FINE) return;
+        var aura = document.querySelector('.aura');
+        var qx = g.quickTo(aura, 'x', { duration: 1.6, ease: 'power3.out' }), qy = g.quickTo(aura, 'y', { duration: 1.6, ease: 'power3.out' });
+        window.addEventListener('pointermove', function (e) { qx((e.clientX / innerWidth - 0.5) * -36); qy((e.clientY / innerHeight - 0.5) * -28); }, { passive: true });
+        var current = null, bx, by;
+        app.addEventListener('pointermove', function (e) {
+          var b = e.target.closest && e.target.closest('.btn-primary, .btn-wa');
+          if (b !== current) {
+            if (current) g.to(current, { x: 0, y: 0, duration: 0.5, ease: 'elastic.out(1, 0.5)' });
+            current = b;
+            if (b) { bx = g.quickTo(b, 'x', { duration: 0.35, ease: 'power3.out' }); by = g.quickTo(b, 'y', { duration: 0.35, ease: 'power3.out' }); }
+          }
+          if (!current) return;
+          var r = current.getBoundingClientRect();
+          bx((e.clientX - r.left - r.width / 2) * 0.16); by((e.clientY - r.top - r.height / 2) * 0.28);
+        });
+        app.addEventListener('pointerleave', function () { if (current) g.to(current, { x: 0, y: 0, duration: 0.5, ease: 'elastic.out(1, 0.5)' }); current = null; });
+      },
+    };
+  })();
+  app.addEventListener('pointerdown', fx.pick);
+  if (document.readyState === 'complete') fx.ambient(); else window.addEventListener('load', fx.ambient);
+
+  function go(view, opts) {
+    state.view = view;
+    if (view === 'contact') state.contact.consent = false;
+    state.errors = {};
+    state.banner = null;
+    if (!(opts && opts.replace)) history.pushState({ view: view, screen: state.screen }, '');
+    render(true);
+  }
+
+  window.addEventListener('popstate', function (e) {
+    if (!e.state) return;
+    state.view = e.state.view;
+    if (state.view === 'contact') state.contact.consent = false;
+    if (e.state.screen) state.screen = e.state.screen;
+    state.errors = {};
+    render(true);
+  });
+
+  /* ───── validation on the page (the server checks again) ───── */
+  function checkScreen() {
+    var errs = {};
+    questionsOn(state.screen).forEach(function (q) {
+      var v = state.answers[q.id];
+      if (!q.required) return;
+      if (q.kind === 'single' && !v) errs[q.id] = 'Selecione uma opção.';
+      if (q.kind === 'multi') {
+        var n = Array.isArray(v) ? v.length : 0;
+        if (n < (q.minSelected || 1)) errs[q.id] = q.minSelected ? 'Selecione pelo menos ' + q.minSelected + ' opções.' : 'Selecione pelo menos uma opção.';
+      }
+      if (q.kind === 'text' && !(v && String(v).trim()) && !state.answers[q.id + 'Unknown']) errs[q.id] = q.unknownLabel ? 'Escreva o nome ou marque ' + q.unknownLabel + '.' : 'Preencha este campo.';
+      if (q.kind === 'number' && !(Number.isInteger(Number(v)) && Number(v) >= (q.min || 0))) errs[q.id] = 'Informe um número inteiro a partir de ' + (q.min || 0) + '.';
+    });
+    return errs;
+  }
+  function showErrors(errs) {
+    state.errors = errs;
+    render(false);
+    var first = Object.keys(errs)[0];
+    var el = first && (document.getElementById('f-' + first) || app.querySelector('[data-q="' + first + '"]'));
+    if (el) el.focus();
+  }
+
+  /* ───── talking to the CRM ───── */
+  function post(path, body) {
+    return fetch(API + path, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body), credentials: 'omit' })
+      .then(function (res) { return res.json().catch(function () { return {}; }).then(function (data) { return { status: res.status, data: data }; }); });
+  }
+  function event(type, value) {
+    if (!state.token) return;
+    var body = value ? { type: type, value: value } : { type: type };
+    try { fetch(API + '/result/' + encodeURIComponent(state.token) + '/events', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body), keepalive: true, credentials: 'omit' }); } catch (e) {}
+  }
+
+  var autonomousChecked = false;
+  var autonomousEnabled = false;
+  function askResult(previousToken) {
+    if (!autonomousChecked) {
+      state.busy = true; render(false);
+      fetch(API + '/autonomous/status', { credentials: 'omit', cache: 'no-store' }).then(function(r) { if (!r.ok) throw new Error(); return r.json(); }).then(function(r) {
+        autonomousChecked = true; autonomousEnabled = r.enabled === true; state.busy = false; askResult(previousToken);
+      }).catch(function() { state.busy = false; state.banner = 'Não consegui conferir a oferta agora. Suas respostas continuam aqui. Tente novamente.'; render(false); });
+      return;
+    }
+    if (autonomousEnabled) {
+      try {
+        var old = JSON.parse(sessionStorage.getItem('cenlo-food-autonomous:v1') || 'null');
+        var same = old && JSON.stringify(old.answers) === JSON.stringify(state.answers);
+        var journey = same ? old : { previousOfferId: old && old.offer ? old.offer.id : undefined, composition: old ? old.composition : undefined, sessionKey: old ? old.sessionKey : crypto.randomUUID(), entry: 'diagnostic', answers: state.answers, isTest: new URLSearchParams(location.search).get('test') === '1', attribution: old ? old.attribution : utm() };
+        sessionStorage.setItem('cenlo-food-autonomous:v1', JSON.stringify(journey));
+        persist();
+        location.assign('/configurar/oferta');
+      } catch(e) { state.banner = 'Não consegui guardar suas escolhas neste navegador. Permita o armazenamento para continuar com a mesma oferta.'; render(false); }
+      return;
+    }
+    state.busy = true; state.banner = null; render(false);
+    var body = { sessionKey: state.sessionKey, answers: state.answers, clarification: state.c1 || null, previousToken: previousToken || null, website: '', utm: utm() };
+    post('/result', body).then(function (r) {
+      state.busy = false;
+      if (r.status === 200 && r.data.token) {
+        state.token = r.data.token;
+        state.followUp = {};
+        state.receipt = null;
+        if (r.data.clarification) { state.clarification = r.data.clarification; state.result = null; go('clarify'); return; }
+        state.result = r.data.result;
+        trackCustom('DiagnosticoConcluido', { plano: state.result.plan ? state.result.plan.key : 'avaliacao', estado: state.result.state, produto: 'food' });
+        go('result');
+        if (state.result.plan) event('price_shown');
+        return;
+      }
+      if (r.status === 422 && r.data.field) {
+        var q = state.contract.questions.filter(function (x) { return x.id === r.data.field; })[0];
+        if (q) { state.screen = q.screen; state.view = 'q'; var e = {}; e[q.id] = r.data.message; showErrors(e); return; }
+      }
+      state.banner = 'Não deu para preparar a recomendação agora. As suas respostas continuam aqui. Tente de novo em instantes.';
+      render(false);
+    }).catch(function () {
+      state.busy = false;
+      state.banner = 'Sem conexão. As suas respostas continuam aqui. Confira a internet e tente de novo.';
+      render(false);
+    });
+  }
+
+  function localMessage() {
+    var r = state.result, c = state.contact;
+    var lines = ['Oi, Pedro. Fiz o diagnóstico do Cenlo Food e queria conversar com você.'];
+    lines.push('Sou ' + c.firstName + ', do ' + c.business + '.');
+    if (r && r.plan && r.state === 'recommended') lines.push('Vi a indicação do plano ' + r.plan.label + '.');
+    else if (r && r.plan) lines.push('Vi o plano ' + r.plan.label + ' como referência.');
+    return lines.join('\n\n');
+  }
+
+  function sendContact() {
+    var c = state.contact, errs = {};
+    if (!c.firstName || c.firstName.trim().length < 2) errs.firstName = 'Informe o seu primeiro nome.';
+    if (!(c.business && c.business.trim().length >= 2)) errs.business = 'Informe o nome do restaurante.';
+    if (!state.followUp.decision) errs.fd = 'Diga quem decide sobre isso.';
+    if (!c.phone || c.phone.replace(/\D/g, '').length < 6) errs.phone = 'Informe o número de WhatsApp.';
+    if (!c.consent) errs.consent = 'Confirme que podemos usar estes dados para responder ao seu pedido.';
+    if (Object.keys(errs).length) return showErrors(errs);
+    if (!state.followUp.submissionId) state.followUp.submissionId = 'web_' + id(20);
+    var trap = app.querySelector('input[name=website]');
+    var body = {
+      token: state.token,
+      submissionId: state.followUp.submissionId,
+      followUp: { nextStep: state.followUp.nextStep, start: state.followUp.start || null, startMonth: state.followUp.start === 'adiante' ? state.followUp.startMonth || null : null, decision: state.followUp.decision || null, implementer: state.followUp.implementer || null },
+      contact: { firstName: c.firstName, business: c.business, phone: c.phone, country: c.country || '351' },
+      consent: true,
+      website: trap ? trap.value : '',
+      utm: utm(),
+      pageUrl: location.origin + location.pathname,
+      timezone: (Intl.DateTimeFormat().resolvedOptions().timeZone || null),
+    };
+    state.busy = true; state.banner = null; state.fallback = null; render(false);
+    post('/contact', body).then(function (r) {
+      state.busy = false;
+      if (r.status === 201 && r.data.saved && r.data.submissionId === body.submissionId) {
+        state.receipt = r.data;
+        track('Lead', { content_name: 'diagnostico_food' });
+        go('done');
+        return;
+      }
+      if (r.status === 422 && r.data.field) { var e = {}; e[r.data.field === 'followUp' ? (/decide/.test(r.data.message || '') ? 'fd' : 'p2a') : r.data.field] = r.data.message; return showErrors(e); }
+      if (r.status === 409) { var sc = visibleScreens(); state.banner = r.data.message || 'O resultado mudou. Veja a recomendação outra vez.'; state.token = null; state.view = 'q'; state.screen = sc[sc.length - 1]; render(true); return; }
+      fail();
+    }).catch(fail);
+    function fail() {
+      state.busy = false;
+      state.banner = 'Não deu para salvar o pedido. Os seus dados continuam aqui. Tente de novo.';
+      state.fallback = 'https://wa.me/' + WA_FALLBACK + '?text=' + encodeURIComponent(localMessage());
+      render(false);
+    }
+  }
+
+  /* ───── events ───── */
+  app.addEventListener('change', function (e) {
+    var t = e.target;
+    if (t.dataset.q && (t.type === 'radio' || t.type === 'checkbox')) {
+      var qid = t.dataset.q;
+      if (qid === 'c1') { state.c1 = { id: state.clarification.id, value: t.value }; persist(); return; }
+      if (t.name.indexOf('fu-') === 0) {
+        var map = { p1: 'choice', p1e: 'choice', pv: 'pv', p2: 'start', fd: 'decision', fi: 'implementer' };
+        state.followUp[map[qid]] = t.value;
+        delete state.errors[qid];
+        if (qid === 'p1') { if (t.value !== 'valor') delete state.followUp.pv; render(false); }
+        if (qid === 'p2') { if (t.value !== 'adiante') state.followUp.startMonth = null; render(false); }
+        persist();
+        var back2 = app.querySelector('input[data-q="' + qid + '"][value="' + t.value + '"]');
+        if (back2) back2.focus();
+        return;
+      }
+      if (t.type === 'radio') state.answers[qid] = t.value;
+      else {
+        var cur = Array.isArray(state.answers[qid]) ? state.answers[qid].slice() : [];
+        if (t.checked) cur = t.dataset.exclusive ? [t.value] : cur.filter(function (v) { return !app.querySelector('input[data-q="' + qid + '"][value="' + v + '"][data-exclusive]'); }).concat([t.value]);
+        else cur = cur.filter(function (v) { return v !== t.value; });
+        state.answers[qid] = cur;
+      }
+      delete state.errors[qid];
+      prune();
+      render(false);
+      var again = app.querySelector('input[data-q="' + qid + '"][value="' + t.value + '"]');
+      if (again) again.focus();
+      return;
+    }
+    if (t.dataset.unknown) {
+      var id2 = t.dataset.unknown;
+      if (t.checked) { state.answers[id2 + 'Unknown'] = true; delete state.answers[id2]; } else delete state.answers[id2 + 'Unknown'];
+      render(false);
+      var box = app.querySelector('[data-unknown="' + id2 + '"]'); if (box) box.focus();
+      return;
+    }
+    if (t.dataset.c === 'consent' || t.dataset.c === 'captureConsent') {
+      state.contact[t.dataset.c] = t.checked;
+      persist();
+    }
+    if (t.dataset.c === 'country') { state.contact.country = t.value; persist(); }
+    if (t.dataset.fu === 'startMonth') { state.followUp.startMonth = t.value || null; persist(); }
+  });
+  app.addEventListener('input', function (e) {
+    var t = e.target;
+    if (t.dataset.q && t.type !== 'checkbox' && t.type !== 'radio') {
+      state.answers[t.dataset.q] = t.type === 'number' ? (t.value === '' ? '' : Number(t.value)) : t.value;
+      var n = document.getElementById('count-' + t.dataset.q); if (n) n.textContent = t.value.length + ' de ' + t.maxLength;
+      persist();
+    }
+    if (t.dataset.c && t.type !== 'checkbox' && t.tagName !== 'SELECT') { state.contact[t.dataset.c] = t.value; persist(); }
+  });
+  app.addEventListener('submit', function (e) { e.preventDefault(); if (!state.busy) sendContact(); });
+  app.addEventListener('click', function (e) {
+    var el = e.target.closest('[data-act]');
+    if (!el) return;
+    var act = el.dataset.act;
+    if (act === 'start') { trackCustom('DiagnosticoIniciado', { origem: document.referrer ? 'site' : 'link direto' }); state.screen = visibleScreens()[0]; go('q'); }
+    if (act === 'next') {
+      if (state.busy) return;
+      var errs = checkScreen();
+      if (Object.keys(errs).length) return showErrors(errs);
+      var screens = visibleScreens(), at = screens.indexOf(state.screen);
+      trackCustom('DiagnosticoPasso', { passo: at + 1 });
+      if (at < screens.length - 1) { state.screen = screens[at + 1]; go('q'); }
+      else { state.c1 = null; askResult(state.token); }
+    }
+    if (act === 'back') {
+      var s = visibleScreens(), i = s.indexOf(state.screen);
+      if (i > 0) { state.screen = s[i - 1]; go('q'); } else go('intro');
+    }
+    if (act === 'clarify') {
+      if (!state.c1) return showErrors({ c1: 'Selecione uma opção.' });
+      askResult(state.token);
+    }
+    if (act === 'edit') { state.screen = visibleScreens()[0]; go('q'); }
+    if (act === 'p1') {
+      var f = state.followUp, scope = state.result.nextStepKind === 'scope';
+      if (!f.choice) return showErrors({ [scope ? 'p1e' : 'p1']: 'Escolha como prefere avançar.' });
+      if (f.choice === 'valor' && !f.pv) return showErrors({ pv: 'Selecione uma opção.' });
+      f.nextStep = f.choice === 'valor' ? f.pv : f.choice;
+      event('next_step', f.nextStep);
+      go(f.nextStep === 'nao_agora' ? 'ended' : 'contact');
+    }
+    if (act === 'capture' && !state.capturing) sendCapture();
+    if (act === 'end') go('ended');
+    if (act === 'clearStart') {
+      state.followUp.start = null; state.followUp.startMonth = null; delete state.errors.p2a;
+      render(false); persist();
+      var firstStart = app.querySelector('input[data-q="p2"]'); if (firstStart) firstStart.focus();
+    }
+    if (act === 'toResult') go(state.result ? 'result' : 'intro');
+    if (act === 'wa') { event('whatsapp_opened'); track('Contact', { content_name: 'whatsapp_diagnostico_food' }); }
+    if (act === 'restart') {
+      state.answers = {}; state.token = null; state.result = null; state.c1 = null; state.followUp = {}; state.receipt = null; state.clarification = null;
+      state.contact = { country: '351' }; state.fallback = null; state.captured = null;
+      try { sessionStorage.removeItem(CONTACT_STORE); } catch (e) {}
+      state.sessionKey = id(24); state.screen = 1; go('intro');
+    }
+  });
+
+  fetch(API + '/questions', { credentials: 'omit' })
+    .then(function (r) { if (!r.ok) throw new Error(String(r.status)); return r.json(); })
+    .then(function (contract) {
+      state.contract = contract;
+      prune();
+      history.replaceState({ view: state.view, screen: state.screen }, '');
+      render(true);
+    })
+    .catch(function () {
+      app.innerHTML = '<h1 data-focus>Não deu para abrir o diagnóstico.</h1><p class="lead">Confira a internet e tente de novo.</p><div class="actions"><button type="button" class="btn btn-primary" onclick="location.reload()">Tentar de novo</button></div>';
+    });
+})();
+</script>
+</body>
+</html>

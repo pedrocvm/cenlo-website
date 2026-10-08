@@ -65,3 +65,6 @@ export function removeModule(id: string) {
 export function clearSelection() {
   write([])
 }
+
+/** Read current selection after hydration, before creating an offer. */
+export function readSelection() { return read() }

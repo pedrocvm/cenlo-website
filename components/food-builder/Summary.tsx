@@ -53,7 +53,7 @@ function Panel({ onNavigate, headingId }: { onNavigate?: () => void; headingId: 
           )}
         </div>
       )}
-      <p className="fb-note">Sem compromisso. A seleção é uma preferência para analisarmos consigo, não ativa nada na sua conta.</p>
+      <p className="fb-note">Confira o escopo e os valores antes de enviar um pedido. Nada é cobrado ou ativado nesta etapa.</p>
     </section>
   )
 }
@@ -63,7 +63,7 @@ export default function Summary({ children }: { children: React.ReactNode }) {
   const selection = useSelection()
   const sheetRef = useRef<HTMLDialogElement>(null)
   const [sheetOpen, setSheetOpen] = useState(false)
-  const showSide = !pathname.startsWith('/configurar/rever') && !pathname.startsWith('/configurar/enviado')
+  const showSide = !pathname.startsWith('/configurar/oferta') && !pathname.startsWith('/configurar/rever') && !pathname.startsWith('/configurar/enviado')
 
   useEffect(() => {
     const d = sheetRef.current
@@ -72,6 +72,8 @@ export default function Summary({ children }: { children: React.ReactNode }) {
     if (!sheetOpen && d.open) d.close()
   }, [sheetOpen])
 
+  // Synchronize the mobile sheet with external navigation.
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => setSheetOpen(false), [pathname])
 
   const n = selection.length
