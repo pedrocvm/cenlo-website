@@ -1,4 +1,4 @@
-export const CATALOG_VERSION = '2026-10-08.2'
+export const CATALOG_VERSION = '2026-10-08.3'
 
 export const GROUPS = [
   { id: 'operations', title: 'Atendimento e operação', intro: 'Do primeiro contacto ao pedido pronto: tudo entra no mesmo sítio e chega à cozinha sem ser copiado à mão.' },
@@ -138,7 +138,7 @@ const modules = [
     group: 'operations',
     title: 'Impressão Automática',
     icon: 'printer',
-    tier: 'base',
+    tier: 'optional',
     promise: 'A comanda sai na impressora da cozinha assim que o pedido é confirmado.',
     summary: 'O Cenlo Print Agent liga o Cenlo à impressora térmica da loja, com fila, monitorização e recuperação de falhas.',
     problem: [
@@ -228,7 +228,7 @@ const modules = [
     group: 'channels',
     title: 'Pedidos Agendados',
     icon: 'calendar',
-    tier: 'base',
+    tier: 'optional',
     promise: 'Aceite encomendas para mais tarde sem as misturar com a produção do momento.',
     summary: 'Pedidos para uma data e hora futuras ficam à parte e só entram na cozinha quando chega a altura.',
     problem: [
@@ -313,7 +313,7 @@ const modules = [
     group: 'delivery',
     title: 'Entregas por Raio',
     icon: 'radius',
-    tier: 'base',
+    tier: 'optional',
     promise: 'A cobertura e a taxa definidas pela distância real até à morada do cliente.',
     summary: 'Faixas de distância a partir da morada da loja, com uma taxa por faixa e um raio máximo de entrega.',
     problem: [
@@ -569,7 +569,7 @@ const modules = [
     group: 'intelligence',
     title: 'Insights e Recomendações',
     icon: 'bulb',
-    tier: 'base',
+    tier: 'optional',
     promise: 'Alertas com evidência sobre o que mudou e o que vale a pena fazer.',
     summary: 'Sinais como um produto que deixou de vender ou um dia consistentemente fraco, com a evidência e uma sugestão de ação.',
     problem: [
@@ -596,7 +596,7 @@ const modules = [
     group: 'intelligence',
     title: 'Relatórios e Desempenho',
     icon: 'chart',
-    tier: 'base',
+    tier: 'optional',
     productArea: 'reports',
     promise: 'Vendas, pedidos, ticket e recorrência por período, comparados com o anterior.',
     summary: 'Indicadores comerciais e operacionais com evolução diária e produtos mais vendidos.',
@@ -634,13 +634,13 @@ const modules = [
       'À hora do fecho definida, o Cenlo fecha o dia.',
       'O resumo do dia é enviado para os números de WhatsApp indicados pelo dono, até cinco.',
       'Ao fim da semana, chega um resumo semanal.',
-      'Nos relatórios, os fechos ficam guardados e podem ser recalculados.',
+      'Com o módulo Relatórios e Desempenho, os fechos ficam guardados para consulta e podem ser recalculados.',
     ],
     deliverables: [
       { title: 'Fecho diário automático', text: 'O registo oficial de cada dia de operação.' },
       { title: 'Resumo no WhatsApp', text: 'Envio do resumo do dia para até cinco números.' },
       { title: 'Resumo semanal', text: 'O balanço da semana com uma explicação escrita.' },
-      { title: 'Histórico de fechos', text: 'Lista de fechos com o estado de cada dia.' },
+      { title: 'Histórico de fechos', text: 'Lista de fechos com o estado de cada dia, disponível com o módulo Relatórios e Desempenho.' },
     ],
     fit: [
       'Donos que não estão sempre na loja e querem saber como correu o dia.',
@@ -708,7 +708,7 @@ const modules = [
     group: 'structure',
     title: 'Auditoria',
     icon: 'history',
-    tier: 'base',
+    tier: 'optional',
     productArea: 'audit',
     promise: 'Quem fez o quê, e quando, com os valores antes e depois.',
     summary: 'Trilha de alterações das ações relevantes na plataforma, para consulta pela gestão.',

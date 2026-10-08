@@ -75,7 +75,7 @@ export const SCREENSHOTS: Partial<Record<ModuleId, Shot[]>> = {
   'forecasting': [S.forecast],
   'insights-recommendations': [S.insights, S.intelligence],
   'reports': [S.reports, S.insights],
-  'closings-summaries': [S.closings, S.summaries],
+  'closings-summaries': [S.summaries, S.closings],
   'multi-store': [S.team],
   'team-permissions': [S.team],
   'audit-trail': [S.audit],

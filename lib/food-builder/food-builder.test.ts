@@ -26,13 +26,13 @@ test('catalog: 25 modules in the expected six groups, stable unique ids and slug
 })
 
 const premiumIds = ['ordering-site', 'table-service', 'cenlo-delivery', 'promotions', 'customer-reactivation', 'loyalty', 'multi-store']
-const optionalIds = ['cenlo-intelligence', 'forecasting']
+const optionalIds = ['auto-printing', 'scheduled-orders', 'delivery-radius', 'cenlo-intelligence', 'forecasting', 'insights-recommendations', 'reports', 'audit-trail']
 
 test('catalog: tiers match the commercial definition and every module has full detail content', () => {
   assert.deepEqual(MODULES.filter(m => m.tier === 'premium').map(m => m.id), premiumIds)
   assert.deepEqual(MODULES.filter(m => m.tier === 'optional').map(m => m.id), optionalIds)
-  assert.equal(MODULES.filter(m => m.tier === 'base').length, 16)
-  for (const id of ['orders-core', 'whatsapp-assistant', 'kitchen-display', 'auto-printing', 'delivery-zones', 'delivery-radius', 'reports', 'insights-recommendations', 'closings-summaries', 'team-permissions', 'audit-trail', 'help-training'])
+  assert.equal(MODULES.filter(m => m.tier === 'base').length, 10)
+  for (const id of ['orders-core', 'whatsapp-assistant', 'kitchen-display', 'counter-phone', 'delivery-zones', 'customer-updates', 'customer-crm', 'closings-summaries', 'team-permissions', 'help-training'])
     assert.equal(MODULES.find(m => m.id === id)?.tier, 'base', id)
   for (const m of MODULES) {
     for (const k of ['problem', 'flow', 'deliverables', 'fit'] as const) assert.ok(m[k].length > 0, `${m.id}.${k}`)
@@ -105,7 +105,7 @@ test('submission: base modules are always selected, chosen modules added, the re
   assert.equal(s.reference, await referenceFor(id))
   assert.equal(s.submittedAt, '2026-10-08T10:00:00.000Z')
   assert.deepEqual(s.selectedModules.filter(m => m.tier !== 'base').map(m => m.id), ['ordering-site', 'loyalty', 'forecasting'])
-  assert.equal(s.selectedModules.filter(m => m.tier === 'base').length, 16)
+  assert.equal(s.selectedModules.filter(m => m.tier === 'base').length, 10)
   assert.equal(s.selectedModules.length + s.unselectedModules.length, 25)
   assert.ok(s.unselectedModules.every(m => m.tier !== 'base'))
   assert.ok(s.unselectedModules.some(m => m.id === 'promotions' && m.tier === 'premium'))
@@ -154,6 +154,6 @@ test('email: subject, reference, all modules and escaped visitor text', async ()
   assert.ok(text.includes('utm_source: whatsapp'))
   assert.match(text, /PREMIUM ESCOLHIDOS \(2\)\n   ★ Site de Pedidos\n   ★ Fidelização/)
   assert.match(text, /OPCIONAIS ESCOLHIDOS \(1\)\n   ✓ Previsões/)
-  assert.match(text, /BASE INCLUÍDA \(16\)/)
+  assert.match(text, /BASE INCLUÍDA \(10\)/)
   assert.match(text, /· Promoções \(premium\)/)
 })
