@@ -1,6 +1,7 @@
 'use client'
 /* eslint-disable react-hooks/set-state-in-effect -- Restore this tab's saved external session after hydration. */
 import { useEffect, useRef, useState } from 'react'
+import { usePathname, useRouter } from 'next/navigation'
 import { readSelection } from './selection'
 import ModuleIcon from './ModuleIcon'
 import { MODULES } from '@/lib/food-builder/catalog'
@@ -14,7 +15,7 @@ type Composition = { moduleIds: string[]; preferences: string[]; units: number; 
 type Snapshot = { state: string; label: string; plan: string; version: string; setupCents: number; monthlyCents: number; sessions: number; reason: string; removalExplanation: string; composition: Composition; included: Cap[]; conditions: { id: string; text: string; state: string }[]; payment: { cash: { cents: number; discountPercent: number } | null; split: { upfrontCents: number; restCents: number[] } | null }; policy: { monthlyStart: string; installmentDue: string[]; validityText: string; taxText: string } }
 type Offer = { id: string; reference: string; snapshot: Snapshot; expiresAt: string | null; isTest: boolean }
 type Receipt = { saved: boolean; id: string; reference: string; kind: string; whatsappUrl: string; snapshot: { offer: Snapshot; payment: { totalCents: number; amounts: number[]; due: string[]; option: string } } }
-type Journey = { sessionKey: string; entry: 'diagnostic' | 'builder'; previousOfferId?: string; builderSelection?: string; answers?: Record<string, unknown>; composition?: Composition; offer?: Offer; receipt?: Receipt; payment?: 'cash' | 'split'; isTest: boolean; attribution: Record<string, string>; submissionId?: string; contact?: { name: string; business: string; phone: string; email: string }; decision?: string; desiredStart?: string; question?: string }
+type Journey = { evaluation?: { reasons: string[]; composition: Composition }; sessionKey: string; entry: 'diagnostic' | 'builder'; previousOfferId?: string; builderSelection?: string; answers?: Record<string, unknown>; composition?: Composition; offer?: Offer; receipt?: Receipt; payment?: 'cash' | 'split'; isTest: boolean; attribution: Record<string, string>; submissionId?: string; contact?: { name: string; business: string; phone: string; email: string }; decision?: string; desiredStart?: string; question?: string }
 function load(): Journey | null { try { return JSON.parse(sessionStorage.getItem(KEY) || 'null') } catch { return null } }
 function save(j: Journey) { try { sessionStorage.setItem(KEY, JSON.stringify(j)) } catch { /* This tab still works without storage. */ } }
 
@@ -43,7 +44,7 @@ function FoodReceipt({ receipt, offerReference, isTest, onWhatsApp }: { receipt:
         </section>
 
         <section className="fr-scope" aria-labelledby="fr-scope-title"><div className="fr-section-heading"><div><span className="fr-kicker">O que você escolheu</span><h2 id="fr-scope-title">Sua operação, conectada.</h2></div><span>{s.included.length} recursos incluídos</span></div>
-          <ul className="fr-features">{s.included.map(c => <li key={c.id}><ModuleIcon name={MODULES.find(m => m.id === c.id)?.icon || 'orders'} /><div><h3>{c.label}</h3>{c.condition ? <p>{c.condition}</p> : <span className="fr-included">Incluído na sua solução</span>}</div></li>)}</ul>
+          <ul className="fr-features">{s.included.map(c => <li key={c.id}><ModuleIcon name={MODULES.find(m => m.id === c.id)?.icon || 'orders'} /><div><h3>{c.label}</h3>{c.condition ? <p>{c.condition}</p> : <span className="fr-included">{s.composition.moduleIds.includes(c.id) ? 'Escolhido por você' : 'Incluído sem custo adicional'}</span>}</div></li>)}</ul>
           <div className="fr-support"><ModuleIcon name="users" /><p><strong>Acompanhamento inicial</strong><span>{s.sessions} {s.sessions === 1 ? 'sessão estratégica' : 'sessões estratégicas'} de 1 hora, no total. Treinamento operacional separado.</span></p></div>
         </section>
 
@@ -58,6 +59,8 @@ function FoodReceipt({ receipt, offerReference, isTest, onWhatsApp }: { receipt:
 }
 
 export default function FoodOfferJourney({ entry = 'builder' }: { entry?: 'builder' | 'diagnostic' }) {
+  const router = useRouter()
+  const pathname = usePathname()
   const [journey, setJourney] = useState<Journey | null>(null)
   const [caps, setCaps] = useState<Cap[]>([])
   const [composition, setComposition] = useState<Composition>({ moduleIds: ['orders-core'], preferences: [], units: 1, integration: 'none', priority: 'pedidos' })
@@ -91,8 +94,12 @@ export default function FoodOfferJourney({ entry = 'builder' }: { entry?: 'build
     try {
       const result = await call('/offers', { sessionKey: j.sessionKey, entry: j.entry, ...(c ? { composition: c } : j.entry === 'diagnostic' ? { answers: j.answers } : { composition: composition }),
         ...((j.offer || j.previousOfferId) ? { previousId: j.offer?.id || j.previousOfferId } : {}), revisionConfirmed: confirmedRevision, isTest: j.isTest, attribution: j.attribution })
-      if (result.state === 'evaluation') { setReasons(result.reasons); setComposition(result.composition); setEditing(true); return }
-      const next = update({ offer: result.offer, composition: result.offer.snapshot.composition, receipt: undefined, previousOfferId: undefined, submissionId: undefined, builderSelection: JSON.stringify(readSelection()) })
+      if (result.state === 'evaluation') {
+        update({ evaluation: { reasons: result.reasons, composition: result.composition }, composition: result.composition, builderSelection: JSON.stringify(readSelection()) })
+        setComposition(result.composition); setEditing(false); setReasons([])
+        router.push('/configurar/avaliacao'); window.scrollTo({ top: 0, behavior: 'instant' }); return
+      }
+      const next = update({ evaluation: undefined, offer: result.offer, composition: result.offer.snapshot.composition, receipt: undefined, previousOfferId: undefined, submissionId: undefined, builderSelection: JSON.stringify(readSelection()) })
       setComposition(result.offer.snapshot.composition); setEditing(false); setReview(null); setConfirmed(false)
       event('food_offer_viewed', next); window.scrollTo({ top: 0, behavior: 'instant' })
     } catch (e) { setError((e as Error).message); if (!j.offer) setEditing(true) }
@@ -105,11 +112,13 @@ export default function FoodOfferJourney({ entry = 'builder' }: { entry?: 'build
     const old = load()
     const j: Journey = old || { sessionKey: crypto.randomUUID(), entry, isTest: new URLSearchParams(location.search).get('test') === '1', attribution: Object.fromEntries(Object.entries(readAttribution()).filter(([,v]) => typeof v === 'string').map(([k,v]) => [k.replace(/^utm_/, ''), v!])) }
     ref.current = j; setJourney(j); save(j)
-    if (j.offer) {
+    if (j.evaluation && pathname === '/configurar/avaliacao') { setComposition(j.evaluation.composition); setEditing(false) }
+    else if (j.offer) {
       const changedInBuilder = entry === 'builder' && j.builderSelection !== undefined && j.builderSelection !== JSON.stringify(selection) && !j.receipt
       setComposition(changedInBuilder ? { ...j.offer.snapshot.composition, moduleIds: [...new Set(['orders-core', ...selection])] } : j.offer.snapshot.composition)
-      setEditing(changedInBuilder); event('food_offer_viewed', j)
+      setEditing(changedInBuilder || new URLSearchParams(location.search).get('editar') === '1'); event('food_offer_viewed', j)
     }
+    else if (j.composition && new URLSearchParams(location.search).get('editar') === '1') { setComposition(j.composition); setEditing(true) }
     else if (j.entry === 'diagnostic' && j.answers) { if (j.previousOfferId) { setEditing(true); setComposition(j.composition || composition); setError('Suas respostas mudaram. Confira os itens indispensáveis e confirme a revisão; a oferta anterior permanece registrada.') } else void issue(j) }
     else { setComposition({ ...composition, moduleIds: [...new Set(['orders-core', ...selection])] }); setEditing(true) }
     void call('/catalog', undefined, j.sessionKey).then(d => setCaps(d.snapshot.capabilities)).catch(e => setError(e.message))
@@ -135,6 +144,24 @@ export default function FoodOfferJourney({ entry = 'builder' }: { entry?: 'build
       update({ receipt }); setReview(null); setConfirmed(false); window.scrollTo({ top: 0, behavior: 'instant' })
     } catch (e) { setError((e as Error).message) }
     finally { lock.current = false; setBusy(false) }
+  }
+  if (journey.evaluation && pathname === '/configurar/avaliacao') {
+    const chosen = journey.evaluation.composition
+    const friendly: Record<string, { title: string; text: string }> = {
+      'auto-printing': { title: 'Impressão dos pedidos', text: 'Vamos conferir a impressora e o computador da sua operação para definir como conectar a impressão.' },
+      'customer-reactivation': { title: 'Recompra automática', text: 'Antes de ativar os envios, precisamos confirmar as regras para começar e interromper as mensagens corretamente.' },
+      'conversation-order': { title: 'Pedidos pela conversa', text: 'Precisamos conferir o atendimento com o seu cardápio antes de confirmar essa função na proposta.' },
+      'multi-store': { title: 'Mais de uma unidade', text: 'Vamos entender como suas lojas trabalham para definir o escopo da implantação.' },
+    }
+    const pending = caps.filter(c => chosen.moduleIds.includes(c.id) && c.state === 'evaluation')
+    const details = pending.map(c => friendly[c.id] || { title: c.label, text: c.condition || 'Vamos confirmar os detalhes deste recurso para a sua operação.' })
+    if (chosen.units !== 1 && !pending.some(c => c.id === 'multi-store')) details.push(friendly['multi-store'])
+    if (chosen.integration !== 'none') details.push({ title: 'Conexão com outro sistema', text: 'Vamos conferir qual sistema você usa e se a conexão atende ao que precisa.' })
+    return <section className="fr fe" aria-labelledby="offer-heading">
+      <header className="fr-hero"><div className="fr-check"><ModuleIcon name="chat" /></div><div><span className="fr-kicker">Próximo passo · Sua solução</span><h1 id="offer-heading">Vamos acertar os últimos detalhes.</h1><p>Alguns itens precisam de uma conferência com a sua operação. Você não precisa começar de novo.</p></div></header>
+      <div className="fe-layout"><section className="fe-content"><span className="fr-kicker">Para preparar uma proposta que faça sentido</span><h2>O que falta confirmar</h2><ul className="fe-checklist">{details.length ? details.map((d,i) => <li key={d.title}><span className="fe-number">{String(i+1).padStart(2,'0')}</span><div><h3>{d.title}</h3><p>{d.text}</p></div></li>) : <li><ModuleIcon name="help" /><div><h3>Compatibilidade da solução</h3><p>Precisamos conferir os requisitos selecionados antes de fechar os valores.</p></div></li>}</ul><details className="fr-details"><summary><ModuleIcon name="orders" /><span>Rever os itens que você escolheu<small>Sua seleção foi mantida nesta etapa</small></span><b aria-hidden="true">+</b></summary><div className="fr-details-body"><ul>{chosen.moduleIds.map(id => <li key={id}>{caps.find(c => c.id === id)?.label || MODULES.find(m => m.id === id)?.title || 'Recurso a confirmar'}</li>)}</ul></div></details></section>
+      <aside className="fr-next"><span className="fr-kicker">Vamos juntos</span><h2>Uma conversa para fechar os detalhes.</h2><p>Converse com Pedro sobre esses itens. Depois da conferência, você poderá revisar o escopo e os valores antes de decidir.</p><a className="fr-whatsapp fe-contact" href="https://pedro.cenlo.pt/food">Conversar sobre minha solução <span aria-hidden="true">↗</span></a><button className="fe-back" onClick={() => { update({ evaluation: undefined }); setEditing(true); setChangedConfirmed(false); router.push('/configurar/rever?editar=1') }}>Ajustar minha seleção</button><p className="fr-reassurance">Esta etapa ainda não confirma um pedido, valor final ou ativação.</p></aside></div>
+    </section>
   }
   if (journey.receipt) return <FoodReceipt receipt={journey.receipt} offerReference={journey.offer?.reference} isTest={journey.isTest} onWhatsApp={() => event('food_whatsapp_opened')} />
   return <section className="fo-journey" aria-labelledby="offer-heading">
@@ -172,7 +199,7 @@ export default function FoodOfferJourney({ entry = 'builder' }: { entry?: 'build
         <button className="fb-btn fb-btn-primary" disabled={busy || !confirmed}>{busy ? 'Registrando…' : review === 'implementation' ? 'Enviar meu pedido de implantação' : 'Enviar minha dúvida'}</button><button type="button" className="fb-btn fb-btn-ghost" onClick={() => { setReview(null); setConfirmed(false) }}>Voltar à oferta</button>
         <p>Esta etapa não cobra nem ativa uma conta. Seus dados serão usados para tratar este pedido.</p>
       </form>}
-      <details className="fo-scope" open={!!review}><summary>O que está incluído na sua solução</summary><ul>{s.included.map(c => <li key={c.id}>{c.label}{c.condition && <small>{c.condition}</small>}</li>)}</ul><p>{s.sessions} {s.sessions === 1 ? 'sessão estratégica' : 'sessões estratégicas'} de 1 hora no acompanhamento inicial, no total. Treinamento operacional separado.</p></details>
+      <details className="fo-scope" open={!!review}><summary>O que está incluído na sua solução</summary><ul>{s.included.map(c => <li key={c.id}>{c.label}{!s.composition.moduleIds.includes(c.id) && c.state !== 'evaluation' && <span className="fo-included-bonus">Incluído sem custo adicional</span>}{c.condition && <small>{c.condition}</small>}</li>)}</ul><p>{s.sessions} {s.sessions === 1 ? 'sessão estratégica' : 'sessões estratégicas'} de 1 hora no acompanhamento inicial, no total. Treinamento operacional separado.</p></details>
       <div className="fo-conditions"><h2>Condições de implantação</h2><ul>{s.conditions.map(c => <li key={c.id}>{c.text}</li>)}</ul><p>A Cenlo configura a unidade e os recursos contratados, prepara os acessos e treina a equipe. O restaurante fornece cardápio, horários, regras de entrega e um responsável pela implantação. Os testes e o início são combinados com você.</p></div>
       <details className="fo-demo" open={demo} onToggle={e => { const open = e.currentTarget.open; if (open && !demo) event('food_demo_opened'); setDemo(open) }}><summary>Veja como isso funciona na prática</summary><p>Capturas reais do produto com dados de demonstração. Este fluxo mostra a página de pedidos e o quadro da cozinha, presentes em todos os planos. A equipe muda as etapas no painel.</p>{demo && <div><figure><img src="/food-builder/screens/online-ordering-menu-mobile.webp" alt="Cardápio da operação de demonstração Bella Napoli" width="390" height="844" loading="lazy" /><figcaption>1. O cliente escolhe os itens na página de pedidos.</figcaption></figure><figure><img src="/food-builder/screens/orders-list.webp" alt="Pedidos com dados de demonstração no painel" width="1600" height="1000" loading="lazy" /><figcaption>2. O pedido confirmado fica registrado no painel.</figcaption></figure><figure><img src="/food-builder/screens/kitchen-board.webp" alt="Quadro da cozinha com pedidos de demonstração em cada etapa" width="1600" height="1000" loading="lazy" /><figcaption>3. A equipe acompanha e atualiza a preparação na cozinha.</figcaption></figure></div>}</details>
       <p>{s.removalExplanation}</p><button className="fb-btn fb-btn-ghost fo-print-button" onClick={() => window.print()}>Salvar resumo sem dados pessoais</button>

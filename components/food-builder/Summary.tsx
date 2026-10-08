@@ -63,7 +63,7 @@ export default function Summary({ children }: { children: React.ReactNode }) {
   const selection = useSelection()
   const sheetRef = useRef<HTMLDialogElement>(null)
   const [sheetOpen, setSheetOpen] = useState(false)
-  const showSide = !pathname.startsWith('/configurar/oferta') && !pathname.startsWith('/configurar/rever') && !pathname.startsWith('/configurar/enviado')
+  const showSide = !pathname.startsWith('/configurar/avaliacao') && !pathname.startsWith('/configurar/oferta') && !pathname.startsWith('/configurar/rever') && !pathname.startsWith('/configurar/enviado')
 
   useEffect(() => {
     const d = sheetRef.current
