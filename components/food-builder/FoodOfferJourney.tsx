@@ -71,11 +71,13 @@ export default function FoodOfferJourney({ entry = 'builder' }: { entry?: 'build
   const [error, setError] = useState('')
   const [reasons, setReasons] = useState<string[]>([])
   const [editing, setEditing] = useState(false)
+  const [cartOpen, setCartOpen] = useState(false)
   const [review, setReview] = useState<null | 'implementation' | 'question'>(null)
   const [confirmed, setConfirmed] = useState(false)
   const [changedConfirmed, setChangedConfirmed] = useState(false)
   const [demo, setDemo] = useState(false)
   const [evaluationContact, setEvaluationContact] = useState(false)
+  const cartToggle = useRef<HTMLButtonElement>(null)
   const init = useRef(false)
   const lock = useRef(false)
   const ref = useRef<Journey | null>(null)
@@ -230,12 +232,22 @@ export default function FoodOfferJourney({ entry = 'builder' }: { entry?: 'build
           })}</div></AnimatedDetails>
         })}</div>
       </div>
-      <aside className="fc-selection" aria-labelledby="fc-selection-title"><span className="fc-kicker">Montado por você</span><div className="fc-selection-title"><h2 id="fc-selection-title">Sua seleção</h2><span aria-live="polite">{composition.moduleIds.length}</span></div><p>Escolha os itens indispensáveis. Vamos encontrar o menor plano que atende à sua operação.</p><ul className="fc-selected-list">{composition.moduleIds.map(id => <li key={id}><span aria-hidden="true">✓</span>{caps.find(c => c.id === id)?.label || MODULES.find(m => m.id === id)?.title || 'Recurso selecionado'}</li>)}</ul>
+      <aside className={`fc-selection${cartOpen ? ' is-open' : ''}`} aria-label="Sua seleção" onKeyDown={e => { if (e.key === 'Escape') { setCartOpen(false); cartToggle.current?.focus() } }}><div className="fc-cart-panel" id="fc-cart-details"><div className="fc-cart-content"><span className="fc-kicker">Montado por você</span><div className="fc-selection-title"><h2 id="fc-selection-title">Sua seleção</h2><span aria-live="polite">{composition.moduleIds.length}</span></div><p>Escolha os itens indispensáveis. Vamos encontrar o menor plano que atende à sua operação.</p><ul className="fc-selected-list">{composition.moduleIds.map(id => <li key={id}><span aria-hidden="true">✓</span>{caps.find(c => c.id === id)?.label || MODULES.find(m => m.id === id)?.title || 'Recurso selecionado'}</li>)}</ul>
       {journey.offer && removed.length > 0 && <AnimatedDetails className="fc-changes"><summary>{removed.length} {removed.length === 1 ? 'item retirado' : 'itens retirados'} nesta revisão <span aria-hidden="true">+</span></summary><p>{removed.map(id => caps.find(c => c.id === id)?.label || id).join(', ')}.</p></AnimatedDetails>}
       {(journey.offer || journey.previousOfferId) && <label className="fc-confirm"><input type="checkbox" checked={changedConfirmed} onChange={e => setChangedConfirmed(e.target.checked)} /><span>Confirmo minhas alterações e quero conferir a nova oferta.</span></label>}
-      <button className="fc-continue" disabled={busy || !caps.length || (!!(journey.offer || journey.previousOfferId) && !changedConfirmed)} onClick={() => void issue(journey, composition, changedConfirmed)}>{busy ? 'Preparando sua oferta…' : <>Ver minha oferta <span aria-hidden="true">→</span></>}</button>
+      <button className="fc-continue fc-desktop-continue" disabled={busy || !caps.length || (!!(journey.offer || journey.previousOfferId) && !changedConfirmed)} onClick={() => void issue(journey, composition, changedConfirmed)}>{busy ? 'Preparando sua oferta…' : <>Ver minha oferta <span aria-hidden="true">→</span></>}</button>
       {journey.offer && <button className="fc-previous" onClick={() => { setEditing(false); setReasons([]) }}>Voltar à oferta anterior</button>}
-      <p className="fc-footnote">Você confere os valores antes de decidir. Nada é cobrado nesta etapa.</p></aside></div>
+      <p className="fc-footnote">Você confere os valores antes de decidir. Nada é cobrado nesta etapa.</p></div></div>
+      <div className="fc-cart-bar">
+        <button ref={cartToggle} type="button" className="fc-cart-toggle" aria-expanded={cartOpen} aria-controls="fc-cart-details" onClick={() => setCartOpen(!cartOpen)}>
+          <span><small>Sua seleção</small><strong aria-live="polite">{composition.moduleIds.length} {composition.moduleIds.length === 1 ? 'item' : 'itens'}</strong></span>
+          <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="m6 15 6-6 6 6" /></svg>
+        </button>
+        <button type="button" className="fc-continue fc-mobile-continue" disabled={busy || !caps.length} onClick={() => {
+          if ((journey.offer || journey.previousOfferId) && !changedConfirmed) { setCartOpen(true); return }
+          void issue(journey, composition, changedConfirmed)
+        }}>{busy ? 'Preparando…' : (journey.offer || journey.previousOfferId) && !changedConfirmed ? 'Rever alterações' : 'Ver minha oferta'}<span aria-hidden="true">→</span></button>
+      </div></aside></div>
     </div>}
     {s && !editing && <>
       <p className="fb-lede">{s.reason}</p>
