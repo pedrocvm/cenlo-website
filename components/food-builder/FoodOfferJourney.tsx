@@ -6,6 +6,7 @@ import { BASE_SELECTION_IDS, readSelection, replaceSelection, mergeSelectionInto
 import ModuleIcon from './ModuleIcon'
 import AnimatedDetails from './AnimatedDetails'
 import OfferValue from './OfferValue'
+import LoyaltyGift, { type LoyaltyPromotion } from './LoyaltyGift'
 import { GROUPS, MODULES } from '@/lib/food-builder/catalog'
 import { MODULE_BENEFITS } from '@/lib/food-builder/benefits'
 import { readAttribution } from './CaptureAttribution'
@@ -15,9 +16,9 @@ const API = '/api/food-builder/autonomous'
 const money = (n: number) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'EUR' }).format(n / 100)
 type Cap = { id: string; label: string; plan: string; state: string; condition?: string }
 type Composition = { moduleIds: string[]; preferences: string[]; units: number; integration: string; priority: string }
-type Snapshot = { state: string; label: string; plan: string; version: string; setupCents: number; monthlyCents: number; sessions: number; reason: string; removalExplanation: string; composition: Composition; included: Cap[]; benefits?: { baseIds: string[]; courtesyIds: string[] }; conditions: { id: string; text: string; state: string }[]; payment: { cash: { cents: number; discountPercent: number } | null; split: { upfrontCents: number; restCents: number[] } | null }; policy: { monthlyStart: string; installmentDue: string[]; validityText: string; taxText: string } }
+type Snapshot = { state: string; label: string; plan: string; version: string; setupCents: number; monthlyCents: number; sessions: number; reason: string; removalExplanation: string; composition: Composition; included: Cap[]; promotion?: LoyaltyPromotion; benefits?: { baseIds: string[]; courtesyIds: string[] }; conditions: { id: string; text: string; state: string }[]; payment: { cash: { cents: number; discountPercent: number } | null; split: { upfrontCents: number; restCents: number[] } | null }; policy: { monthlyStart: string; installmentDue: string[]; validityText: string; taxText: string } }
 type Offer = { id: string; reference: string; snapshot: Snapshot; expiresAt: string | null; isTest: boolean }
-type Receipt = { saved: boolean; id: string; reference: string; kind: string; whatsappUrl: string; snapshot: { offer: Snapshot; payment: { totalCents: number; amounts: number[]; due: string[]; option: string } } }
+type Receipt = { saved: boolean; id: string; reference: string; kind: string; whatsappUrl: string; snapshot: { offer: Snapshot; promotion?: LoyaltyPromotion & { status: 'reserved'; reservedAt: string }; payment: { totalCents: number; amounts: number[]; due: string[]; option: string } } }
 type EvaluationReceipt = { saved: boolean; id: string; reference: string; whatsappUrl: string }
 type Journey = { selectionSyncVersion?: number; compositionEdited?: boolean; evaluationSubmissionId?: string; evaluationReceipt?: EvaluationReceipt; evaluation?: { reasons: string[]; composition: Composition }; sessionKey: string; entry: 'diagnostic' | 'builder'; previousOfferId?: string; builderSelection?: string; answers?: Record<string, unknown>; composition?: Composition; offer?: Offer; receipt?: Receipt; payment?: 'cash' | 'split'; isTest: boolean; attribution: Record<string, string>; submissionId?: string; contact?: { name: string; business: string; phone: string; email: string }; decision?: string; desiredStart?: string; question?: string }
 function load(): Journey | null { try { return JSON.parse(sessionStorage.getItem(KEY) || 'null') } catch { return null } }
@@ -25,7 +26,7 @@ function save(j: Journey) { try { sessionStorage.setItem(KEY, JSON.stringify(j))
 
 function OfferBenefits({ snapshot: s }: { snapshot: Snapshot }) {
   if (!s.benefits) return null
-  const extras = s.included.filter(c => s.benefits!.courtesyIds.includes(c.id))
+  const extras = s.included.filter(c => s.benefits!.courtesyIds.includes(c.id) && c.id !== s.promotion?.moduleId)
   const items = extras.length ? extras : s.included.filter(c => s.benefits!.baseIds.includes(c.id))
   if (!items.length) return null
   const item = (c: Cap) => <li key={c.id}><ModuleIcon name={MODULES.find(m => m.id === c.id)?.icon || 'orders'} /><span>{c.label}</span><span aria-hidden="true">✓</span></li>
@@ -38,7 +39,7 @@ function OfferBenefits({ snapshot: s }: { snapshot: Snapshot }) {
   </section>
 }
 
-function FoodReceipt({ receipt, offerReference, isTest, onWhatsApp }: { receipt: Receipt; offerReference?: string; isTest: boolean; onWhatsApp: () => void }) {
+function FoodReceipt({ receipt, offerReference, isTest, onWhatsApp, onResumeOffer }: { receipt: Receipt; offerReference?: string; isTest: boolean; onWhatsApp: () => void; onResumeOffer: () => void }) {
   const s = receipt.snapshot.offer
   const payment = receipt.snapshot.payment
   const cash = payment.option === 'cash'
@@ -62,6 +63,8 @@ function FoodReceipt({ receipt, offerReference, isTest, onWhatsApp }: { receipt:
           <p className="fr-unpaid"><span aria-hidden="true">○</span> Nenhum pagamento realizado nesta etapa.</p>
         </section>
 
+        {question && s.promotion && <section className="fl-expired"><h2>O presente ainda não está reservado.</h2><p>Sua dúvida foi registrada. Para garantir o Clube de Fidelização, é preciso enviar o pedido de implantação dentro do prazo da oferta.</p><button type="button" className="fb-btn fb-btn-primary" onClick={onResumeOffer}>Voltar à oferta e conferir o prazo</button></section>}
+        {receipt.snapshot.promotion && <LoyaltyGift promotion={receipt.snapshot.promotion} now={0} reserved />}
         <OfferBenefits snapshot={s} />
         <section className="fr-scope" aria-labelledby="fr-scope-title"><div className="fr-section-heading"><div><span className="fr-kicker">O que você escolheu</span><h2 id="fr-scope-title">Sua operação, conectada.</h2></div><span>{s.included.length} recursos incluídos</span></div>
           <ul className="fr-features">{s.included.map(c => <li key={c.id}><ModuleIcon name={MODULES.find(m => m.id === c.id)?.icon || 'orders'} /><div><h3>{c.label}</h3>{c.condition ? <p>{c.condition}</p> : <span className="fr-included">{s.benefits?.baseIds.includes(c.id) ? 'Básico incluído' : s.composition.moduleIds.includes(c.id) ? 'Escolhido por você' : 'Incluído sem custo adicional'}</span>}</div></li>)}</ul>
@@ -83,6 +86,10 @@ export default function FoodOfferJourney({ entry = 'builder' }: { entry?: 'build
   const pathname = usePathname()
   const [journey, setJourney] = useState<Journey | null>(null)
   const [caps, setCaps] = useState<Cap[]>([])
+  const [campaign, setCampaign] = useState<LoyaltyPromotion | null>(null)
+  const [serverClock, setServerClock] = useState<{ time: number; measuredAt: number } | null>(null)
+  const [serverNow, setServerNow] = useState(0)
+  const [promotionRejected, setPromotionRejected] = useState(false)
   const [composition, setComposition] = useState<Composition>({ moduleIds: BASE_SELECTION_IDS, preferences: [], units: 1, integration: 'none', priority: 'pedidos' })
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
@@ -110,7 +117,7 @@ export default function FoodOfferJourney({ entry = 'builder' }: { entry?: 'build
   async function call(path: string, body?: unknown, session = ref.current?.sessionKey) {
     const res = await fetch(API + path, { method: body ? 'POST' : 'GET', headers: { 'content-type': 'application/json', 'x-food-session': session || '' }, body: body ? JSON.stringify(body) : undefined })
     const data = await res.json()
-    if (!res.ok) throw new Error(data.message || 'Não foi possível continuar. Tente novamente.')
+    if (!res.ok) throw Object.assign(new Error(data.message || 'Não foi possível continuar. Tente novamente.'), { code: data.code })
     return data
   }
   function event(name: string, j = ref.current) {
@@ -130,7 +137,7 @@ export default function FoodOfferJourney({ entry = 'builder' }: { entry?: 'build
         router.push('/configurar/avaliacao'); window.scrollTo({ top: 0, behavior: 'instant' }); return
       }
       const next = update({ compositionEdited: false, evaluation: undefined, offer: result.offer, composition: result.offer.snapshot.composition, receipt: undefined, previousOfferId: undefined, submissionId: undefined, builderSelection: JSON.stringify(readSelection()) })
-      setComposition(result.offer.snapshot.composition); setEditing(false); setReview(null); setConfirmed(false)
+      setComposition(result.offer.snapshot.composition); setPromotionRejected(false); setEditing(false); setReview(null); setConfirmed(false)
       if (pathname === '/configurar/avaliacao') router.replace('/configurar/oferta')
       event('food_offer_viewed', next); window.scrollTo({ top: 0, behavior: 'instant' })
     } catch (e) { setError((e as Error).message); if (!j.offer) setEditing(true) }
@@ -173,6 +180,8 @@ export default function FoodOfferJourney({ entry = 'builder' }: { entry?: 'build
     void call('/catalog', undefined, j.sessionKey).then(d => {
       const published = d.snapshot.capabilities as Cap[]
       setCaps(published)
+      setCampaign(d.snapshot.promotion || null)
+      if (d.serverNow) setServerClock({ time: Date.parse(d.serverNow), measuredAt: performance.now() })
       // Retry only an unissued evaluation whose old blockers have been released.
       // Confirmed offers and requests always keep their frozen version.
       if (d.snapshot.selectionPolicy === 'complete-essential' && j.evaluation && !j.offer && !j.previousOfferId && !j.evaluationReceipt && !editRequested && !j.compositionEdited && !changedInBuilder && draft.units === 1 && draft.integration === 'none' && draft.moduleIds.every(id => published.some(c => c.id === id && c.state !== 'evaluation'))) void issue(j, draft)
@@ -184,8 +193,29 @@ export default function FoodOfferJourney({ entry = 'builder' }: { entry?: 'build
     if (editing && journey?.sessionKey) void call('/journey-events', { sessionKey: journey.sessionKey, event: 'food_configurator_opened', isTest: journey.isTest }).catch(() => {})
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editing, journey?.sessionKey])
+  useEffect(() => {
+    if (!serverClock) return
+    const tick = () => setServerNow(serverClock.time + performance.now() - serverClock.measuredAt)
+    tick()
+    const timer = window.setInterval(tick, 1000)
+    const resync = () => {
+      if (document.visibilityState !== 'visible') return
+      void call('/catalog').then(d => {
+        if (d.serverNow) setServerClock({ time: Date.parse(d.serverNow), measuredAt: performance.now() })
+        setCampaign(d.snapshot.promotion || null)
+      }).catch(() => {})
+    }
+    document.addEventListener('visibilitychange', resync)
+    return () => { window.clearInterval(timer); document.removeEventListener('visibilitychange', resync) }
+    // The display clock is anchored to server time; request acceptance is checked on the server.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [serverClock])
   if (!journey) return <p role="status">Carregando suas escolhas…</p>
   const s = journey.receipt?.snapshot.offer || journey.offer?.snapshot
+  const promotionExpired = !!s?.promotion && (promotionRejected || (!!serverNow && serverNow >= Date.parse(s.promotion.endsAt)))
+  const promotionChecking = !!s?.promotion && !serverNow
+  const campaignActive = !!campaign && serverNow >= Date.parse(campaign.startsAt) && serverNow < Date.parse(campaign.endsAt)
+  const availableGift = campaignActive && s && s.composition.units === 1 && s.composition.integration === 'none' && s.composition.moduleIds.every(id => BASE_SELECTION_IDS.includes(id) || id === 'loyalty') ? campaign : null
   const cash = journey.payment !== 'split'
   const total = s ? (cash ? s.payment.cash?.cents ?? s.setupCents : s.setupCents) : 0
   const amounts = s ? cash ? [total] : [...(s.payment.split?.upfrontCents ? [s.payment.split.upfrontCents] : []), ...(s.payment.split?.restCents || [])] : []
@@ -194,14 +224,14 @@ export default function FoodOfferJourney({ entry = 'builder' }: { entry?: 'build
   const removed = journey.offer?.snapshot.composition.moduleIds.filter(id => !composition.moduleIds.includes(id)) || []
   async function submit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
-    if (!confirmed || !review || !journey?.offer || lock.current) return
+    if (!confirmed || !review || !journey?.offer || lock.current || promotionExpired || promotionChecking) return
     lock.current = true; setBusy(true); setError('')
     const next = update({ submissionId: journey.submissionId || crypto.randomUUID() })
     try {
       const receipt = await call('/requests', { submissionId: next.submissionId, offerId: next.offer!.id, sessionKey: next.sessionKey, kind: review, payment: next.payment || 'cash', contact,
         decision: next.decision || 'self', desiredStart: next.desiredStart || 'unknown', confirmation: true, ...(review === 'question' ? { question: next.question || '' } : {}), website: '' })
       update({ receipt }); setReview(null); setConfirmed(false); window.scrollTo({ top: 0, behavior: 'instant' })
-    } catch (e) { setError((e as Error).message) }
+    } catch (e) { if ((e as Error & { code?: string }).code === 'promotion_expired') { setPromotionRejected(true); setReview(null); setConfirmed(false) } setError((e as Error).message) }
     finally { lock.current = false; setBusy(false) }
   }
   async function requestEvaluation(e: React.FormEvent<HTMLFormElement>) {
@@ -240,7 +270,7 @@ export default function FoodOfferJourney({ entry = 'builder' }: { entry?: 'build
       <aside className="fr-next"><span className="fr-kicker">Vamos juntos</span><h2>Uma conversa para fechar os detalhes.</h2><p>Converse com Pedro sobre esses itens. Depois da conferência, você poderá revisar o escopo e os valores antes de decidir.</p>{journey.evaluationReceipt ? <div><p className="fe-saved" role="status">Suas escolhas estão salvas. Referência {journey.evaluationReceipt.reference}.</p><a className="fr-whatsapp fe-contact" href={journey.evaluationReceipt.whatsappUrl}>Continuar no WhatsApp <span aria-hidden="true">↗</span></a><p className="fb-note">O registro continua salvo mesmo que você não envie a mensagem.</p></div> : evaluationContact ? <form className="fe-contact-form" onSubmit={requestEvaluation}><p>Para Pedro encontrar sua configuração:</p><label>Seu nome<input autoComplete="name" required minLength={2} maxLength={120} value={contact.name} onChange={e => update({ contact: { ...contact, name: e.target.value } })} /></label><label>Nome do restaurante<input autoComplete="organization" required minLength={2} maxLength={120} value={contact.business} onChange={e => update({ contact: { ...contact, business: e.target.value } })} /></label><label>Seu WhatsApp<input autoComplete="tel" type="tel" required minLength={8} maxLength={30} placeholder="+351…" value={contact.phone} onChange={e => update({ contact: { ...contact, phone: e.target.value } })} /></label><label>Quer acrescentar algo? <small>Opcional</small><textarea rows={3} maxLength={1500} value={journey.question || ''} onChange={e => update({ question: e.target.value })} /></label><p className="fb-note">Vamos salvar suas escolhas e esses dados para responder à sua solicitação. Ao continuar, o WhatsApp abre com a mensagem pronta.</p><button className="fr-whatsapp fe-contact" type="submit" disabled={busy}>{busy ? 'Salvando sua solução…' : 'Salvar e conversar no WhatsApp'}<span aria-hidden="true">↗</span></button></form> : <button type="button" className="fr-whatsapp fe-contact" onClick={() => setEvaluationContact(true)}>Conversar sobre minha solução <span aria-hidden="true">↗</span></button>}{error && <p className="fo-error" role="alert">{error}</p>}<button className="fe-back" onClick={() => { update({ evaluation: undefined }); setEditing(true); setChangedConfirmed(false); router.push('/configurar/rever?editar=1') }}>Ajustar minha seleção</button><p className="fr-reassurance">Esta etapa ainda não confirma um pedido, valor final ou ativação.</p></aside></div>
     </section>
   }
-  if (journey.receipt) return <FoodReceipt receipt={journey.receipt} offerReference={journey.offer?.reference} isTest={journey.isTest} onWhatsApp={() => event('food_whatsapp_opened')} />
+  if (journey.receipt) return <FoodReceipt receipt={journey.receipt} offerReference={journey.offer?.reference} isTest={journey.isTest} onWhatsApp={() => event('food_whatsapp_opened')} onResumeOffer={() => { update({ receipt: undefined, submissionId: undefined }); setReview(null); setConfirmed(false) }} />
   return <section className={`fo-journey${editing ? ' fc-journey' : ''}`} aria-labelledby="offer-heading">
     {journey.isTest && <p className="fo-test">Teste controlado. Sem cobrança, ativação ou evento de compra.</p>}
     <span className="fb-eyebrow">Cenlo Food · {received ? 'Pedido recebido' : editing ? 'Sua composição' : 'Sua oferta'}</span>
@@ -258,7 +288,7 @@ export default function FoodOfferJourney({ entry = 'builder' }: { entry?: 'build
           const selected = items.filter(c => composition.moduleIds.includes(c.id)).length
           return <AnimatedDetails className="fc-group" key={group.id} open={index === 0}><summary><ModuleIcon name={MODULES.find(m => m.group === group.id)?.icon || 'orders'} /><span className="fc-group-title">{group.title}<small>{items.length} recursos disponíveis para escolher</small></span><span className={`fc-group-count${selected ? ' has-selection' : ''}`}>{selected ? `${selected} ${selected === 1 ? 'selecionado' : 'selecionados'}` : 'Explorar'}</span><span className="fc-chevron" aria-hidden="true">⌄</span></summary><div className="fc-cards">{items.map(c => {
             const checked = composition.moduleIds.includes(c.id)
-            return <article className={`fc-card${checked ? ' is-selected' : ''}`} key={c.id}><label><ModuleIcon name={MODULES.find(m => m.id === c.id)?.icon || 'orders'} /><span className="fc-card-title">{c.label}<span className="fc-card-benefit">{MODULE_BENEFITS[c.id]}</span><small>{c.plan === 'essential' ? 'Básico · já incluído em todos os planos' : c.state === 'evaluation' ? 'Sujeito a confirmação' : checked ? 'Na sua seleção' : 'Adicionar à solução'}</small></span><input type="checkbox" checked={checked} disabled={c.plan === 'essential'} onChange={e => editComposition({ ...composition, moduleIds: e.target.checked ? [...composition.moduleIds, c.id] : composition.moduleIds.filter(x => x !== c.id) })} /></label>{c.condition && <AnimatedDetails className="fc-card-detail"><summary>O que considerar <span aria-hidden="true">+</span></summary><p>{c.condition}</p></AnimatedDetails>}</article>
+            return <article className={`fc-card${checked ? ' is-selected' : ''}`} key={c.id}><label><ModuleIcon name={MODULES.find(m => m.id === c.id)?.icon || 'orders'} /><span className="fc-card-title">{c.label}<span className="fc-card-benefit">{MODULE_BENEFITS[c.id]}</span><small>{c.id === 'loyalty' && campaignActive && composition.moduleIds.every(id => BASE_SELECTION_IDS.includes(id) || id === 'loyalty') ? 'Presente no Essential · por tempo limitado' : c.plan === 'essential' ? 'Básico · já incluído em todos os planos' : c.state === 'evaluation' ? 'Sujeito a confirmação' : checked ? 'Na sua seleção' : 'Adicionar à solução'}</small></span><input type="checkbox" checked={checked} disabled={c.plan === 'essential'} onChange={e => editComposition({ ...composition, moduleIds: e.target.checked ? [...composition.moduleIds, c.id] : composition.moduleIds.filter(x => x !== c.id) })} /></label>{c.condition && <AnimatedDetails className="fc-card-detail"><summary>O que considerar <span aria-hidden="true">+</span></summary><p>{c.condition}</p></AnimatedDetails>}</article>
           })}</div></AnimatedDetails>
         })}</div>
       </div>
@@ -279,9 +309,14 @@ export default function FoodOfferJourney({ entry = 'builder' }: { entry?: 'build
         }}>{busy ? 'Preparando…' : (journey.offer || journey.previousOfferId) && !changedConfirmed ? 'Rever alterações' : 'Ver minha oferta'}<span aria-hidden="true">→</span></button>
       </div></aside></div>
     </div>}
-    {s && !editing && <>
+    {s && !editing && promotionExpired && <section className="fl-expired" role="status"><ModuleIcon name="calendar" /><h2>A condição especial do Clube terminou.</h2><p>Seu diagnóstico e suas escolhas continuam salvos. Confira o Essential sem o presente, ou ajuste a seleção para incluir o Clube nas condições atuais.</p><div className="fo-actions"><button type="button" className="fb-btn fb-btn-primary" disabled={busy} onClick={() => void issue(journey, { ...s.composition, moduleIds: s.composition.moduleIds.filter(id => id !== 'loyalty') }, true)}>Conferir Essential sem o presente</button><button type="button" className="fb-btn fb-btn-ghost" onClick={() => { setEditing(true); setChangedConfirmed(false) }}>Ajustar minha seleção</button></div><p>O prazo não reinicia ao atualizar a página. Nenhum valor é alterado ou cobrado sem sua confirmação.</p></section>}
+    {s && !editing && !promotionExpired && <>
       <p className="fb-lede">{s.reason}</p>
       <p className="fo-route">Suas escolhas <span aria-hidden="true">→</span> <strong>Sua oferta</strong> <span aria-hidden="true">→</span> Pedido de implantação</p>
+      {(s.promotion || availableGift) && <LoyaltyGift promotion={(s.promotion || availableGift)!} now={serverNow} busy={busy} onDemo={() => event('food_demo_opened')} onContinue={() => {
+        if (!s.promotion) { void issue(journey, s.composition, true); return }
+        setReview('implementation'); event('food_review_started'); window.setTimeout(() => document.querySelector('.fo-review')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50)
+      }} />}
       <div className="fo-prices"><div><span>Implantação · {cash ? 'à vista' : 'parcelada'}</span><strong>{money(received ? received.snapshot.payment.totalCents : total)}</strong><small>Base: {money(s.setupCents)}{cash && s.payment.cash ? ` · ${s.payment.cash.discountPercent}% à vista` : ''}</small></div><div><span>Mensalidade por unidade</span><strong>{money(s.monthlyCents)}</strong><small>{s.policy.monthlyStart}</small></div></div>
       <OfferBenefits snapshot={s} />
       <p>{s.policy.taxText}</p>
@@ -294,7 +329,7 @@ export default function FoodOfferJourney({ entry = 'builder' }: { entry?: 'build
         <p className="fo-calendar-note">A mensalidade é cobrada separadamente das parcelas da implantação.</p>
       </section>
       <p className="fo-offer-validity">{s.policy.validityText}</p>
-      {!received && !review && <div className="fo-actions"><button className="fb-btn fb-btn-primary" onClick={() => { setReview('implementation'); event('food_review_started') }}>Avançar com esta solução</button><button className="fb-btn fb-btn-ghost" onClick={() => { setEditing(true); setChangedConfirmed(false) }}>Ajustar os recursos</button><button className="fb-link-btn" onClick={() => { setReview('question'); event('food_review_started') }}>Ainda tenho uma dúvida</button></div>}
+      {!received && !review && <div className="fo-actions"><button className="fb-btn fb-btn-primary" disabled={promotionChecking} onClick={() => { setReview('implementation'); event('food_review_started') }}>Avançar com esta solução</button><button className="fb-btn fb-btn-ghost" onClick={() => { setEditing(true); setChangedConfirmed(false) }}>Ajustar os recursos</button><button className="fb-link-btn" onClick={() => { setReview('question'); event('food_review_started') }}>Ainda tenho uma dúvida</button></div>}
       {!review && <p className="fo-assurance">Você confere os dados no próximo passo. O pedido não realiza cobrança nem ativa uma conta.</p>}
       {!review && <OfferValue selected={s.included.filter(c => s.composition.moduleIds.includes(c.id))} priority={s.composition.priority} diagnostic={journey.entry === 'diagnostic'} onDemo={() => event('food_demo_opened')} />}
       {review && !received && <form className="fo-review" onSubmit={submit}>
@@ -304,8 +339,8 @@ export default function FoodOfferJourney({ entry = 'builder' }: { entry?: 'build
           <label>Quem decide?<select value={journey.decision || ''} required onChange={e => update({ decision: e.target.value, submissionId: undefined })}><option value="" disabled>Selecione quem decide</option><option value="self">Eu decido</option><option value="together">Decido com outra pessoa</option><option value="research">Estou pesquisando para o responsável</option></select></label>
           <label>Quando gostaria de começar?<select value={journey.desiredStart || 'unknown'} onChange={e => update({ desiredStart: e.target.value, submissionId: undefined })}><option value="unknown">Ainda sem data</option><option value="now">Agora</option><option value="later">Em um período posterior</option></select></label></div>
         {review === 'question' && <label>Sua dúvida<textarea required maxLength={1500} value={journey.question || ''} onChange={e => update({ question: e.target.value, submissionId: undefined })} /></label>}
-        <label className="fo-check"><input required type="checkbox" checked={confirmed} onChange={e => setConfirmed(e.target.checked)} />{review === 'implementation' ? 'Revisei a solução, os valores e a forma de pagamento. Quero seguir com a implantação e autorizo o retorno sobre este pedido.' : 'Autorizo o retorno para esclarecer esta dúvida. Isso não é um pedido de implantação.'}</label>
-        <div className="fo-review-actions"><button className="fb-btn fb-btn-primary" disabled={busy || !confirmed}>{busy ? 'Registrando…' : review === 'implementation' ? 'Enviar meu pedido de implantação' : 'Enviar minha dúvida'}</button><button type="button" className="fb-btn fb-btn-ghost" onClick={() => { setReview(null); setConfirmed(false) }}>Voltar à oferta</button></div>
+        <label className="fo-check"><input required type="checkbox" checked={confirmed} onChange={e => setConfirmed(e.target.checked)} />{review === 'implementation' ? 'Revisei a solução, os benefícios incluídos, os valores e a forma de pagamento. Quero seguir com a implantação e autorizo o retorno sobre este pedido.' : 'Autorizo o retorno para esclarecer esta dúvida. Isso não é um pedido de implantação.'}</label>
+        <div className="fo-review-actions"><button className="fb-btn fb-btn-primary" disabled={busy || !confirmed || promotionChecking || promotionExpired}>{busy ? 'Registrando…' : review === 'implementation' ? 'Enviar meu pedido de implantação' : 'Enviar minha dúvida'}</button><button type="button" className="fb-btn fb-btn-ghost" onClick={() => { setReview(null); setConfirmed(false) }}>Voltar à oferta</button></div>
         <p className="fo-review-notice">Esta etapa não cobra nem ativa uma conta. Seus dados serão usados para tratar este pedido.</p>
       </form>}
       <AnimatedDetails className="fo-scope" open={!!review}><summary>O que está incluído na sua solução</summary><ul className="fo-included-grid">{s.included.map(c => <li key={c.id}><ModuleIcon name={MODULES.find(m => m.id === c.id)?.icon || 'orders'} /><div><strong>{c.label}</strong><p>{MODULE_BENEFITS[c.id]}</p>{!s.composition.moduleIds.includes(c.id) && c.state !== 'evaluation' && <span className="fo-included-bonus">Incluído sem custo adicional</span>}{c.condition && <small>{c.condition}</small>}</div></li>)}</ul><p>{s.sessions} {s.sessions === 1 ? 'sessão estratégica' : 'sessões estratégicas'} de 1 hora no acompanhamento inicial, no total. Treinamento operacional separado.</p></AnimatedDetails>
