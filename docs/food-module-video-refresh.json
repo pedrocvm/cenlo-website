@@ -134,5 +134,15 @@
       "end": 64.6
     },
     "file": "demo-customer-reactivation.mp4"
+  },
+  {
+    "module": "loyalty",
+    "sources": [
+      "/food-builder/videos/clube-m-meta-definir.mp4",
+      "/food-builder/videos/clube-c15-recebimento.mp4",
+      "/food-builder/videos/clube-m-reservar.mp4"
+    ],
+    "file": "demo-loyalty.mp4",
+    "description": "Existing three recordings joined at original speed, no new capture."
   }
 ]

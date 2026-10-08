@@ -129,25 +129,11 @@ export const MODULE_VIDEOS: Partial<Record<ModuleId, ModuleVideo[]>> = {
   ],
   "loyalty": [
     {
-      "src": "/food-builder/videos/clube-m-meta-definir.mp4",
-      "title": "O cliente escolhe uma recompensa como meta",
-      "seconds": 8,
-      "width": 780,
-      "height": 1688
-    },
-    {
-      "src": "/food-builder/videos/clube-c15-recebimento.mp4",
-      "title": "Registre um atendimento no clube",
-      "seconds": 18,
-      "width": 2000,
-      "height": 1250
-    },
-    {
-      "src": "/food-builder/videos/clube-m-reservar.mp4",
-      "title": "O cliente reserva sua recompensa",
-      "seconds": 11,
-      "width": 780,
-      "height": 1688
+      "src": "/food-builder/videos/demo-loyalty.mp4",
+      "title": "Da escolha da meta ao registro no clube e à reserva da recompensa",
+      "seconds": 37,
+      "width": 1280,
+      "height": 800
     }
   ],
   "cenlo-intelligence": [
