@@ -6,6 +6,8 @@ import { shotsFor } from '@/lib/food-builder/screenshots'
 import ModuleIcon from '@/components/food-builder/ModuleIcon'
 import SelectToggle, { RemoveLink, TierBadge } from '@/components/food-builder/SelectToggle'
 import Gallery from '@/components/food-builder/Gallery'
+import ModuleVideos from '@/components/food-builder/ModuleVideos'
+import { videosFor } from '@/lib/food-builder/videos'
 
 export const dynamicParams = false
 
@@ -26,6 +28,7 @@ export default async function ModulePage({ params }: { params: Promise<{ slug: s
   if (!m) notFound()
   const group = GROUPS.find(g => g.id === m.group)!
   const shots = shotsFor(m.id)
+  const videos = videosFor(m.id)
   const i = MODULES.indexOf(m)
   const prev = MODULES[i - 1]
   const next = MODULES[i + 1]
@@ -48,6 +51,11 @@ export default async function ModulePage({ params }: { params: Promise<{ slug: s
           <RemoveLink id={m.id} title={m.title} />
         </div>
       </header>
+
+      <section className="fb-section fm-demo-section" aria-labelledby="s-shots">
+        <h2 id="s-shots" className="fm-demo-title">Veja o módulo em funcionamento</h2>
+        {videos.length ? <ModuleVideos videos={videos} title={m.title} poster={shots[0]?.src} /> : <><Gallery shots={shots} title={m.title} /><p className="fb-note">Imagens reais com dados de demonstração. Vídeo específico deste recurso ainda não disponível nesta página.</p></>}
+      </section>
 
       <section className="fb-section" aria-labelledby="s-problem">
         <div className="fb-section-head">
@@ -73,22 +81,6 @@ export default async function ModulePage({ params }: { params: Promise<{ slug: s
                 <p>{d.text}</p>
               </div>
             ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="fb-section" aria-labelledby="s-shots">
-        <div className="fb-section-head">
-          <h2 id="s-shots">Veja o módulo em funcionamento</h2>
-          <div>
-            {shots.length ? (
-              <>
-                <Gallery shots={shots} title={m.title} />
-                <p className="fb-note">Capturas da plataforma Cenlo Food com dados de demonstração.</p>
-              </>
-            ) : (
-              <p className="fb-pending">Estamos a preparar as capturas deste módulo. Se quiser vê-lo a funcionar, inclua-o na sua configuração e mostramos-lhe numa demonstração.</p>
-            )}
           </div>
         </div>
       </section>

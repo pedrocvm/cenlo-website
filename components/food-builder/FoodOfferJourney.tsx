@@ -5,6 +5,7 @@ import { usePathname, useRouter } from 'next/navigation'
 import { readSelection } from './selection'
 import ModuleIcon from './ModuleIcon'
 import { GROUPS, MODULES } from '@/lib/food-builder/catalog'
+import { MODULE_BENEFITS } from '@/lib/food-builder/benefits'
 import { readAttribution } from './CaptureAttribution'
 
 const KEY = 'cenlo-food-autonomous:v1'
@@ -181,7 +182,7 @@ export default function FoodOfferJourney({ entry = 'builder' }: { entry?: 'build
           const selected = items.filter(c => composition.moduleIds.includes(c.id)).length
           return <details className="fc-group" key={group.id} open={index === 0}><summary><ModuleIcon name={MODULES.find(m => m.group === group.id)?.icon || 'orders'} /><span className="fc-group-title">{group.title}<small>{items.length} recursos disponíveis para escolher</small></span><span className={`fc-group-count${selected ? ' has-selection' : ''}`}>{selected ? `${selected} ${selected === 1 ? 'selecionado' : 'selecionados'}` : 'Explorar'}</span><span className="fc-chevron" aria-hidden="true">⌄</span></summary><div className="fc-cards">{items.map(c => {
             const checked = composition.moduleIds.includes(c.id)
-            return <article className={`fc-card${checked ? ' is-selected' : ''}`} key={c.id}><label><ModuleIcon name={MODULES.find(m => m.id === c.id)?.icon || 'orders'} /><span className="fc-card-title">{c.label}<small>{c.id === 'orders-core' ? 'A base da sua solução' : c.state === 'evaluation' ? 'Sujeito a confirmação' : checked ? 'Na sua seleção' : 'Adicionar à solução'}</small></span><input type="checkbox" checked={checked} disabled={c.id === 'orders-core'} onChange={e => setComposition({ ...composition, moduleIds: e.target.checked ? [...composition.moduleIds, c.id] : composition.moduleIds.filter(x => x !== c.id) })} /></label>{c.condition && <details className="fc-card-detail"><summary>O que considerar <span aria-hidden="true">+</span></summary><p>{c.condition}</p></details>}</article>
+            return <article className={`fc-card${checked ? ' is-selected' : ''}`} key={c.id}><label><ModuleIcon name={MODULES.find(m => m.id === c.id)?.icon || 'orders'} /><span className="fc-card-title">{c.label}<span className="fc-card-benefit">{MODULE_BENEFITS[c.id]}</span><small>{c.id === 'orders-core' ? 'A base da sua solução' : c.state === 'evaluation' ? 'Sujeito a confirmação' : checked ? 'Na sua seleção' : 'Adicionar à solução'}</small></span><input type="checkbox" checked={checked} disabled={c.id === 'orders-core'} onChange={e => setComposition({ ...composition, moduleIds: e.target.checked ? [...composition.moduleIds, c.id] : composition.moduleIds.filter(x => x !== c.id) })} /></label>{c.condition && <details className="fc-card-detail"><summary>O que considerar <span aria-hidden="true">+</span></summary><p>{c.condition}</p></details>}</article>
           })}</div></details>
         })}</div>
       </div>
