@@ -494,7 +494,7 @@ textarea.fb-input { resize: vertical; min-height: 96px; }
 .fe-checklist h3 { font-size:17px; font-weight:600; margin:3px 0 8px; }
 .fe-checklist p { font-size:14px; color:var(--ink2); line-height:1.75; max-width:54ch; }
 .fe .fr-next > p { font-size:14px; }
-.fe-contact { margin-top:24px; }
+.fe-contact { margin-top:24px; width:100%; padding:18px 20px; font-size:18px; font-weight:700; line-height:1.4; text-align:left; }
 .fe-back { display:block; width:100%; padding:13px 8px; margin-top:10px; border:0; border-radius:8px; background:none; color:var(--ink2); font:inherit; font-size:12px; cursor:pointer; }
 .fe-back:hover { background:var(--surface); color:var(--ink); }
 .fo-included-bonus { display:inline-block; margin-left:10px; padding:3px 8px; border-radius:5px; background:var(--surface); color:var(--terra); font-size:11px; vertical-align:middle; }
