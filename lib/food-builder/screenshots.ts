@@ -50,6 +50,7 @@ const S = {
   team: desktop('team.webp', 'Gestão da equipa com membros, papel na organização e acesso por unidade', 'Equipa: cada pessoa com a sua função em cada unidade.'),
   audit: desktop('audit.webp', 'Trilha de alterações da auditoria com filtros e ações registadas por utilizador e hora', 'Auditoria: quem fez o quê, e quando, com filtros por âmbito, tipo de ação e datas.', 1600, 830),
   guides: desktop('guides.webp', 'Ajuda e guias com o próximo passo, objetivos com progresso e guias por secção', 'Ajuda e guias: o próximo passo, objetivos com progresso e guias por secção.'),
+  loyalty: desktop('loyalty-overview.webp', 'Visão geral do clube de fidelidade com clientes no clube, pontos emitidos, recompensas utilizadas e próximas ações', 'Clube de fidelidade: clientes no clube, pontos emitidos, últimas compras com pontos e próximas ações.'),
   onlineAdmin: desktop('online-ordering-admin.webp', 'Administração da página de pedidos online com aparência e pré-visualização no telemóvel', 'Pedidos online no Cenlo: aparência da página e pré-visualização tal como o cliente a vê.'),
 } satisfies Record<string, Shot>
 
@@ -69,6 +70,7 @@ export const SCREENSHOTS: Partial<Record<ModuleId, Shot[]>> = {
   'promotions': [S.promotions, S.promotionForm],
   'customer-crm': [S.customer, S.customers],
   'customer-reactivation': [S.reactivate],
+  'loyalty': [S.loyalty],
   'cenlo-intelligence': [S.intelligence],
   'forecasting': [S.forecast],
   'insights-recommendations': [S.insights, S.intelligence],
