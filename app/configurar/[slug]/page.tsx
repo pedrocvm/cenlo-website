@@ -17,7 +17,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const m = moduleBySlug((await params).slug)
   if (!m) return {}
   const title = `${m.title} | Cenlo Food Builder`
-  const url = `https://cenlo.pt/food/montar/${m.slug}`
+  const url = `https://cenlofood.cenlo.pt/configurar/${m.slug}`
   return { title, description: m.promise, alternates: { canonical: url }, openGraph: { title, description: m.promise, url, type: 'website' } }
 }
 
@@ -32,7 +32,7 @@ export default async function ModulePage({ params }: { params: Promise<{ slug: s
 
   return (
     <article>
-      <Link href={`/food/montar#grupo-${m.group}`} className="fb-back"><span aria-hidden="true">←</span> Todos os módulos</Link>
+      <Link href={`/configurar#grupo-${m.group}`} className="fb-back"><span aria-hidden="true">←</span> Todos os módulos</Link>
 
       <header className="fb-detail-hero">
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
@@ -109,20 +109,20 @@ export default async function ModulePage({ params }: { params: Promise<{ slug: s
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           {m.tier === 'base' ? (
-            <Link href="/food/montar#modulos" className="fb-btn fb-btn-primary">Escolher módulos</Link>
+            <Link href="/configurar#modulos" className="fb-btn fb-btn-primary">Escolher módulos</Link>
           ) : (
             <>
               <SelectToggle id={m.id} title={m.title} tier={m.tier} />
               <RemoveLink id={m.id} title={m.title} />
             </>
           )}
-          <Link href="/food/montar/rever" className="fb-btn fb-btn-ghost">Rever a minha configuração</Link>
+          <Link href="/configurar/rever" className="fb-btn fb-btn-ghost">Rever a minha configuração</Link>
         </div>
       </section>
 
       <nav className="fb-pager" aria-label="Outros módulos">
-        {prev ? <Link href={`/food/montar/${prev.slug}`}><small>← Módulo anterior</small><strong>{prev.title}</strong></Link> : <span />}
-        {next ? <Link href={`/food/montar/${next.slug}`}><small>Módulo seguinte →</small><strong>{next.title}</strong></Link> : <span />}
+        {prev ? <Link href={`/configurar/${prev.slug}`}><small>← Módulo anterior</small><strong>{prev.title}</strong></Link> : <span />}
+        {next ? <Link href={`/configurar/${next.slug}`}><small>Módulo seguinte →</small><strong>{next.title}</strong></Link> : <span />}
       </nav>
     </article>
   )

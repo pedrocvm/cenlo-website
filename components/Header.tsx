@@ -28,7 +28,7 @@ export default function Header() {
     return () => document.removeEventListener('keydown', onKey)
   }, [mobileOpen])
 
-  if (pathname.startsWith('/food/montar')) return null
+  if (pathname.startsWith('/configurar')) return null
 
   function closeMobile() {
     setMobileOpen(false)

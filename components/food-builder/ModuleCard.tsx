@@ -10,7 +10,7 @@ import { isSelected, useSelection } from './selection'
 export default function ModuleCard({ module: m, number, shot }: { module: Module; number: number; shot?: Shot }) {
   const selection = useSelection()
   const on = isSelected(selection, m.id)
-  const href = `/food/montar/${m.slug}`
+  const href = `/configurar/${m.slug}`
 
   return (
     <article className={`fb-card fb-card-${m.tier}${on && m.tier !== 'base' ? ' is-on' : ''}${m.id === CORE_MODULE_ID ? ' is-core' : ''}`} aria-labelledby={`card-${m.id}`}>

@@ -90,7 +90,7 @@ function input(over: Record<string, unknown> = {}) {
     business: { name: 'Casa <Teste>', city: 'Braga', type: 'Pizzaria' },
     notes: 'Fazemos 60 pedidos <b>por noite</b>.',
     moduleIds: ['loyalty', 'ordering-site', 'forecasting'],
-    attribution: { utm_source: 'whatsapp', landingPath: '/food/montar?utm_source=whatsapp', referrerHost: 'l.instagram.com' },
+    attribution: { utm_source: 'whatsapp', landingPath: '/configurar?utm_source=whatsapp', referrerHost: 'l.instagram.com' },
     ...over,
   }
 }
@@ -111,7 +111,7 @@ test('submission: base modules are always selected, chosen modules added, the re
   assert.ok(s.unselectedModules.some(m => m.id === 'promotions' && m.tier === 'premium'))
   assert.equal(s.contact.phone, '+351912345678')
   assert.equal(s.contact.email, null)
-  assert.equal(s.attribution.landingPath, '/food/montar')
+  assert.equal(s.attribution.landingPath, '/configurar')
   assert.deepEqual(s.attribution.utm, { utm_source: 'whatsapp' })
 })
 

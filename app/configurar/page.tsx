@@ -12,8 +12,8 @@ const description = 'Explore os módulos do Cenlo Food, veja a plataforma real e
 export const metadata: Metadata = {
   title,
   description,
-  alternates: { canonical: 'https://cenlo.pt/food/montar' },
-  openGraph: { title, description, url: 'https://cenlo.pt/food/montar', type: 'website' },
+  alternates: { canonical: 'https://cenlofood.cenlo.pt/configurar' },
+  openGraph: { title, description, url: 'https://cenlofood.cenlo.pt/configurar', type: 'website' },
   twitter: { card: 'summary_large_image', title, description },
 }
 

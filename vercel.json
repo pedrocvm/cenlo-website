@@ -10,6 +10,16 @@
       "source": "/contato",
       "destination": "https://pedro.cenlo.pt",
       "permanent": false
+    },
+    {
+      "source": "/food/montar",
+      "destination": "https://cenlofood.cenlo.pt/configurar",
+      "permanent": false
+    },
+    {
+      "source": "/food/montar/:path*",
+      "destination": "https://cenlofood.cenlo.pt/configurar/:path*",
+      "permanent": false
     }
   ],
   "rewrites": [

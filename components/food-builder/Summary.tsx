@@ -24,13 +24,13 @@ function Panel({ onNavigate, headingId }: { onNavigate?: () => void; headingId: 
       </div>
       <div className="fb-base">
         <span className="fb-badge fb-badge-ok" aria-hidden="true">Base</span>
-        <Link href="/food/montar#modulos" onClick={onNavigate}><b>{BASE_MODULES.length} módulos</b> já incluídos</Link>
+        <Link href="/configurar#modulos" onClick={onNavigate}><b>{BASE_MODULES.length} módulos</b> já incluídos</Link>
       </div>
       {selected.length ? (
         <ul className="fb-sel-list">
           {selected.map(m => (
             <li key={m.id}>
-              <Link href={`/food/montar/${m.slug}`} onClick={onNavigate}>{m.title}</Link>
+              <Link href={`/configurar/${m.slug}`} onClick={onNavigate}>{m.title}</Link>
               {m.tier === 'premium' && <TierBadge tier="premium" />}
               <button type="button" className="fb-x" onClick={() => removeModule(m.id)} aria-label={`Remover ${m.title}`}>✕</button>
             </li>
@@ -39,7 +39,7 @@ function Panel({ onNavigate, headingId }: { onNavigate?: () => void; headingId: 
       ) : (
         <p className="fb-empty">Junte à base os módulos premium e opcionais que fazem sentido para a sua operação. Pode alterar a escolha a qualquer momento.</p>
       )}
-      <Link href="/food/montar/rever" className="fb-btn fb-btn-primary" onClick={onNavigate}>Rever a minha configuração</Link>
+      <Link href="/configurar/rever" className="fb-btn fb-btn-primary" onClick={onNavigate}>Rever a minha configuração</Link>
       {selected.length > 0 && (
         <div className="fb-reset">
           {confirming ? (
@@ -63,7 +63,7 @@ export default function Summary({ children }: { children: React.ReactNode }) {
   const selection = useSelection()
   const sheetRef = useRef<HTMLDialogElement>(null)
   const [sheetOpen, setSheetOpen] = useState(false)
-  const showSide = !pathname.startsWith('/food/montar/rever') && !pathname.startsWith('/food/montar/enviado')
+  const showSide = !pathname.startsWith('/configurar/rever') && !pathname.startsWith('/configurar/enviado')
 
   useEffect(() => {
     const d = sheetRef.current
@@ -89,7 +89,7 @@ export default function Summary({ children }: { children: React.ReactNode }) {
               <small>A sua configuração · base incluída</small>
               <strong><b key={n}>{n}</b> {countLabel(n)} ▴</strong>
             </button>
-            <Link href="/food/montar/rever" className="fb-btn fb-btn-primary">Rever</Link>
+            <Link href="/configurar/rever" className="fb-btn fb-btn-primary">Rever</Link>
           </div>
           <dialog
             ref={sheetRef}

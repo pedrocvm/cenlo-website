@@ -88,7 +88,7 @@ export default function Review() {
       } catch {
         // ponytail: without storage the done page falls back to a generic confirmation
       }
-      router.push('/food/montar/enviado')
+      router.push('/configurar/enviado')
     } catch {
       setApiError('Sem ligação ao servidor. Verifique a internet e tente novamente. A sua seleção e os seus dados continuam aqui.')
     } finally {
@@ -138,7 +138,7 @@ export default function Review() {
                   <div key={g.id} className="fb-base-row">
                     <span>{g.title}</span>
                     <ul className="fb-chips">
-                      {items.map(m => <li key={m.id}><Link href={`/food/montar/${m.slug}`} className="fb-chip">✓ {m.title}</Link></li>)}
+                      {items.map(m => <li key={m.id}><Link href={`/configurar/${m.slug}`} className="fb-chip">✓ {m.title}</Link></li>)}
                     </ul>
                   </div>
                 )
@@ -158,7 +158,7 @@ export default function Review() {
                     <div>
                       <h3>{m.title} <TierBadge tier={m.tier} /></h3>
                       <p>{m.summary}</p>
-                      <div className="fb-ritem-links"><Link href={`/food/montar/${m.slug}`}>Ver detalhes</Link></div>
+                      <div className="fb-ritem-links"><Link href={`/configurar/${m.slug}`}>Ver detalhes</Link></div>
                     </div>
                     <button type="button" className="fb-x" onClick={() => removeModule(m.id)} aria-label={`Remover ${m.title}`}>✕</button>
                   </div>
@@ -172,7 +172,7 @@ export default function Review() {
               Ainda não escolheu módulos premium ou opcionais. Pode enviar só com a base, ou explorar os módulos e escolher os que fazem sentido para a sua operação.
             </p>
           )}
-          <Link href="/food/montar#modulos" className="fb-btn fb-btn-ghost" style={{ marginTop: 22 }}>← Continuar a explorar módulos</Link>
+          <Link href="/configurar#modulos" className="fb-btn fb-btn-ghost" style={{ marginTop: 22 }}>← Continuar a explorar módulos</Link>
         </div>
 
         <form ref={formRef} className="fb-form" onSubmit={submit} noValidate aria-labelledby="form-title">

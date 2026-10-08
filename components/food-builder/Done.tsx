@@ -48,8 +48,8 @@ export default function Done() {
         <h1 className="fb-display">Não encontrámos um envio recente.</h1>
         <p className="fb-lede" style={{ marginTop: 16 }}>Esta página mostra a confirmação logo depois de enviar a configuração. Se ainda não a enviou, pode rever a sua seleção e enviá-la agora.</p>
         <div className="fb-done-actions">
-          <Link href="/food/montar/rever" className="fb-btn fb-btn-primary">Rever a minha configuração</Link>
-          <Link href="/food/montar" className="fb-btn fb-btn-ghost">Explorar módulos</Link>
+          <Link href="/configurar/rever" className="fb-btn fb-btn-primary">Rever a minha configuração</Link>
+          <Link href="/configurar" className="fb-btn fb-btn-ghost">Explorar módulos</Link>
         </div>
       </div>
     )
@@ -106,7 +106,7 @@ export default function Done() {
       <p className="fb-note" role="status" aria-live="polite">
         {copied === 'ok' ? 'Resumo copiado.' : copied === 'fail' ? 'Não foi possível copiar automaticamente. Selecione a referência e os módulos acima para os copiar.' : 'Não precisa de reenviar nada pelo WhatsApp: a configuração já nos chegou. O WhatsApp abre com uma mensagem pronta, que só é enviada se a enviar.'}
       </p>
-      <Link href="/food/montar" className="fb-back">← Voltar aos módulos</Link>
+      <Link href="/configurar" className="fb-back">← Voltar aos módulos</Link>
     </div>
   )
 }

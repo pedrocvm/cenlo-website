@@ -6,7 +6,7 @@ import { usePrivacy } from './PrivacyContext'
 
 export default function Footer() {
   const { openModal } = usePrivacy()
-  if (usePathname().startsWith('/food/montar')) return null
+  if (usePathname().startsWith('/configurar')) return null
 
   return (
     <footer style={{ background: 'var(--panel)', color: '#E8DECE', marginTop: 'auto' }}>
