@@ -5,6 +5,7 @@ import { usePathname, useRouter } from 'next/navigation'
 import { readSelection, replaceSelection, mergeSelectionIntoComposition } from './selection'
 import ModuleIcon from './ModuleIcon'
 import AnimatedDetails from './AnimatedDetails'
+import OfferValue from './OfferValue'
 import { GROUPS, MODULES } from '@/lib/food-builder/catalog'
 import { MODULE_BENEFITS } from '@/lib/food-builder/benefits'
 import { readAttribution } from './CaptureAttribution'
@@ -75,7 +76,6 @@ export default function FoodOfferJourney({ entry = 'builder' }: { entry?: 'build
   const [review, setReview] = useState<null | 'implementation' | 'question'>(null)
   const [confirmed, setConfirmed] = useState(false)
   const [changedConfirmed, setChangedConfirmed] = useState(false)
-  const [demo, setDemo] = useState(false)
   const [evaluationContact, setEvaluationContact] = useState(false)
   const cartToggle = useRef<HTMLButtonElement>(null)
   const init = useRef(false)
@@ -104,7 +104,7 @@ export default function FoodOfferJourney({ entry = 'builder' }: { entry?: 'build
     if (lock.current) return
     lock.current = true; setBusy(true); setError(''); setReasons([])
     try {
-      const result = await call('/offers', { sessionKey: j.sessionKey, entry: j.entry, ...(c ? { composition: c } : j.entry === 'diagnostic' ? { answers: j.answers } : { composition: composition }),
+      const result = await call('/offers', { sessionKey: j.sessionKey, entry: j.entry, ...(j.answers ? { answers: j.answers } : {}), ...(c ? { composition: c } : j.entry === 'diagnostic' ? {} : { composition }),
         ...((j.offer || j.previousOfferId) ? { previousId: j.offer?.id || j.previousOfferId } : {}), revisionConfirmed: confirmedRevision, isTest: j.isTest, attribution: j.attribution })
       replaceSelection(result.state === 'evaluation' ? result.composition.moduleIds : result.offer.snapshot.composition.moduleIds)
       if (result.state === 'evaluation') {
@@ -149,12 +149,17 @@ export default function FoodOfferJourney({ entry = 'builder' }: { entry?: 'build
     else if (savedComposition && (editRequested || j.compositionEdited || j.evaluation || j.previousOfferId)) {
       setComposition(draft); setEditing(true)
     }
+    else if (j.entry === 'diagnostic' && j.answers && Array.isArray(j.answers.f16) && j.answers.f16.includes('demo')) { setComposition(draft); setEditing(true) }
     else if (j.entry === 'diagnostic' && j.answers) void issue(j)
     else { setComposition(draft); setEditing(true) }
     void call('/catalog', undefined, j.sessionKey).then(d => setCaps(d.snapshot.capabilities)).catch(e => setError(e.message))
     // Restore a frozen offer, never recalculate it on refresh.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+  useEffect(() => {
+    if (editing && journey?.sessionKey) void call('/journey-events', { sessionKey: journey.sessionKey, event: 'food_configurator_opened', isTest: journey.isTest }).catch(() => {})
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [editing, journey?.sessionKey])
   if (!journey) return <p role="status">Carregando suas escolhas…</p>
   const s = journey.receipt?.snapshot.offer || journey.offer?.snapshot
   const cash = journey.payment !== 'split'
@@ -206,6 +211,7 @@ export default function FoodOfferJourney({ entry = 'builder' }: { entry?: 'build
     if (chosen.integration !== 'none') details.push({ title: 'Conexão com outro sistema', text: 'Vamos conferir qual sistema você usa e se a conexão atende ao que precisa.' })
     return <section className="fr fe" aria-labelledby="offer-heading">
       <header className="fr-hero"><div className="fr-check"><ModuleIcon name="chat" /></div><div><span className="fr-kicker">Próximo passo · Sua solução</span><h1 id="offer-heading">Vamos acertar os últimos detalhes.</h1><p>Alguns itens precisam de uma conferência com a sua operação. Você não precisa começar de novo.</p></div></header>
+      <OfferValue offered={false} selected={caps.filter(c => chosen.moduleIds.includes(c.id))} priority={chosen.priority} diagnostic={journey.entry === 'diagnostic'} onDemo={() => event('food_demo_opened')} />
       <div className="fe-layout"><section className="fe-content"><span className="fr-kicker">Para preparar uma proposta que faça sentido</span><h2>O que falta confirmar</h2><ul className="fe-checklist">{details.length ? details.map((d,i) => <li key={d.title}><span className="fe-number">{String(i+1).padStart(2,'0')}</span><div><h3>{d.title}</h3><p>{d.text}</p></div></li>) : <li><ModuleIcon name="help" /><div><h3>Compatibilidade da solução</h3><p>Precisamos conferir os requisitos selecionados antes de fechar os valores.</p></div></li>}</ul><AnimatedDetails className="fr-details"><summary><ModuleIcon name="orders" /><span>Rever os itens que você escolheu<small>Sua seleção foi mantida nesta etapa</small></span><b aria-hidden="true">+</b></summary><div className="fr-details-body"><ul>{chosen.moduleIds.map(id => <li key={id}>{caps.find(c => c.id === id)?.label || MODULES.find(m => m.id === id)?.title || 'Recurso a confirmar'}</li>)}</ul></div></AnimatedDetails></section>
       <aside className="fr-next"><span className="fr-kicker">Vamos juntos</span><h2>Uma conversa para fechar os detalhes.</h2><p>Converse com Pedro sobre esses itens. Depois da conferência, você poderá revisar o escopo e os valores antes de decidir.</p>{journey.evaluationReceipt ? <div><p className="fe-saved" role="status">Suas escolhas estão salvas. Referência {journey.evaluationReceipt.reference}.</p><a className="fr-whatsapp fe-contact" href={journey.evaluationReceipt.whatsappUrl}>Continuar no WhatsApp <span aria-hidden="true">↗</span></a><p className="fb-note">O registro continua salvo mesmo que você não envie a mensagem.</p></div> : evaluationContact ? <form className="fe-contact-form" onSubmit={requestEvaluation}><p>Para Pedro encontrar sua configuração:</p><label>Seu nome<input autoComplete="name" required minLength={2} maxLength={120} value={contact.name} onChange={e => update({ contact: { ...contact, name: e.target.value } })} /></label><label>Nome do restaurante<input autoComplete="organization" required minLength={2} maxLength={120} value={contact.business} onChange={e => update({ contact: { ...contact, business: e.target.value } })} /></label><label>Seu WhatsApp<input autoComplete="tel" type="tel" required minLength={8} maxLength={30} placeholder="+351…" value={contact.phone} onChange={e => update({ contact: { ...contact, phone: e.target.value } })} /></label><label>Quer acrescentar algo? <small>Opcional</small><textarea rows={3} maxLength={1500} value={journey.question || ''} onChange={e => update({ question: e.target.value })} /></label><p className="fb-note">Vamos salvar suas escolhas e esses dados para responder à sua solicitação. Ao continuar, o WhatsApp abre com a mensagem pronta.</p><button className="fr-whatsapp fe-contact" type="submit" disabled={busy}>{busy ? 'Salvando sua solução…' : 'Salvar e conversar no WhatsApp'}<span aria-hidden="true">↗</span></button></form> : <button type="button" className="fr-whatsapp fe-contact" onClick={() => setEvaluationContact(true)}>Conversar sobre minha solução <span aria-hidden="true">↗</span></button>}{error && <p className="fo-error" role="alert">{error}</p>}<button className="fe-back" onClick={() => { update({ evaluation: undefined }); setEditing(true); setChangedConfirmed(false); router.push('/configurar/rever?editar=1') }}>Ajustar minha seleção</button><p className="fr-reassurance">Esta etapa ainda não confirma um pedido, valor final ou ativação.</p></aside></div>
     </section>
@@ -251,26 +257,29 @@ export default function FoodOfferJourney({ entry = 'builder' }: { entry?: 'build
     </div>}
     {s && !editing && <>
       <p className="fb-lede">{s.reason}</p>
+      <p className="fo-route">Suas escolhas <span aria-hidden="true">→</span> <strong>Sua oferta</strong> <span aria-hidden="true">→</span> Pedido de implantação</p>
+      <OfferValue selected={s.included.filter(c => s.composition.moduleIds.includes(c.id))} priority={s.composition.priority} diagnostic={journey.entry === 'diagnostic'} onDemo={() => event('food_demo_opened')} />
       <div className="fo-prices"><div><span>Implantação · {cash ? 'à vista' : 'parcelada'}</span><strong>{money(received ? received.snapshot.payment.totalCents : total)}</strong><small>Base: {money(s.setupCents)}{cash && s.payment.cash ? ` · ${s.payment.cash.discountPercent}% à vista` : ''}</small></div><div><span>Mensalidade por unidade</span><strong>{money(s.monthlyCents)}</strong><small>{s.policy.monthlyStart}</small></div></div>
       <p>{s.policy.taxText}</p>
       {!received && <fieldset className="fo-payment"><legend>Escolha como prefere pagar a implantação</legend><label><input type="radio" name="payment" checked={cash} onChange={() => { update({ payment: 'cash', submissionId: undefined }); setConfirmed(false) }} />À vista: {money(s.payment.cash?.cents ?? s.setupCents)}</label>{s.payment.split && <label><input type="radio" name="payment" checked={!cash} onChange={() => { update({ payment: 'split', submissionId: undefined }); setConfirmed(false) }} />Parcelado: total de {money(s.setupCents)}</label>}</fieldset>}
       <ol className="fo-schedule">{(received ? received.snapshot.payment.amounts : amounts).map((n,i) => <li key={i}><strong>{money(n)}</strong> · {(received ? received.snapshot.payment.due : s.policy.installmentDue)[i]}</li>)}</ol>
       <p>Mensalidade: {s.policy.monthlyStart}</p><p>{s.policy.validityText}</p>
-      {!received && !review && <div className="fo-actions"><button className="fb-btn fb-btn-primary" onClick={() => { setReview('implementation'); event('food_review_started') }}>Quero começar com esta oferta</button><button className="fb-btn fb-btn-ghost" onClick={() => { setEditing(true); setChangedConfirmed(false) }}>Revisar minha solução</button><button className="fb-link-btn" onClick={() => { setReview('question'); event('food_review_started') }}>Ainda tenho uma dúvida</button></div>}
+      {!received && !review && <div className="fo-actions"><button className="fb-btn fb-btn-primary" onClick={() => { setReview('implementation'); event('food_review_started') }}>Avançar com esta solução</button><button className="fb-btn fb-btn-ghost" onClick={() => { setEditing(true); setChangedConfirmed(false) }}>Ajustar os recursos</button><button className="fb-link-btn" onClick={() => { setReview('question'); event('food_review_started') }}>Ainda tenho uma dúvida</button></div>}
+      {!review && <p className="fo-assurance">Você confere os dados no próximo passo. O pedido não realiza cobrança nem ativa uma conta.</p>}
       {review && !received && <form className="fo-review" onSubmit={submit}>
-        <h2>{review === 'implementation' ? 'Confira a solução e os valores antes de enviar seu pedido.' : 'O que você precisa entender antes de decidir?'}</h2>
+        <h2>{review === 'implementation' ? 'Sua solução está escolhida. Vamos organizar o próximo passo.' : 'O que você precisa entender antes de decidir?'}</h2>
         <p>{s.label} · Implantação {money(total)} · Mensalidade {money(s.monthlyCents)}. {cash ? 'À vista.' : 'Parcelado conforme os vencimentos acima.'}</p>
         <div className="fo-fields">{(['name', 'business', 'phone', 'email'] as const).map(k => <label key={k}>{({ name: 'Seu nome', business: 'Nome do negócio', phone: 'WhatsApp com código do país', email: 'E-mail (opcional)' })[k]}<input required={k !== 'email'} type={k === 'phone' ? 'tel' : k === 'email' ? 'email' : 'text'} autoComplete={k === 'business' ? 'organization' : k === 'phone' ? 'tel' : k} maxLength={k === 'email' ? 254 : 120} value={contact[k]} onChange={e => update({ contact: { ...contact, [k]: e.target.value }, submissionId: undefined })} /></label>)}
-          <label>Quem decide?<select value={journey.decision || 'self'} onChange={e => update({ decision: e.target.value, submissionId: undefined })}><option value="self">Eu decido</option><option value="together">Decido com outra pessoa</option><option value="research">Estou pesquisando para o responsável</option></select></label>
+          <label>Quem decide?<select value={journey.decision || ''} required onChange={e => update({ decision: e.target.value, submissionId: undefined })}><option value="" disabled>Selecione quem decide</option><option value="self">Eu decido</option><option value="together">Decido com outra pessoa</option><option value="research">Estou pesquisando para o responsável</option></select></label>
           <label>Quando gostaria de começar?<select value={journey.desiredStart || 'unknown'} onChange={e => update({ desiredStart: e.target.value, submissionId: undefined })}><option value="unknown">Ainda sem data</option><option value="now">Agora</option><option value="later">Em um período posterior</option></select></label></div>
         {review === 'question' && <label>Sua dúvida<textarea required maxLength={1500} value={journey.question || ''} onChange={e => update({ question: e.target.value, submissionId: undefined })} /></label>}
         <label className="fo-check"><input required type="checkbox" checked={confirmed} onChange={e => setConfirmed(e.target.checked)} />{review === 'implementation' ? 'Revisei a solução, os valores e a forma de pagamento. Quero seguir com a implantação e autorizo o retorno sobre este pedido.' : 'Autorizo o retorno para esclarecer esta dúvida. Isso não é um pedido de implantação.'}</label>
         <button className="fb-btn fb-btn-primary" disabled={busy || !confirmed}>{busy ? 'Registrando…' : review === 'implementation' ? 'Enviar meu pedido de implantação' : 'Enviar minha dúvida'}</button><button type="button" className="fb-btn fb-btn-ghost" onClick={() => { setReview(null); setConfirmed(false) }}>Voltar à oferta</button>
         <p>Esta etapa não cobra nem ativa uma conta. Seus dados serão usados para tratar este pedido.</p>
       </form>}
-      <AnimatedDetails className="fo-scope" open={!!review}><summary>O que está incluído na sua solução</summary><ul>{s.included.map(c => <li key={c.id}>{c.label}{!s.composition.moduleIds.includes(c.id) && c.state !== 'evaluation' && <span className="fo-included-bonus">Incluído sem custo adicional</span>}{c.condition && <small>{c.condition}</small>}</li>)}</ul><p>{s.sessions} {s.sessions === 1 ? 'sessão estratégica' : 'sessões estratégicas'} de 1 hora no acompanhamento inicial, no total. Treinamento operacional separado.</p></AnimatedDetails>
+      <AnimatedDetails className="fo-scope" open={!!review}><summary>O que está incluído na sua solução</summary><ul className="fo-included-grid">{s.included.map(c => <li key={c.id}><ModuleIcon name={MODULES.find(m => m.id === c.id)?.icon || 'orders'} /><div><strong>{c.label}</strong><p>{MODULE_BENEFITS[c.id]}</p>{!s.composition.moduleIds.includes(c.id) && c.state !== 'evaluation' && <span className="fo-included-bonus">Incluído sem custo adicional</span>}{c.condition && <small>{c.condition}</small>}</div></li>)}</ul><p>{s.sessions} {s.sessions === 1 ? 'sessão estratégica' : 'sessões estratégicas'} de 1 hora no acompanhamento inicial, no total. Treinamento operacional separado.</p></AnimatedDetails>
       <div className="fo-conditions"><h2>Condições de implantação</h2><ul>{s.conditions.map(c => <li key={c.id}>{c.text}</li>)}</ul><p>A Cenlo configura a unidade e os recursos contratados, prepara os acessos e treina a equipe. O restaurante fornece cardápio, horários, regras de entrega e um responsável pela implantação. Os testes e o início são combinados com você.</p></div>
-      <AnimatedDetails className="fo-demo" open={demo} onToggle={e => { const open = e.currentTarget.open; if (open && !demo) event('food_demo_opened'); setDemo(open) }}><summary>Veja como isso funciona na prática</summary><p>Capturas reais do produto com dados de demonstração. Este fluxo mostra a página de pedidos e o quadro da cozinha, presentes em todos os planos. A equipe muda as etapas no painel.</p>{demo && <div><figure><img src="/food-builder/screens/online-ordering-menu-mobile.webp" alt="Cardápio da operação de demonstração Bella Napoli" width="390" height="844" loading="lazy" /><figcaption>1. O cliente escolhe os itens na página de pedidos.</figcaption></figure><figure><img src="/food-builder/screens/orders-list.webp" alt="Pedidos com dados de demonstração no painel" width="1600" height="1000" loading="lazy" /><figcaption>2. O pedido confirmado fica registrado no painel.</figcaption></figure><figure><img src="/food-builder/screens/kitchen-board.webp" alt="Quadro da cozinha com pedidos de demonstração em cada etapa" width="1600" height="1000" loading="lazy" /><figcaption>3. A equipe acompanha e atualiza a preparação na cozinha.</figcaption></figure></div>}</AnimatedDetails>
+
       <p>{s.removalExplanation}</p><button className="fb-btn fb-btn-ghost fo-print-button" onClick={() => window.print()}>Salvar resumo sem dados pessoais</button>
       <p className="fo-reference">Oferta {journey.offer?.reference} · Publicação {s.version}</p>
     </>}

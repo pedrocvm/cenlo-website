@@ -6,7 +6,7 @@
 <title>Diagnóstico · Cenlo Food</title>
 <meta name="description" content="Responda sobre o seu restaurante e veja o plano indicado e o investimento, incluindo a implantação.">
 <meta name="robots" content="index, follow">
-<meta name="theme-color" content="#F7F5F1">
+<meta name="theme-color" content="#0B0B0F">
 <link rel="canonical" href="https://cenlofood.cenlo.pt/diagnostico">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Crect width='48' height='48' rx='10' fill='%230B0B0F'/%3E%3Cpath d='M35.4 17.1 A13.2 13.2 0 1 0 35.4 30.9' fill='none' stroke='%23F4F3F7' stroke-width='5.1' stroke-linecap='round'/%3E%3Ccircle cx='26.6' cy='24' r='5.7' fill='%23FF6A2C'/%3E%3C/svg%3E">
 <meta property="og:type" content="website">
@@ -316,13 +316,61 @@ fbq('track', 'PageView');
     .segs span.now::after, .card.hero.sheen::after, .plan.sheen::after, .done-mark::after, .btn-wa, .dots i { animation: none; }
     .aura { display: none; }
   }
+
+  /* Shared Cenlo Food identity and a shorter, guided diagnostic. */
+  :root { --bg:#0B0B0F; --surface:#16161D; --ink:#F4F3F7; --ink-2:#CACAD3; --muted:#A6A6B3; --line:#272730; --line-2:#393944; --accent:#FF6A2C; --accent-hover:#FF8552; --ok:#85CDA2; --err:#FFABA0; color-scheme:dark; }
+  .top { background:rgba(11,11,15,.94); }
+  .top-in,.segs { max-width:900px; }
+  .brand b span { color:#FF6A2C; }
+  main { justify-content:flex-start; padding-top:32px; max-width:900px; }
+  h1 { max-width:740px; font-size:clamp(28px,4.6vw,44px); letter-spacing:-.04em; }
+  .lead { color:var(--muted); line-height:1.7; }
+  .dx-step-lead { margin-bottom:30px; }
+  fieldset.sub { padding-top:22px; margin:0 0 25px; border-top:1px solid var(--line); }
+  fieldset.sub legend { padding:0 10px 0 0; font-size:19px; line-height:1.4; }
+  .type { text-transform:none; letter-spacing:0; font-weight:400; font-size:12px; }
+  .help { font-size:14px; color:var(--muted); }
+  .opt { box-shadow:none; padding:17px; }
+  .opt:has(input:checked) { background:rgba(255,106,44,.1); border-color:var(--accent); }
+  .opt .txt small { display:block; color:var(--muted); font-size:13px; font-weight:400; line-height:1.6; margin-top:8px; }
+  .btn-primary { background:#C2461A; border-color:#C2461A; color:#fff; }
+  .btn-primary:hover { background:#A93C14; border-color:#A93C14; }
+  .btn-secondary,.close:hover { background:var(--surface); color:var(--ink); border-color:var(--line); }
+  .aura { opacity:.22; }
+  .dx-path { list-style:none; padding:0; display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin:28px 0; }
+  .dx-path li { padding:18px; background:var(--surface); border:1px solid var(--line); border-radius:13px; font-size:14px; }
+  .dx-path b { display:block; font-size:13px; color:var(--accent); margin-bottom:8px; }
+  .dx-insight-card { padding:18px 20px; border-left:3px solid var(--accent); background:var(--surface); border-radius:0 12px 12px 0; margin:0 0 28px; }
+  .dx-insight-card>span { display:block; font-size:10px; color:var(--accent); letter-spacing:.08em; text-transform:uppercase; margin-bottom:7px; }
+  .dx-insight-card>strong { display:block; font-size:17px; margin-bottom:6px; }
+  .dx-insight-card>p { color:var(--muted); font-size:14px; line-height:1.7; margin:0; }
+  .dx-extra { border:1px solid var(--line); border-radius:12px; padding:0 18px; margin:20px 0; background:var(--surface); }
+  .dx-extra summary { padding:17px 0; cursor:pointer; color:var(--ink); font-size:14px; }
+  .dx-extra summary small { color:var(--muted); margin-left:8px; font-size:11px; }
+  .dx-extra>div { padding-top:16px; }
+  .dx-extra fieldset:last-child { margin-bottom:12px; }
+  .status.bad { background:#301C20; border-color:#69414A; color:#FFCCC6; }
+  .dx-actions { padding:18px 0; margin-top:12px; border-top:1px solid var(--line); }
+  @media(max-width:600px) {
+    main { padding:26px 18px 40px; }
+    .opts { grid-template-columns:1fr; gap:9px; }
+    .opt .txt { font-size:15px; }
+    .dx-path { grid-template-columns:1fr; gap:8px; }
+    .dx-path li { display:flex; align-items:center; gap:12px; padding:13px 16px; }
+    .dx-path b { margin:0; }
+    .stage { font-size:10px; letter-spacing:.06em; }
+    .dx-actions { display:flex; flex-wrap:nowrap; gap:10px; }
+    .dx-actions .btn-primary { flex:1; justify-content:center; padding:15px 12px; font-size:14px; }
+    .dx-actions .btn-secondary { padding:15px 12px; font-size:13px; }
+  }
+
 </style>
 </head>
 <body>
 <header class="top">
   <div class="top-in">
     <a class="brand" href="/" aria-label="Cenlo Food, página inicial">
-      <svg width="27" height="27" viewBox="0 0 48 48" aria-hidden="true"><path d="M35.4 17.1 A13.2 13.2 0 1 0 35.4 30.9" fill="none" stroke="#16181D" stroke-width="5.1" stroke-linecap="round"></path><circle cx="26.6" cy="24" r="5.7" fill="#FF6A2C"></circle></svg>
+      <svg width="27" height="27" viewBox="0 0 48 48" aria-hidden="true"><path d="M35.4 17.1 A13.2 13.2 0 1 0 35.4 30.9" fill="none" stroke="#F4F3F7" stroke-width="5.1" stroke-linecap="round"></path><circle cx="26.6" cy="24" r="5.7" fill="#FF6A2C"></circle></svg>
       <b>Cenlo<span> Food</span></b>
     </a>
     <span class="stage" id="step" aria-live="polite">Diagnóstico</span>
@@ -346,7 +394,7 @@ fbq('track', 'PageView');
   var WA_FALLBACK = '351912333313';
   var STORE = 'cenlo_food_diag_v2';
   var CONTACT_STORE = 'cenlo_food_diag_v2_contact';
-  var SCREENS = [1, 2, 3, 4, 5];
+  var SCREENS = [1, 2, 3, 4, 5]; // Updated from the served contract after loading.
   try { localStorage.removeItem('cenlo_diag_v1'); } catch (e) {}
 
   function track(name, data) { if (new URLSearchParams(location.search).get('test') === '1') return; try { if (window.fbq) window.fbq('track', name, data || {}); } catch (e) {} }
@@ -363,6 +411,9 @@ fbq('track', 'PageView');
   var saved = read(STORE) || {};
   var state = {
     contract: null,
+    detailsOpen: {},
+    autonomousSession: (read('cenlo-food-autonomous:v1', sessionStorage) || {}).sessionKey || saved.autonomousSession || crypto.randomUUID(),
+    attribution: Object.keys(utm()).length ? utm() : saved.attribution || {},
     view: saved.view || 'intro',
     screen: saved.screen || 1,
     answers: saved.answers || {},
@@ -401,7 +452,7 @@ fbq('track', 'PageView');
     write('cenlo-food-builder:diagnostic:v1', fingerprint);
   }
   function persist() {
-    write(STORE, { view: state.view, screen: state.screen, answers: state.answers, sessionKey: state.sessionKey, token: state.token, result: state.result, clarification: state.clarification, c1: state.c1, followUp: state.followUp, receipt: state.receipt, captured: state.captured });
+    write(STORE, { autonomousSession: state.autonomousSession, attribution: state.attribution, view: state.view, screen: state.screen, answers: state.answers, sessionKey: state.sessionKey, token: state.token, result: state.result, clarification: state.clarification, c1: state.c1, followUp: state.followUp, receipt: state.receipt, captured: state.captured });
     var c = { sessionKey: state.sessionKey };
     ['firstName', 'business', 'phone', 'country'].forEach(function (k) { c[k] = state.contact[k]; });
     write(CONTACT_STORE, c, sessionStorage);
@@ -489,11 +540,11 @@ fbq('track', 'PageView');
     var opts = visibleOptions(q).map(function (o) {
       var on = multi ? Array.isArray(value) && value.indexOf(o.value) >= 0 : value === o.value;
       return '<label class="opt"><input type="' + (multi ? 'checkbox' : 'radio') + '" name="' + name + '" value="' + esc(o.value) + '"' +
-        (on ? ' checked' : '') + ' data-q="' + q.id + '"' + (o.exclusive ? ' data-exclusive="1"' : '') + '><span class="mark" aria-hidden="true">' + TICK + '</span><span class="txt">' + esc(o.label) + '</span></label>';
+        (on ? ' checked' : '') + ' data-q="' + q.id + '"' + (o.exclusive ? ' data-exclusive="1"' : '') + '><span class="mark" aria-hidden="true">' + TICK + '</span><span class="txt">' + esc(o.label) + (q.id === 'f16' && NEED_COPY[o.value] ? '<small>' + esc(NEED_COPY[o.value]) + '</small>' : '') + '</span></label>';
     }).join('');
     return '<fieldset data-block="' + q.id + '" class="' + (first ? '' : 'sub') + '"' + described(q.id, 'type-' + q.id) + '>' +
       '<legend' + (first ? ' class="big" data-focus' : '') + '>' + esc(q.title) + '</legend>' +
-      '<p class="type" id="type-' + q.id + '">' + esc(q.typeLabel) + '</p>' +
+      '<p class="type" id="type-' + q.id + '">' + (q.required ? (multi ? 'Pode escolher mais de um' : 'Escolha uma opção') : 'Opcional') + '</p>' +
       (q.help ? '<p class="help">' + esc(q.help) + '</p>' : '') +
       '<div class="opts">' + opts + '</div>' + errorFor(q.id) + '</fieldset>';
   }
@@ -514,22 +565,73 @@ fbq('track', 'PageView');
       input + unknownBox + errorFor(q.id) + '</div>';
   }
 
-  function viewIntro() {
-    return '<h1 data-focus>Veja qual plano faz sentido para o seu restaurante.</h1>' +
-      '<p class="lead">Responda sobre como os pedidos chegam e saem hoje, e veja o plano indicado e o investimento, com a implantação. Leva uns três minutos, e você não precisa deixar o seu contato para ver o resultado.</p>' +
-      '<div class="actions">' + primary('start', 'Começar') + '</div>';
+  var NEED_COPY = {
+    pedido_conversa: 'Ajude o cliente a concluir o pedido onde a conversa começou. O funcionamento é conferido com o seu cardápio.',
+    site: 'Dê ao cliente um endereço da sua marca para conhecer o restaurante e chegar aos pedidos.',
+    mesa: 'Deixe o cliente pedir pelo QR e mantenha os pedidos organizados na conta da mesa.',
+    recompra: 'Crie um motivo para quem já comprou voltar. As regras de envio precisam de confirmação antes da ativação.',
+    relatorios: 'Veja o que está vendendo e como a operação se comporta para decidir com mais clareza.',
+    fidelidade: 'Reconheça quem volta com pontos e recompensas. A configuração do clube é validada na implantação.',
+    logistica: 'Acompanhe a organização das entregas e a localização no mapa, conforme as condições do recurso.',
+    cardapio_ia: 'Aproveite o cardápio que já tem como ponto de partida. Revise os itens importados antes de publicar.',
+    base: 'Comece pelo essencial. Depois você pode conferir e ajustar a composição.',
+    demo: 'Veja os módulos funcionando e escolha com mais segurança. Suas respostas seguem com você.'
+  };
+  var STEP_COPY = {
+    1: ['Sua operação', 'Vamos partir da sua rotina.', 'Primeiro, entendemos como o restaurante atende. Assim, você vê recursos que fazem sentido para a sua operação.'],
+    2: ['Sua prioridade', 'O que faria diferença no próximo turno?', 'Sua prioridade ajuda a explicar a solução. Ela não adiciona módulos nem aumenta o preço automaticamente.'],
+    3: ['Como começar', 'Uma mudança que caiba na sua operação.', 'Vamos identificar o que você já usa e o que precisa ser conferido para começar.'],
+    4: ['Sua solução', 'Agora, escolha o que quer colocar em prática.', 'Você verá os valores antes de decidir e poderá adicionar ou retirar recursos depois.']
+  };
+  function journeyEvent(name, step) {
+    fetch(API + '/autonomous/journey-events', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ sessionKey: state.autonomousSession, event: name, step: step, isTest: new URLSearchParams(location.search).get('test') === '1' }), keepalive: true, credentials: 'omit' }).catch(function () {});
   }
-
+  function viewIntro() {
+    return '<p class="counter">Da sua rotina à sua solução</p><h1 data-focus>Mais organização para o restaurante. Mais espaço para você cuidar do negócio.</h1>' +
+      '<p class="lead">Conte o que precisa melhorar. Vamos conectar suas escolhas aos recursos do Cenlo Food e mostrar a solução e os valores para você decidir.</p>' +
+      '<ol class="dx-path"><li><b>1</b><span>Conte sua prioridade</span></li><li><b>2</b><span>Conheça e ajuste a solução</span></li><li><b>3</b><span>Confira os valores e decida</span></li></ol>' +
+      '<div class="actions">' + primary('start', 'Encontrar minha solução') + '</div><p class="note">Sem deixar contato para ver os valores. Sem cobrança nesta etapa.</p>' +
+      '<a class="link" href="/configurar">Já sei o que quero: explorar os módulos →</a>';
+  }
+  function stageInsight() {
+    var priority = state.answers.f8;
+    var examples = {
+      atendimento: ['Mais atenção na conversa', 'Imagine conferir os pedidos e as conversas no mesmo contexto, em vez de procurar informações espalhadas. Na seleção, você pode explorar o atendimento pelo WhatsApp.'],
+      erros: ['Um pedido mais fácil de acompanhar', 'Itens, observações e andamento juntos ajudam a equipe a consultar o que foi combinado. Vamos começar pela organização dos pedidos.'],
+      cozinha: ['Do pedido ao preparo', 'O quadro da cozinha permite acompanhar o que entrou e o que está em preparação. Você poderá ver esse fluxo na demonstração.'],
+      salao: ['A mesa faz parte da operação', 'Se fizer sentido para o seu salão, explore o pedido por QR com os itens reunidos na conta da mesa. A escolha desse recurso é sua.'],
+      entregas: ['Clareza também na saída', 'Regras de entrega e acompanhamento do pedido ajudam a organizar essa etapa. Recursos de mapa têm condições específicas que vamos apresentar.'],
+      retorno: ['Dar um motivo para voltar', 'Você pode explorar o histórico de clientes e o clube de fidelidade. Pontos, recompensas e regras precisam fazer sentido para o seu restaurante.'],
+      direto: ['Um caminho até o seu restaurante', 'Uma página própria de pedidos dá ao cliente um endereço para comprar diretamente. Na próxima etapa, confira o que deseja incluir.'],
+      movimento: ['Preparar o caminho até o pedido', 'Um canal próprio e uma operação organizada ajudam a receber quem chega. O sistema apoia o atendimento; a atração de clientes também depende da divulgação do restaurante.']
+    };
+    var item = examples[priority];
+    if (state.screen < 3 || !item) return '';
+    return '<aside class="dx-insight-card"><span>Ligando sua prioridade à prática</span><strong>' + item[0] + '</strong><p>' + item[1] + '</p></aside>';
+  }
   function viewQuestions() {
     var qs = questionsOn(state.screen);
-    var screens = visibleScreens();
-    var html = '<p class="counter">Passo ' + (screens.indexOf(state.screen) + 1) + ' de ' + screens.length + '</p>' + qs.map(function (q, i) {
-      return q.kind === 'single' || q.kind === 'multi' ? renderChoice(q, state.answers[q.id], i === 0) : renderText(q, i === 0);
-    }).join('');
+    if (state.screen === 2) qs = qs.slice().sort(function(a,b) { return (a.id === 'f8' ? -1 : b.id === 'f8' ? 1 : 0); });
+    var screens = visibleScreens(), copy = STEP_COPY[state.screen] || STEP_COPY[4];
+    var renderQ = function(q) {
+      var displayed = Object.assign({}, q);
+      if (state.answers.f2 === 'vai_abrir') {
+        if (q.id === 'f4') displayed.title = 'Como você pretende atender?';
+        if (q.id === 'f6') displayed.title = 'Por onde pretende receber os pedidos?';
+        if (q.id === 'f8') displayed.title = 'O que você quer organizar primeiro para a abertura?';
+        if (q.id === 'f15') displayed.title = 'Já escolheu algum sistema para pedidos ou caixa?';
+      }
+      return displayed.kind === 'single' || displayed.kind === 'multi' ? renderChoice(displayed, state.answers[q.id], false) : renderText(displayed, false);
+    };
+    var main = qs.filter(function(q) { return q.required; }), extra = qs.filter(function(q) { return !q.required; });
+    var html = '<p class="counter">' + copy[0] + ' · ' + (screens.indexOf(state.screen) + 1) + ' de ' + screens.length + '</p><h1 data-focus>' + copy[1] + '</h1><p class="lead dx-step-lead">' + copy[2] + '</p>' + stageInsight() + main.map(renderQ).join('');
+    if (extra.length) html += '<details class="dx-extra" data-extra="' + state.screen + '"' + (state.detailsOpen[state.screen] ? ' open' : '') + '><summary>Acrescentar detalhes da operação <small>Opcional</small></summary><div>' + extra.map(renderQ).join('') + '</div></details>';
     var last = state.screen === screens[screens.length - 1];
-    if (last) html += '<p class="note">As suas respostas são analisadas automaticamente para preparar a recomendação. Ninguém lê as respostas antes de você pedir contato. <a href="' + PRIVACY + '" target="_blank" rel="noopener">Informação de privacidade</a>.</p>';
+    if (last) html += '<p class="note">As escolhas marcadas vão com você para a próxima etapa. Se algum recurso precisar de avaliação, vamos mostrar exatamente o que falta confirmar.</p>';
     if (state.banner) html += '<div class="status bad" role="alert">' + esc(state.banner) + '</div>';
-    html += '<div class="actions">' + back('back') + primary('next', last ? (state.busy ? 'Preparando a recomendação…' : 'Ver a minha recomendação') : 'Continuar', state.busy ? ' disabled' : '') + '</div>';
+    var wantsDemo = Array.isArray(state.answers.f16) && state.answers.f16.indexOf('demo') >= 0;
+    html += '<div class="actions dx-actions">' + back('back') + primary('next', last ? (state.busy ? 'Preparando sua solução…' : wantsDemo ? 'Ver os módulos na prática' : 'Ver minha solução e valores') : ['','Ver o que pode melhorar','Preparar minha solução','Escolher os recursos'][state.screen] || 'Continuar', state.busy ? ' disabled' : '') + '</div>';
+    if (last) html += '<p class="note">Ainda não é um pedido. <a href="' + PRIVACY + '" target="_blank" rel="noopener">Como usamos suas respostas</a>.</p>';
     return html;
   }
 
@@ -549,7 +651,7 @@ fbq('track', 'PageView');
     if (r.organization) html += orgBlock(r.organization);
     if (a.changes.length) html += changeRows(a.changes.slice(0, 1));
     if (r.plan) html += planCard(r);
-    else html += '<section class="card hero" aria-labelledby="plan-h"><p class="eyebrow">Indicação</p><h2 id="plan-h" class="plan-name">' + esc(r.headline) + '</h2><p style="color:#3A3D44">' + esc(r.reason) + '</p>' +
+    else html += '<section class="card hero" aria-labelledby="plan-h"><p class="eyebrow">Indicação</p><h2 id="plan-h" class="plan-name">' + esc(r.headline) + '</h2><p style="color:var(--ink-2)">' + esc(r.reason) + '</p>' +
       '<p style="color:#3A3D44;margin:0">O valor depende dessa avaliação. Não tem orçamento automático para este caso.</p></section>';
     r.limitations.forEach(function (l) { html += '<p class="limit">' + esc(l) + '</p>'; });
     html += captureCard();
@@ -928,23 +1030,7 @@ fbq('track', 'PageView');
         Array.prototype.forEach.call(blobs, function (b, i) {
           g.to(b, { xPercent: i % 2 ? -14 : 12, yPercent: i === 1 ? -10 : 9, scale: 1.12, duration: 12 + i * 4, ease: 'sine.inOut', yoyo: true, repeat: -1 });
         });
-        if (!FINE) return;
-        var aura = document.querySelector('.aura');
-        var qx = g.quickTo(aura, 'x', { duration: 1.6, ease: 'power3.out' }), qy = g.quickTo(aura, 'y', { duration: 1.6, ease: 'power3.out' });
-        window.addEventListener('pointermove', function (e) { qx((e.clientX / innerWidth - 0.5) * -36); qy((e.clientY / innerHeight - 0.5) * -28); }, { passive: true });
-        var current = null, bx, by;
-        app.addEventListener('pointermove', function (e) {
-          var b = e.target.closest && e.target.closest('.btn-primary, .btn-wa');
-          if (b !== current) {
-            if (current) g.to(current, { x: 0, y: 0, duration: 0.5, ease: 'elastic.out(1, 0.5)' });
-            current = b;
-            if (b) { bx = g.quickTo(b, 'x', { duration: 0.35, ease: 'power3.out' }); by = g.quickTo(b, 'y', { duration: 0.35, ease: 'power3.out' }); }
-          }
-          if (!current) return;
-          var r = current.getBoundingClientRect();
-          bx((e.clientX - r.left - r.width / 2) * 0.16); by((e.clientY - r.top - r.height / 2) * 0.28);
-        });
-        app.addEventListener('pointerleave', function () { if (current) g.to(current, { x: 0, y: 0, duration: 0.5, ease: 'elastic.out(1, 0.5)' }); current = null; });
+
       },
     };
   })();
@@ -1018,10 +1104,12 @@ fbq('track', 'PageView');
       try {
         var old = JSON.parse(sessionStorage.getItem('cenlo-food-autonomous:v1') || 'null');
         var same = old && JSON.stringify(old.answers) === JSON.stringify(state.answers);
-        var journey = same ? old : { previousOfferId: old && old.offer ? old.offer.id : old ? old.previousOfferId : undefined, composition: builderComposition(), sessionKey: old ? old.sessionKey : crypto.randomUUID(), entry: 'diagnostic', answers: state.answers, isTest: new URLSearchParams(location.search).get('test') === '1', attribution: old ? old.attribution : utm() };
+        var journey = same ? old : { previousOfferId: old && old.offer ? old.offer.id : old ? old.previousOfferId : undefined, composition: builderComposition(), sessionKey: old ? old.sessionKey : state.autonomousSession, entry: 'diagnostic', answers: state.answers, isTest: new URLSearchParams(location.search).get('test') === '1', attribution: Object.assign({}, state.attribution, old ? old.attribution : {}) };
         sessionStorage.setItem('cenlo-food-autonomous:v1', JSON.stringify(journey));
         persist();
-        location.assign('/configurar/oferta');
+        var wantsDemo = Array.isArray(state.answers.f16) && state.answers.f16.indexOf('demo') >= 0;
+        if (wantsDemo) { journey.compositionEdited = true; sessionStorage.setItem('cenlo-food-autonomous:v1', JSON.stringify(journey)); }
+        location.assign(wantsDemo ? '/configurar?origem=diagnostico' : '/configurar/oferta');
       } catch(e) { state.banner = 'Não consegui guardar suas escolhas neste navegador. Permita o armazenamento para continuar com a mesma oferta.'; render(false); }
       return;
     }
@@ -1158,18 +1246,19 @@ fbq('track', 'PageView');
     }
     if (t.dataset.c && t.type !== 'checkbox' && t.tagName !== 'SELECT') { state.contact[t.dataset.c] = t.value; persist(); }
   });
+  app.addEventListener('toggle', function(e) { if (e.target.dataset && e.target.dataset.extra) { if (app.contains(e.target)) state.detailsOpen[e.target.dataset.extra] = e.target.open; } }, true);
   app.addEventListener('submit', function (e) { e.preventDefault(); if (!state.busy) sendContact(); });
   app.addEventListener('click', function (e) {
     var el = e.target.closest('[data-act]');
     if (!el) return;
     var act = el.dataset.act;
-    if (act === 'start') { trackCustom('DiagnosticoIniciado', { origem: document.referrer ? 'site' : 'link direto' }); state.screen = visibleScreens()[0]; go('q'); }
+    if (act === 'start') { journeyEvent('food_diagnostic_started'); trackCustom('DiagnosticoIniciado', { origem: document.referrer ? 'site' : 'link direto' }); state.screen = visibleScreens()[0]; go('q'); }
     if (act === 'next') {
       if (state.busy) return;
       var errs = checkScreen();
       if (Object.keys(errs).length) return showErrors(errs);
       var screens = visibleScreens(), at = screens.indexOf(state.screen);
-      trackCustom('DiagnosticoPasso', { passo: at + 1 });
+      trackCustom('DiagnosticoPasso', { passo: at + 1 }); journeyEvent('food_diagnostic_step_completed', at + 1);
       if (at < screens.length - 1) { state.screen = screens[at + 1]; go('q'); }
       else { state.c1 = null; askResult(state.token); }
     }
@@ -1203,7 +1292,7 @@ fbq('track', 'PageView');
       state.answers = {}; state.token = null; state.result = null; state.c1 = null; state.followUp = {}; state.receipt = null; state.clarification = null;
       state.contact = { country: '351' }; state.fallback = null; state.captured = null;
       try { sessionStorage.removeItem(CONTACT_STORE); } catch (e) {}
-      state.sessionKey = id(24); state.screen = 1; go('intro');
+      state.sessionKey = id(24); state.autonomousSession = (read('cenlo-food-autonomous:v1', sessionStorage) || {}).sessionKey || crypto.randomUUID(); state.screen = 1; go('intro');
     }
   });
 
@@ -1211,6 +1300,8 @@ fbq('track', 'PageView');
     .then(function (r) { if (!r.ok) throw new Error(String(r.status)); return r.json(); })
     .then(function (contract) {
       state.contract = contract;
+      SCREENS = Array.from(new Set(contract.questions.map(function(q) { return q.screen; }))).sort();
+      if (SCREENS.indexOf(state.screen) < 0) state.screen = SCREENS[SCREENS.length - 1];
       prune();
       history.replaceState({ view: state.view, screen: state.screen }, '');
       render(true);

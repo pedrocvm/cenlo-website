@@ -681,3 +681,46 @@ textarea.fb-input { resize: vertical; min-height: 96px; }
   .fc-cart-bar .fc-mobile-continue { width:auto; flex-shrink:0; min-height:50px; padding:12px 15px; gap:12px; font-size:13px; }
 }
 @media(prefers-reduced-motion:reduce) { .fc-cart-panel,.fc-cart-toggle svg { transition:none; } }
+
+/* Diagnostic → chosen scope → commercial offer, with the same Food identity. */
+.fo-route { display:flex; align-items:center; flex-wrap:wrap; gap:10px; font-size:12px; color:var(--ink2); margin:22px 0; }
+.fo-route strong { color:var(--terra); }
+.fv { margin:24px 0 30px; }
+.fo-journey .fv h2 { font-size:clamp(22px,3vw,30px); line-height:1.25; margin:10px 0; max-width:690px; }
+.fo-journey .fv-intro { color:var(--ink2); font-size:14px; line-height:1.7; margin-bottom:20px; max-width:690px; }
+.fv-cards { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; align-items:start; }
+.fv-cards article { min-width:0; background:var(--surface); padding:20px; border:1px solid var(--line); border-radius:14px; }
+.fv-cards article.is-open { grid-column:1/-1; border-color:var(--terra); }
+.fv-card-heading { display:flex; align-items:center; gap:10px; margin-bottom:12px; }
+.fv-card-heading .fb-ico { flex-shrink:0; color:var(--terra); }
+.fo-journey .fv-card-heading h3 { font-size:15px; margin:0; line-height:1.4; }
+.fo-journey .fv-cards article>p { font-size:13px; color:var(--ink2); line-height:1.7; }
+.fv-cards article>small { display:block; color:var(--ink2); font-size:11px; line-height:1.6; margin-top:12px; }
+.fv-cards article>button { display:flex; align-items:center; justify-content:space-between; gap:12px; width:100%; background:none; color:var(--terraD); border:0; border-top:1px solid var(--line); padding:14px 0 0; margin-top:16px; font:inherit; font-size:13px; cursor:pointer; text-align:left; }
+.fv-cards button:focus-visible { outline:2px solid var(--terra); outline-offset:4px; }
+.fv-video { margin-top:18px; }
+.fo-journey .fv-note,.fo-journey .fo-assurance { font-size:12px; line-height:1.7; color:var(--ink2); margin:14px 0; }
+.fo-prices { gap:16px; }
+.fo-prices>div { padding:26px; border-radius:16px; }
+.fo-prices>div:first-child { border-color:rgba(255,106,44,.5); background:linear-gradient(135deg,var(--terraBg),var(--surface)); }
+.fo-prices strong { color:var(--terraD); font-size:clamp(32px,5vw,44px); letter-spacing:-.04em; }
+.fo-prices small { display:block; color:var(--ink2); line-height:1.6; margin-top:12px; }
+.fo-journey .fo-included-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; padding:0; list-style:none; }
+.fo-journey .fo-included-grid li { display:flex; align-items:start; gap:12px; padding:16px; background:var(--surface); border:1px solid var(--line); border-radius:12px; margin:0; }
+.fo-included-grid .fb-ico { flex-shrink:0; color:var(--terra); }
+.fo-included-grid strong { font-size:14px; }
+.fo-journey .fo-included-grid p { font-size:12px; line-height:1.7; color:var(--ink2); margin:6px 0; }
+.fo-included-grid small { display:block; font-size:11px; color:var(--ink2); }
+.fb-diagnostic-welcome { margin:24px 0; padding:24px; border:1px solid var(--line); border-left:3px solid var(--terra); border-radius:14px; background:var(--surface); }
+.fb-diagnostic-welcome h2 { font-size:24px; letter-spacing:-.03em; margin:8px 0; }
+.fb-diagnostic-welcome p { color:var(--ink2); font-size:14px; line-height:1.7; margin-bottom:18px; max-width:700px; }
+.fb-diagnostic-welcome .fb-link-btn { margin-left:16px; }
+@media(max-width:720px) {
+  .fv-cards,.fo-journey .fo-included-grid { grid-template-columns:1fr; }
+  .fv-cards article { padding:18px; }
+  .fo-prices { grid-template-columns:1fr; }
+  .fo-prices>div { padding:22px; }
+  .fo-actions { display:flex; flex-direction:column; align-items:stretch; gap:10px; }
+  .fo-actions button { justify-content:center; }
+  .fb-diagnostic-welcome .fb-link-btn { display:block; margin:14px 0 0; }
+}
