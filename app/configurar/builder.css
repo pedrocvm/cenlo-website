@@ -596,3 +596,10 @@ textarea.fb-input { resize: vertical; min-height: 96px; }
 .fm-video-chapters button>span:first-child { color:var(--terraD); font-size:11px; }
 .fm-video-chapters button small { margin-left:auto; white-space:nowrap; }
 @media(max-width:720px) { .fo-journey,.fo-journey.fc-journey,.fr { padding-top:24px; } .fc-card-title .fc-card-benefit { font-size:13px; } .fm-videos { padding:12px; } }
+.fm-examples > h2 { font-family:var(--font-schibsted); font-size:clamp(24px,3vw,32px); letter-spacing:-.035em; margin:12px 0 24px; }
+.fm-examples > div { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+.fm-examples article { border:1px solid var(--line); border-radius:16px; background:var(--surface); padding:24px; }
+.fm-example-number { display:inline-flex; align-items:center; justify-content:center; width:32px; height:32px; border-radius:9px; background:var(--terraBg); color:var(--terra); font-size:12px; font-weight:600; margin-bottom:18px; }
+.fm-examples h3 { font-size:18px; line-height:1.4; letter-spacing:-.02em; margin-bottom:12px; }
+.fm-examples article p { font-size:14px; line-height:1.75; color:var(--ink2); }
+@media(max-width:720px) { .fm-examples > div { grid-template-columns:minmax(0,1fr); } }

@@ -29,3 +29,18 @@ export const MODULE_BENEFITS: Record<string, string> = {
   'help-training': 'Ajude quem está começando com guias e orientações, sem repetir toda a explicação a cada pessoa nova.',
   'menu-import': 'Parta do seu cardápio para montar os itens com ajuda da IA e revise tudo antes de publicar.',
 }
+
+export const MODULE_EXAMPLES: Record<string, { title: string; text: string }[]> = {
+  'delivery-radius': [
+    { title: 'Quem está perto paga pela faixa mais próxima', text: 'Você pode definir uma faixa até 3 km e outra até 6 km, cada uma com a taxa escolhida pelo restaurante. Ao informar o endereço, o cliente recebe a taxa da faixa correspondente.' },
+    { title: 'Sua equipe sabe até onde pode entregar', text: 'A última faixa define o limite de atendimento. Se você já trabalha com zonas, o raio atende os endereços que não pertencem a uma zona configurada.' },
+  ],
+  'multi-store': [
+    { title: 'Duas lojas, sem misturar a operação', text: 'Imagine uma unidade no Centro e outra em um bairro vizinho. Cada uma mantém seus pedidos, cardápio, clientes e equipe, dentro da mesma organização.' },
+    { title: 'Quem trabalha nas duas encontra a unidade certa', text: 'Um responsável com acesso a mais de uma loja usa o seletor de unidade para abrir a operação desejada. Os acessos e o escopo de cada loja são alinhados na implantação.' },
+  ],
+  'audit-trail': [
+    { title: 'Um pedido foi cancelado. O que aconteceu?', text: 'Em vez de perguntar a toda a equipe, a gestão consulta o registro para identificar a ação, quem a realizou e quando aconteceu.' },
+    { title: 'Uma informação mudou. Qual era o valor anterior?', text: 'Nas alterações registradas com antes e depois, você compara os valores e entende o que foi modificado. Isso ajuda a esclarecer divergências com base no histórico.' },
+  ],
+}
