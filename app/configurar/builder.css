@@ -626,10 +626,14 @@ textarea.fb-input { resize: vertical; min-height: 96px; }
 .fm-next-link { width:100%; display:flex; justify-content:space-between; align-items:center; gap:18px; min-height:64px; margin-top:22px; padding:18px 22px; border:1px solid var(--terra); border-radius:12px; color:var(--ink); background:var(--terraBtn); text-align:left; font:inherit; font-size:18px; font-weight:700; line-height:1.4; cursor:pointer; transition:background .18s ease; }
 .fm-next-link:hover { background:var(--terraBtnH); }
 .fm-next-link:focus-visible { outline:3px solid var(--terraD); outline-offset:4px; }
-.fm-next-link span { display:grid; place-items:center; flex-shrink:0; width:36px; height:36px; border-radius:50%; background:rgba(255,255,255,.14); font-size:25px; }
-.fm-video-toolbar button,.fm-video-chapters button,.fm-video-next button,.fm-next-link span { transition:transform .18s ease-out,background .18s ease; }
+.fm-next-copy { display:flex; flex:1; min-width:0; flex-direction:column; gap:4px; }
+.fm-next-copy small { font-size:11px; font-weight:500; line-height:1.2; letter-spacing:.06em; text-transform:uppercase; opacity:.85; }
+.fm-next-copy strong { font-size:17px; font-weight:650; line-height:1.35; overflow-wrap:anywhere; }
+.fm-next-arrow { display:grid; place-items:center; flex-shrink:0; width:36px; height:36px; border-radius:10px; background:rgba(255,255,255,.13); }
+@media(max-width:600px) { .fm-next-link { gap:12px; min-height:72px; margin-top:18px; padding:14px 16px; } .fm-next-copy { gap:5px; } .fm-next-copy small { font-size:10px; } .fm-next-copy strong { font-size:15px; } .fm-next-arrow { width:32px; height:32px; border-radius:9px; } }
+.fm-video-toolbar button,.fm-video-chapters button,.fm-video-next button,.fm-next-arrow { transition:transform .18s ease-out,background .18s ease; }
 .fm-video-toolbar button:hover,.fm-video-next button:hover { background:var(--terraBg); }
-.fm-next-link:hover span { transform:translateX(4px); }
+.fm-next-link:hover .fm-next-arrow { transform:translateX(4px); }
 .fm-video-toolbar button:active,.fm-video-chapters button:active { transform:scale(.98); }
 .fr-details summary>b,.fc-card-detail summary>span,.fc-changes summary>span,.fc-chevron { transition:transform .3s cubic-bezier(.22,1,.36,1); }
 @keyframes fm-reveal { from { opacity:0; transform:translateY(5px); } to { opacity:1; transform:translateY(0); } }

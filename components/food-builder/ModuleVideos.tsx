@@ -69,7 +69,7 @@ export default function ModuleVideos({ videos, title, poster, nextModule }: { vi
     {failed && <p className="fb-note">Não foi possível carregar a gravação. <a href={video.src}>Abrir vídeo</a></p>}
     <p key={video.title} className="fm-video-caption">{video.title}</p>
     {videos.length > 1 && <div className="fm-video-chapters" role="group" aria-label="Escolher trecho">{videos.map((clip,i) => <button key={clip.src} type="button" aria-pressed={i===index} onClick={() => select(i)}><span aria-hidden="true">{i===index ? '▶' : String(i+1).padStart(2,'0')}</span><span>{clip.title}</span><small>{duration(clip.seconds)}</small></button>)}</div>}
-    {nextModule && countdown === null && <button className="fm-next-link" type="button" onClick={() => router.push(nextModule.href)}>Próximo módulo: {nextModule.title} <span aria-hidden="true">→</span></button>}
+    {nextModule && countdown === null && <button className="fm-next-link" type="button" onClick={() => router.push(nextModule.href)}><span className="fm-next-copy"><small>Próximo módulo</small><strong>{nextModule.title}</strong></span><span className="fm-next-arrow" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M13 6l6 6-6 6" /></svg></span></button>}
     <p className="fb-note">Gravações do produto com dados de demonstração. As condições de configuração e ativação continuam valendo para cada recurso.</p>
   </div>
 }
