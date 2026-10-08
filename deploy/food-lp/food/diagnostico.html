@@ -384,11 +384,28 @@ fbq('track', 'PageView');
   var keptContact = read(CONTACT_STORE, sessionStorage);
   if (keptContact && keptContact.sessionKey === state.sessionKey) ['firstName', 'business', 'phone', 'country'].forEach(function (k) { if (keptContact[k] !== undefined) state.contact[k] = keptContact[k]; });
 
+  function builderComposition() {
+    var map = { pedido_conversa: 'conversation-order', site: 'ordering-site', mesa: 'table-service', recompra: 'customer-reactivation', relatorios: 'reports', fidelidade: 'loyalty', logistica: 'cenlo-delivery', cardapio_ia: 'menu-import' };
+    var chosen = Array.isArray(state.answers.f16) ? state.answers.f16 : [];
+    var modules = ['orders-core'];
+    chosen.forEach(function(key) { if (map[key] && modules.indexOf(map[key]) < 0) modules.push(map[key]); });
+    return { moduleIds: modules.sort(), preferences: [], units: state.answers.f3 === 'varias' && typeof state.answers.f3n === 'number' ? state.answers.f3n : 1, integration: state.answers.f15b === 'integrar' ? 'required' : state.answers.f15b === 'nao_sei' ? 'unknown' : 'none', priority: state.answers.f8 || 'pedidos' };
+  }
+  function syncBuilderSelection() {
+    if (!Array.isArray(state.answers.f16)) return;
+    var composition = builderComposition();
+    var fingerprint = JSON.stringify(composition);
+    // Revisiting unchanged answers must not erase a later manual configuration.
+    if (read('cenlo-food-builder:diagnostic:v1') === fingerprint) return;
+    write('cenlo-food-builder:selection:v1', composition.moduleIds.filter(function(id) { return id !== 'orders-core'; }));
+    write('cenlo-food-builder:diagnostic:v1', fingerprint);
+  }
   function persist() {
     write(STORE, { view: state.view, screen: state.screen, answers: state.answers, sessionKey: state.sessionKey, token: state.token, result: state.result, clarification: state.clarification, c1: state.c1, followUp: state.followUp, receipt: state.receipt, captured: state.captured });
     var c = { sessionKey: state.sessionKey };
     ['firstName', 'business', 'phone', 'country'].forEach(function (k) { c[k] = state.contact[k]; });
     write(CONTACT_STORE, c, sessionStorage);
+    syncBuilderSelection();
   }
 
   function utm() {
@@ -1001,7 +1018,7 @@ fbq('track', 'PageView');
       try {
         var old = JSON.parse(sessionStorage.getItem('cenlo-food-autonomous:v1') || 'null');
         var same = old && JSON.stringify(old.answers) === JSON.stringify(state.answers);
-        var journey = same ? old : { previousOfferId: old && old.offer ? old.offer.id : undefined, composition: old ? old.composition : undefined, sessionKey: old ? old.sessionKey : crypto.randomUUID(), entry: 'diagnostic', answers: state.answers, isTest: new URLSearchParams(location.search).get('test') === '1', attribution: old ? old.attribution : utm() };
+        var journey = same ? old : { previousOfferId: old && old.offer ? old.offer.id : old ? old.previousOfferId : undefined, composition: builderComposition(), sessionKey: old ? old.sessionKey : crypto.randomUUID(), entry: 'diagnostic', answers: state.answers, isTest: new URLSearchParams(location.search).get('test') === '1', attribution: old ? old.attribution : utm() };
         sessionStorage.setItem('cenlo-food-autonomous:v1', JSON.stringify(journey));
         persist();
         location.assign('/configurar/oferta');

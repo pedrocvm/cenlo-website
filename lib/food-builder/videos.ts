@@ -1,5 +1,5 @@
 import type { ModuleId } from './catalog'
-export type ModuleVideo = { src: string; title: string; seconds: number; width: number; height: number }
+export type ModuleVideo = { src: string; title: string; seconds: number; width: number; height: number; hasAudio?: boolean }
 export const MODULE_VIDEOS: Partial<Record<ModuleId, ModuleVideo[]>> = {
   "orders-core": [
     {
@@ -7,7 +7,8 @@ export const MODULE_VIDEOS: Partial<Record<ModuleId, ModuleVideo[]>> = {
       "title": "Dos filtros ao pedido registrado no painel",
       "seconds": 53,
       "width": 1280,
-      "height": 720
+      "height": 720,
+      "hasAudio": true
     }
   ],
   "whatsapp-assistant": [
@@ -16,7 +17,8 @@ export const MODULE_VIDEOS: Partial<Record<ModuleId, ModuleVideo[]>> = {
       "title": "O assistente responde, confirma o pedido e envia à cozinha",
       "seconds": 40,
       "width": 720,
-      "height": 1280
+      "height": 1280,
+      "hasAudio": true
     }
   ],
   "kitchen-display": [
@@ -25,7 +27,8 @@ export const MODULE_VIDEOS: Partial<Record<ModuleId, ModuleVideo[]>> = {
       "title": "Acompanhe as etapas, mova o pedido e confira os detalhes",
       "seconds": 50,
       "width": 1280,
-      "height": 720
+      "height": 720,
+      "hasAudio": true
     }
   ],
   "auto-printing": [
@@ -34,7 +37,8 @@ export const MODULE_VIDEOS: Partial<Record<ModuleId, ModuleVideo[]>> = {
       "title": "Prepare a impressão automática dos pedidos",
       "seconds": 49,
       "width": 1280,
-      "height": 720
+      "height": 720,
+      "hasAudio": true
     }
   ],
   "ordering-site": [
@@ -43,7 +47,8 @@ export const MODULE_VIDEOS: Partial<Record<ModuleId, ModuleVideo[]>> = {
       "title": "Da escolha no cardápio ao pedido recebido pela loja",
       "seconds": 49,
       "width": 1280,
-      "height": 720
+      "height": 720,
+      "hasAudio": true
     }
   ],
   "counter-phone": [
@@ -52,7 +57,8 @@ export const MODULE_VIDEOS: Partial<Record<ModuleId, ModuleVideo[]>> = {
       "title": "Registre o pedido, a entrega e o pagamento",
       "seconds": 40,
       "width": 1280,
-      "height": 720
+      "height": 720,
+      "hasAudio": true
     }
   ],
   "scheduled-orders": [
@@ -61,7 +67,8 @@ export const MODULE_VIDEOS: Partial<Record<ModuleId, ModuleVideo[]>> = {
       "title": "Configure horários, capacidade e datas especiais",
       "seconds": 59,
       "width": 1280,
-      "height": 720
+      "height": 720,
+      "hasAudio": true
     }
   ],
   "table-service": [
@@ -70,7 +77,8 @@ export const MODULE_VIDEOS: Partial<Record<ModuleId, ModuleVideo[]>> = {
       "title": "Do pedido na mesa à cozinha e ao fechamento da conta",
       "seconds": 52,
       "width": 1280,
-      "height": 720
+      "height": 720,
+      "hasAudio": true
     }
   ],
   "delivery-zones": [
@@ -79,7 +87,8 @@ export const MODULE_VIDEOS: Partial<Record<ModuleId, ModuleVideo[]>> = {
       "title": "Configure taxas, zonas e condições de entrega",
       "seconds": 47,
       "width": 1280,
-      "height": 720
+      "height": 720,
+      "hasAudio": true
     }
   ],
   "cenlo-delivery": [
@@ -88,7 +97,8 @@ export const MODULE_VIDEOS: Partial<Record<ModuleId, ModuleVideo[]>> = {
       "title": "Da saída automática às entregas acompanhadas no painel",
       "seconds": 53,
       "width": 1280,
-      "height": 720
+      "height": 720,
+      "hasAudio": true
     }
   ],
   "customer-updates": [
@@ -97,7 +107,8 @@ export const MODULE_VIDEOS: Partial<Record<ModuleId, ModuleVideo[]>> = {
       "title": "O cliente acompanha a entrega pelo celular",
       "seconds": 45,
       "width": 780,
-      "height": 1688
+      "height": 1688,
+      "hasAudio": false
     }
   ],
   "promotions": [
@@ -106,7 +117,8 @@ export const MODULE_VIDEOS: Partial<Record<ModuleId, ModuleVideo[]>> = {
       "title": "Crie a promoção e veja o desconto no pedido do cliente",
       "seconds": 47,
       "width": 1280,
-      "height": 720
+      "height": 720,
+      "hasAudio": true
     }
   ],
   "customer-crm": [
@@ -115,7 +127,8 @@ export const MODULE_VIDEOS: Partial<Record<ModuleId, ModuleVideo[]>> = {
       "title": "Conheça os hábitos e identifique quem chamar de volta",
       "seconds": 55,
       "width": 1280,
-      "height": 720
+      "height": 720,
+      "hasAudio": true
     }
   ],
   "customer-reactivation": [
@@ -124,7 +137,8 @@ export const MODULE_VIDEOS: Partial<Record<ModuleId, ModuleVideo[]>> = {
       "title": "Encontre quem deixou de pedir e conheça as opções de reativação",
       "seconds": 34,
       "width": 1280,
-      "height": 720
+      "height": 720,
+      "hasAudio": true
     }
   ],
   "loyalty": [
@@ -133,7 +147,8 @@ export const MODULE_VIDEOS: Partial<Record<ModuleId, ModuleVideo[]>> = {
       "title": "Da escolha da meta ao registro no clube e à reserva da recompensa",
       "seconds": 37,
       "width": 1280,
-      "height": 800
+      "height": 800,
+      "hasAudio": false
     }
   ],
   "cenlo-intelligence": [
@@ -142,7 +157,8 @@ export const MODULE_VIDEOS: Partial<Record<ModuleId, ModuleVideo[]>> = {
       "title": "Entenda padrões, oportunidades e qualidade dos dados",
       "seconds": 50,
       "width": 1280,
-      "height": 720
+      "height": 720,
+      "hasAudio": true
     }
   ],
   "forecasting": [
@@ -151,7 +167,8 @@ export const MODULE_VIDEOS: Partial<Record<ModuleId, ModuleVideo[]>> = {
       "title": "Veja as previsões e o histórico necessário para calculá-las",
       "seconds": 31,
       "width": 1280,
-      "height": 720
+      "height": 720,
+      "hasAudio": true
     }
   ],
   "insights-recommendations": [
@@ -160,7 +177,8 @@ export const MODULE_VIDEOS: Partial<Record<ModuleId, ModuleVideo[]>> = {
       "title": "Dos números do período aos pontos que merecem atenção",
       "seconds": 55,
       "width": 1280,
-      "height": 720
+      "height": 720,
+      "hasAudio": true
     }
   ],
   "reports": [
@@ -169,7 +187,8 @@ export const MODULE_VIDEOS: Partial<Record<ModuleId, ModuleVideo[]>> = {
       "title": "Explore resultados, produtos e fechamentos da operação",
       "seconds": 55,
       "width": 1280,
-      "height": 720
+      "height": 720,
+      "hasAudio": true
     }
   ],
   "closings-summaries": [
@@ -178,7 +197,8 @@ export const MODULE_VIDEOS: Partial<Record<ModuleId, ModuleVideo[]>> = {
       "title": "Receba o resumo da operação no fechamento do dia",
       "seconds": 48,
       "width": 1280,
-      "height": 720
+      "height": 720,
+      "hasAudio": true
     }
   ],
   "team-permissions": [
@@ -187,7 +207,8 @@ export const MODULE_VIDEOS: Partial<Record<ModuleId, ModuleVideo[]>> = {
       "title": "Escolha os acessos e convide sua equipe",
       "seconds": 46,
       "width": 1280,
-      "height": 720
+      "height": 720,
+      "hasAudio": true
     }
   ],
   "help-training": [
@@ -196,7 +217,8 @@ export const MODULE_VIDEOS: Partial<Record<ModuleId, ModuleVideo[]>> = {
       "title": "Dos filtros ao pedido registrado no painel",
       "seconds": 53,
       "width": 1280,
-      "height": 720
+      "height": 720,
+      "hasAudio": true
     }
   ]
 }

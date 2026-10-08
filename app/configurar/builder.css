@@ -494,7 +494,7 @@ textarea.fb-input { resize: vertical; min-height: 96px; }
 .fe-checklist h3 { font-size:17px; font-weight:600; margin:3px 0 8px; }
 .fe-checklist p { font-size:14px; color:var(--ink2); line-height:1.75; max-width:54ch; }
 .fe .fr-next > p { font-size:14px; }
-.fe-contact { margin-top:24px; width:100%; padding:18px 20px; font-size:18px; font-weight:700; line-height:1.4; text-align:left; }
+.fe-contact { margin-top:24px; width:100%; padding:14px; font-size:14px; font-weight:650; line-height:1.35; text-align:left; }
 .fe-back { display:block; width:100%; padding:13px 8px; margin-top:10px; border:0; border-radius:8px; background:none; color:var(--ink2); font:inherit; font-size:12px; cursor:pointer; }
 .fe-back:hover { background:var(--surface); color:var(--ink); }
 .fo-included-bonus { display:inline-block; margin-left:10px; padding:3px 8px; border-radius:5px; background:var(--surface); color:var(--terra); font-size:11px; vertical-align:middle; }
@@ -644,3 +644,8 @@ textarea.fb-input { resize: vertical; min-height: 96px; }
 .fe-contact-form .fb-note { font-size:11px; line-height:1.6; }
 .fe-contact:disabled { opacity:.6; cursor:wait; }
 .fe-saved { overflow-wrap:anywhere; }
+
+.fm-sound-prompt { position:absolute; top:14px; right:14px; z-index:1; display:flex; align-items:center; gap:9px; padding:12px 16px; border:1px solid var(--terraD); border-radius:11px; background:var(--terraBtn); color:var(--ink); font:inherit; font-size:14px; font-weight:700; line-height:1.2; box-shadow:0 4px 18px rgba(0,0,0,.35); cursor:pointer; transition:transform .18s ease,background .18s ease; }
+.fm-sound-prompt:hover { background:var(--terraBtnH); transform:translateY(-1px); }
+.fm-sound-prompt:focus-visible { outline:3px solid var(--ink); outline-offset:3px; }
+@media(max-width:600px) { .fm-sound-prompt { top:10px; right:10px; padding:10px 12px; font-size:13px; } }

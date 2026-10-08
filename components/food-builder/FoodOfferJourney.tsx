@@ -2,7 +2,7 @@
 /* eslint-disable react-hooks/set-state-in-effect -- Restore this tab's saved external session after hydration. */
 import { useEffect, useRef, useState } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
-import { readSelection } from './selection'
+import { readSelection, replaceSelection, mergeSelectionIntoComposition } from './selection'
 import ModuleIcon from './ModuleIcon'
 import AnimatedDetails from './AnimatedDetails'
 import { GROUPS, MODULES } from '@/lib/food-builder/catalog'
@@ -18,7 +18,7 @@ type Snapshot = { state: string; label: string; plan: string; version: string; s
 type Offer = { id: string; reference: string; snapshot: Snapshot; expiresAt: string | null; isTest: boolean }
 type Receipt = { saved: boolean; id: string; reference: string; kind: string; whatsappUrl: string; snapshot: { offer: Snapshot; payment: { totalCents: number; amounts: number[]; due: string[]; option: string } } }
 type EvaluationReceipt = { saved: boolean; id: string; reference: string; whatsappUrl: string }
-type Journey = { evaluationSubmissionId?: string; evaluationReceipt?: EvaluationReceipt; evaluation?: { reasons: string[]; composition: Composition }; sessionKey: string; entry: 'diagnostic' | 'builder'; previousOfferId?: string; builderSelection?: string; answers?: Record<string, unknown>; composition?: Composition; offer?: Offer; receipt?: Receipt; payment?: 'cash' | 'split'; isTest: boolean; attribution: Record<string, string>; submissionId?: string; contact?: { name: string; business: string; phone: string; email: string }; decision?: string; desiredStart?: string; question?: string }
+type Journey = { selectionSyncVersion?: number; compositionEdited?: boolean; evaluationSubmissionId?: string; evaluationReceipt?: EvaluationReceipt; evaluation?: { reasons: string[]; composition: Composition }; sessionKey: string; entry: 'diagnostic' | 'builder'; previousOfferId?: string; builderSelection?: string; answers?: Record<string, unknown>; composition?: Composition; offer?: Offer; receipt?: Receipt; payment?: 'cash' | 'split'; isTest: boolean; attribution: Record<string, string>; submissionId?: string; contact?: { name: string; business: string; phone: string; email: string }; decision?: string; desiredStart?: string; question?: string }
 function load(): Journey | null { try { return JSON.parse(sessionStorage.getItem(KEY) || 'null') } catch { return null } }
 function save(j: Journey) { try { sessionStorage.setItem(KEY, JSON.stringify(j)) } catch { /* This tab still works without storage. */ } }
 
@@ -82,6 +82,12 @@ export default function FoodOfferJourney({ entry = 'builder' }: { entry?: 'build
   function update(value: Partial<Journey>) {
     const next = { ...ref.current!, ...value }; ref.current = next; setJourney(next); save(next); return next
   }
+  function editComposition(next: Composition) {
+    replaceSelection(next.moduleIds)
+    setComposition(next)
+    update({ composition: next, compositionEdited: true })
+    setChangedConfirmed(false)
+  }
   async function call(path: string, body?: unknown, session = ref.current?.sessionKey) {
     const res = await fetch(API + path, { method: body ? 'POST' : 'GET', headers: { 'content-type': 'application/json', 'x-food-session': session || '' }, body: body ? JSON.stringify(body) : undefined })
     const data = await res.json()
@@ -98,12 +104,13 @@ export default function FoodOfferJourney({ entry = 'builder' }: { entry?: 'build
     try {
       const result = await call('/offers', { sessionKey: j.sessionKey, entry: j.entry, ...(c ? { composition: c } : j.entry === 'diagnostic' ? { answers: j.answers } : { composition: composition }),
         ...((j.offer || j.previousOfferId) ? { previousId: j.offer?.id || j.previousOfferId } : {}), revisionConfirmed: confirmedRevision, isTest: j.isTest, attribution: j.attribution })
+      replaceSelection(result.state === 'evaluation' ? result.composition.moduleIds : result.offer.snapshot.composition.moduleIds)
       if (result.state === 'evaluation') {
-        update({ evaluationReceipt: undefined, evaluationSubmissionId: undefined, evaluation: { reasons: result.reasons, composition: result.composition }, composition: result.composition, builderSelection: JSON.stringify(readSelection()) })
+        update({ compositionEdited: false, evaluationReceipt: undefined, evaluationSubmissionId: undefined, evaluation: { reasons: result.reasons, composition: result.composition }, composition: result.composition, builderSelection: JSON.stringify(readSelection()) })
         setComposition(result.composition); setEditing(false); setReasons([])
         router.push('/configurar/avaliacao'); window.scrollTo({ top: 0, behavior: 'instant' }); return
       }
-      const next = update({ evaluation: undefined, offer: result.offer, composition: result.offer.snapshot.composition, receipt: undefined, previousOfferId: undefined, submissionId: undefined, builderSelection: JSON.stringify(readSelection()) })
+      const next = update({ compositionEdited: false, evaluation: undefined, offer: result.offer, composition: result.offer.snapshot.composition, receipt: undefined, previousOfferId: undefined, submissionId: undefined, builderSelection: JSON.stringify(readSelection()) })
       setComposition(result.offer.snapshot.composition); setEditing(false); setReview(null); setConfirmed(false)
       event('food_offer_viewed', next); window.scrollTo({ top: 0, behavior: 'instant' })
     } catch (e) { setError((e as Error).message); if (!j.offer) setEditing(true) }
@@ -112,19 +119,36 @@ export default function FoodOfferJourney({ entry = 'builder' }: { entry?: 'build
   useEffect(() => {
     if (init.current) return
     init.current = true
-    const selection = readSelection()
     const old = load()
     const j: Journey = old || { sessionKey: crypto.randomUUID(), entry, isTest: new URLSearchParams(location.search).get('test') === '1', attribution: Object.fromEntries(Object.entries(readAttribution()).filter(([,v]) => typeof v === 'string').map(([k,v]) => [k.replace(/^utm_/, ''), v!])) }
     ref.current = j; setJourney(j); save(j)
-    if (j.evaluation && pathname === '/configurar/avaliacao') { setComposition(j.evaluation.composition); setEditing(false) }
-    else if (j.offer) {
-      const changedInBuilder = entry === 'builder' && j.builderSelection !== undefined && j.builderSelection !== JSON.stringify(selection) && !j.receipt
-      setComposition(changedInBuilder ? { ...j.offer.snapshot.composition, moduleIds: [...new Set(['orders-core', ...selection])] } : j.offer.snapshot.composition)
-      setEditing(changedInBuilder || new URLSearchParams(location.search).get('editar') === '1'); event('food_offer_viewed', j)
+    const editRequested = new URLSearchParams(location.search).get('editar') === '1'
+    const savedComposition = j.composition || j.offer?.snapshot.composition
+    // Existing journeys get synchronized once; later manual changes remain the draft.
+    const hadBuilderChanges = j.builderSelection !== undefined && j.builderSelection !== JSON.stringify(readSelection())
+    if (savedComposition && (j.builderSelection === undefined || (j.selectionSyncVersion !== 1 && !hadBuilderChanges))) {
+      replaceSelection(savedComposition.moduleIds)
+      j.builderSelection = JSON.stringify(readSelection())
+      save(j)
     }
-    else if (j.composition && new URLSearchParams(location.search).get('editar') === '1') { setComposition(j.composition); setEditing(true) }
-    else if (j.entry === 'diagnostic' && j.answers) { if (j.previousOfferId) { setEditing(true); setComposition(j.composition || composition); setError('Suas respostas mudaram. Confira os itens indispensáveis e confirme a revisão; a oferta anterior permanece registrada.') } else void issue(j) }
-    else { setComposition({ ...composition, moduleIds: [...new Set(['orders-core', ...selection])] }); setEditing(true) }
+    j.selectionSyncVersion = 1
+    save(j)
+    const currentSelection = readSelection()
+    const changedInBuilder = j.builderSelection !== undefined && j.builderSelection !== JSON.stringify(currentSelection) && !j.receipt
+    const draft = savedComposition ? changedInBuilder
+      ? { ...savedComposition, moduleIds: mergeSelectionIntoComposition(savedComposition.moduleIds, currentSelection) }
+      : savedComposition : { ...composition, moduleIds: ['orders-core', ...currentSelection] }
+    if (j.evaluation && pathname === '/configurar/avaliacao') { setComposition(draft); setEditing(false) }
+    else if (j.offer) {
+      setComposition(draft)
+      setEditing(changedInBuilder || !!j.compositionEdited || editRequested || !!j.evaluation)
+      event('food_offer_viewed', j)
+    }
+    else if (savedComposition && (editRequested || j.compositionEdited || j.evaluation || j.previousOfferId)) {
+      setComposition(draft); setEditing(true)
+    }
+    else if (j.entry === 'diagnostic' && j.answers) void issue(j)
+    else { setComposition(draft); setEditing(true) }
     void call('/catalog', undefined, j.sessionKey).then(d => setCaps(d.snapshot.capabilities)).catch(e => setError(e.message))
     // Restore a frozen offer, never recalculate it on refresh.
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -192,9 +216,9 @@ export default function FoodOfferJourney({ entry = 'builder' }: { entry?: 'build
     {error && <p className="fo-error" role="alert">{error}</p>}
     {received && <div className="fo-confirm"><p>A oferta e a forma de pagamento estão registradas. Pedro vai conferir os dados para organizar o próximo passo com você. Nenhum pagamento foi realizado nesta etapa.</p><p className="fo-reference">Referência: <strong>{received.reference}</strong></p><a className="fb-btn fb-btn-primary" href={received.whatsappUrl} target="_blank" rel="noreferrer" onClick={() => event('food_whatsapp_opened')}>Continuar no WhatsApp</a><p>O pedido continua salvo mesmo se você não enviar a mensagem.</p></div>}
     {editing && !received && <div className="fc-editor">
-      <p className="fc-intro">Escolha o que faz sentido para o seu restaurante. Na próxima etapa, você confere a solução e os valores.</p>
+      <p className="fc-intro">{journey.entry === 'diagnostic' ? 'Trouxemos as escolhas do seu diagnóstico. Confira os itens marcados e adicione ou retire o que fizer sentido. Na próxima etapa, você confere a oferta e os valores atualizados.' : 'Escolha o que faz sentido para o seu restaurante. Na próxima etapa, você confere a solução e os valores.'}</p>
       <div className="fc-layout"><div className="fc-main">
-        <section className="fc-operation" aria-labelledby="fc-operation-title"><div className="fc-section-label"><ModuleIcon name="stores" /><div><span>01 · Sua operação</span><h2 id="fc-operation-title">Vamos começar pelo básico.</h2></div></div><div className="fo-fields"><label>Quantas unidades?<input type="number" min="1" max="200" value={composition.units} onChange={e => setComposition({ ...composition, units: Number(e.target.value) })} /></label><label>Precisa conectar outro sistema?<select value={composition.integration} onChange={e => setComposition({ ...composition, integration: e.target.value })}><option value="none">Não preciso de integração</option><option value="required">Sim, é indispensável</option><option value="unknown">Ainda não sei</option></select></label></div></section>
+        <section className="fc-operation" aria-labelledby="fc-operation-title"><div className="fc-section-label"><ModuleIcon name="stores" /><div><span>01 · Sua operação</span><h2 id="fc-operation-title">Vamos começar pelo básico.</h2></div></div><div className="fo-fields"><label>Quantas unidades?<input type="number" min="1" max="200" value={composition.units} onChange={e => editComposition({ ...composition, units: Number(e.target.value) })} /></label><label>Precisa conectar outro sistema?<select value={composition.integration} onChange={e => editComposition({ ...composition, integration: e.target.value })}><option value="none">Não preciso de integração</option><option value="required">Sim, é indispensável</option><option value="unknown">Ainda não sei</option></select></label></div></section>
         <div className="fc-section-label fc-resource-heading"><span className="fc-section-number">02</span><div><span>Os recursos da sua solução</span><h2>O que não pode faltar?</h2></div></div>
         <div className="fc-groups">{GROUPS.map((group, index) => {
           const items = caps.filter(c => (MODULES.find(m => m.id === c.id)?.group || (c.id === 'menu-import' ? 'structure' : 'operations')) === group.id)
@@ -202,7 +226,7 @@ export default function FoodOfferJourney({ entry = 'builder' }: { entry?: 'build
           const selected = items.filter(c => composition.moduleIds.includes(c.id)).length
           return <AnimatedDetails className="fc-group" key={group.id} open={index === 0}><summary><ModuleIcon name={MODULES.find(m => m.group === group.id)?.icon || 'orders'} /><span className="fc-group-title">{group.title}<small>{items.length} recursos disponíveis para escolher</small></span><span className={`fc-group-count${selected ? ' has-selection' : ''}`}>{selected ? `${selected} ${selected === 1 ? 'selecionado' : 'selecionados'}` : 'Explorar'}</span><span className="fc-chevron" aria-hidden="true">⌄</span></summary><div className="fc-cards">{items.map(c => {
             const checked = composition.moduleIds.includes(c.id)
-            return <article className={`fc-card${checked ? ' is-selected' : ''}`} key={c.id}><label><ModuleIcon name={MODULES.find(m => m.id === c.id)?.icon || 'orders'} /><span className="fc-card-title">{c.label}<span className="fc-card-benefit">{MODULE_BENEFITS[c.id]}</span><small>{c.id === 'orders-core' ? 'A base da sua solução' : c.state === 'evaluation' ? 'Sujeito a confirmação' : checked ? 'Na sua seleção' : 'Adicionar à solução'}</small></span><input type="checkbox" checked={checked} disabled={c.id === 'orders-core'} onChange={e => setComposition({ ...composition, moduleIds: e.target.checked ? [...composition.moduleIds, c.id] : composition.moduleIds.filter(x => x !== c.id) })} /></label>{c.condition && <AnimatedDetails className="fc-card-detail"><summary>O que considerar <span aria-hidden="true">+</span></summary><p>{c.condition}</p></AnimatedDetails>}</article>
+            return <article className={`fc-card${checked ? ' is-selected' : ''}`} key={c.id}><label><ModuleIcon name={MODULES.find(m => m.id === c.id)?.icon || 'orders'} /><span className="fc-card-title">{c.label}<span className="fc-card-benefit">{MODULE_BENEFITS[c.id]}</span><small>{c.id === 'orders-core' ? 'A base da sua solução' : c.state === 'evaluation' ? 'Sujeito a confirmação' : checked ? 'Na sua seleção' : 'Adicionar à solução'}</small></span><input type="checkbox" checked={checked} disabled={c.id === 'orders-core'} onChange={e => editComposition({ ...composition, moduleIds: e.target.checked ? [...composition.moduleIds, c.id] : composition.moduleIds.filter(x => x !== c.id) })} /></label>{c.condition && <AnimatedDetails className="fc-card-detail"><summary>O que considerar <span aria-hidden="true">+</span></summary><p>{c.condition}</p></AnimatedDetails>}</article>
           })}</div></AnimatedDetails>
         })}</div>
       </div>

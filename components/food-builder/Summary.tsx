@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { BASE_MODULES, MODULES } from '@/lib/food-builder/catalog'
 import { TierBadge } from './SelectToggle'
-import { clearSelection, removeModule, useSelection } from './selection'
+import { clearSelection, removeModule, useSelection, EXTRA_SELECTION_MODULES } from './selection'
 
 function countLabel(n: number) {
   return n === 1 ? 'módulo selecionado' : 'módulos selecionados'
@@ -13,7 +13,7 @@ function countLabel(n: number) {
 function Panel({ onNavigate, headingId }: { onNavigate?: () => void; headingId: string }) {
   const selection = useSelection()
   const [confirming, setConfirming] = useState(false)
-  const selected = MODULES.filter(m => selection.includes(m.id))
+  const selected = [...MODULES, ...EXTRA_SELECTION_MODULES].filter(m => selection.includes(m.id))
 
   return (
     <section className="fb-summary" aria-labelledby={headingId}>
@@ -30,7 +30,7 @@ function Panel({ onNavigate, headingId }: { onNavigate?: () => void; headingId: 
         <ul className="fb-sel-list">
           {selected.map(m => (
             <li key={m.id}>
-              <Link href={`/configurar/${m.slug}`} onClick={onNavigate}>{m.title}</Link>
+              <Link href={m.slug ? `/configurar/${m.slug}` : '/configurar/rever?editar=1'} onClick={onNavigate}>{m.title}</Link>
               {m.tier === 'premium' && <TierBadge tier="premium" />}
               <button type="button" className="fb-x" onClick={() => removeModule(m.id)} aria-label={`Remover ${m.title}`}>✕</button>
             </li>
