@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint app components lib"
+    "lint": "eslint app components lib",
+    "test": "node --test lib/food-builder/*.test.ts"
   },
   "dependencies": {
     "next": "^16.2.9",
