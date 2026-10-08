@@ -98,3 +98,11 @@ Não executar uma nova publicação comercial para esta mudança: isso não é n
 Reversão: reverter os commits desta tarefa e voltar às versões anteriores do Website e da landing. Se já houver contactos `demonstration`, manter o leitor/API compatível para conservar a identificação correta desses contactos; uma reversão total para código antigo chamaria esses registos de “dúvida”. Não apagar pedidos, ofertas, tarefas nem eventos. O preview pode ser parado sem efeito na produção.
 
 Limitações: dispositivos móveis foram emulados em Chromium, não iPhone físico/Safari. A aceitação real pela Meta e o ajuste do anúncio não foram executados. A conversão comercial só pode ser avaliada depois de publicação autorizada e tráfego real; nenhuma melhoria percentual é prometida.
+
+## Ajuste posterior: CTAs diretos para WhatsApp
+
+Por orientação de Pedro, «Quero avançar com esta solução» e «Pedir demonstração com Pedro» abrem agora o WhatsApp sem formulário intermédio. A API verifica a sessão e usa a oferta persistida para gerar mensagens distintas, com preços, preferência de pagamento e link para um resumo público apenas de leitura. Esse resumo não expõe contactos nem respostas do diagnóstico.
+
+A saída para WhatsApp não cria um pedido de implantação, uma reserva da promoção, uma demonstração agendada ou um Lead de conversão. A identificação e confirmação passam a acontecer na conversa. O fluxo anterior de pedidos permanece compatível e o formulário de dúvida não foi alterado. Para publicação, API antes do Website; nenhuma migração. Reversão: reverter os commits deste ajuste, mantendo as ofertas existentes.
+
+No preview, o link da oferta aponta ao próprio endereço local, pois os dados sintéticos não existem em produção. Nenhuma mensagem enviada durante a verificação dos links.

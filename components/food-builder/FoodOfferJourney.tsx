@@ -248,6 +248,22 @@ export default function FoodOfferJourney({ entry = 'builder' }: { entry?: 'build
     } catch (e) { if ((e as Error & { code?: string }).code === 'promotion_expired') { setPromotionRejected(true); setReview(null); setConfirmed(false) } setError((e as Error).message) }
     finally { lock.current = false; setBusy(false) }
   }
+  async function openWhatsApp(intent: 'implementation' | 'demonstration') {
+    if (!ref.current?.offer || lock.current) return
+    lock.current = true; setBusy(true); setError('')
+    try {
+      const current = ref.current
+      const result = await call(`/offers/${current.offer!.id}/whatsapp`, { sessionKey: current.sessionKey, intent, payment: current.payment || 'cash' })
+      const url = new URL(result.whatsappUrl)
+      // Local offers only exist in this preview; keep their link on the local host.
+      if (result.isTest && ['localhost', '127.0.0.1'].includes(location.hostname)) {
+        url.searchParams.set('text', (url.searchParams.get('text') || '').replace(`https://cenlofood.cenlo.pt${result.offerPath}`, `${location.origin}${result.offerPath}`))
+      }
+      event('food_whatsapp_opened', current)
+      window.location.assign(url.toString())
+    } catch (e) { setError((e as Error).message) }
+    finally { lock.current = false; setBusy(false) }
+  }
   async function requestEvaluation(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
     if (!journey?.evaluation || lock.current) return
@@ -329,11 +345,11 @@ export default function FoodOfferJourney({ entry = 'builder' }: { entry?: 'build
       <OfferValue selected={s.included} priority={s.composition.priority} diagnostic={journey.entry === 'diagnostic'} onDemo={() => event('food_demo_opened')} />
       {s.composition.priority === 'retorno' && (s.promotion || availableGift) && <LoyaltyGift promotion={(s.promotion || availableGift)!} now={serverNow} busy={busy} onDemo={() => event('food_demo_opened')} onContinue={() => {
         if (!s.promotion) { void issue(journey, s.composition, true); return }
-        setReview('implementation'); setConfirmed(false); update({ submissionId: undefined }); event('food_review_started'); window.setTimeout(() => document.querySelector('.fo-review')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50)
+        void openWhatsApp('implementation')
       }} />}
       <div className="fo-plan-intro"><span className="fc-kicker">A solução recomendada</span><h2>Cenlo Food {s.label}</h2><p className="fb-lede">{s.reason}</p><p>O menor plano publicado que cobre a composição apresentada. Consulte o que está incluído e as condições de configuração.</p></div>
       {availableGift && !s.promotion && <p className="fo-assurance">Há um presente disponível para uma nova versão da sua oferta. Confira o Essential com o Clube antes de enviar o pedido.</p>}
-      <p className="fo-route">Suas escolhas <span aria-hidden="true">→</span> <strong>Sua oferta</strong> <span aria-hidden="true">→</span> Pedido de implantação</p>
+      <p className="fo-route">Suas escolhas <span aria-hidden="true">→</span> <strong>Sua oferta</strong> <span aria-hidden="true">→</span> Conversa no WhatsApp</p>
       <div className="fo-prices"><div><span>Implantação · {cash ? 'à vista' : 'em prestações'}</span><strong>{money(received ? received.snapshot.payment.totalCents : total)}</strong><small>Base: {money(s.setupCents)}{cash && s.payment.cash ? ` · ${s.payment.cash.discountPercent}% à vista` : ''}</small></div><div><span>Mensalidade por unidade</span><strong>{money(s.monthlyCents)}</strong><small>{s.policy.monthlyStart}</small></div></div>
       <p>{s.policy.taxText}</p>
       {!received && <fieldset className="fo-payment"><legend>Escolha como prefere pagar a implantação</legend><label><input type="radio" name="payment" checked={cash} onChange={() => { update({ payment: 'cash', submissionId: undefined }); setConfirmed(false) }} />À vista: {money(s.payment.cash?.cents ?? s.setupCents)}</label>{s.payment.split && <label><input type="radio" name="payment" checked={!cash} onChange={() => { update({ payment: 'split', submissionId: undefined }); setConfirmed(false) }} />Em prestações: total de {money(s.setupCents)}</label>}</fieldset>}
@@ -345,11 +361,11 @@ export default function FoodOfferJourney({ entry = 'builder' }: { entry?: 'build
         <p className="fo-calendar-note">A mensalidade é cobrada separadamente das prestações da implantação.</p>
       </section>
       <p className="fo-offer-validity">{s.policy.validityText}</p>
-      {!received && !review && <div className="fo-actions"><button className="fb-btn fb-btn-primary" disabled={promotionChecking || busy} onClick={() => { if (availableGift && !s.promotion) { void issue(journey, s.composition, true); return } setReview('implementation'); setConfirmed(false); update({ submissionId: undefined }); event('food_review_started') }}>{availableGift && !s.promotion ? 'Conferir Essential com o Clube' : 'Quero avançar com esta solução'}</button><button className="fb-btn fb-btn-ghost" onClick={() => { setReview('demonstration'); setConfirmed(false); update({ submissionId: undefined }); event('food_review_started') }}>Pedir demonstração com Pedro</button><button className="fb-link-btn" onClick={() => { setEditing(true); setChangedConfirmed(false) }}>Ajustar no configurador</button><button className="fb-link-btn" onClick={() => { setReview('question'); setConfirmed(false); update({ submissionId: undefined }); event('food_review_started') }}>Ainda tenho uma dúvida</button></div>}
-      {!review && <p className="fo-assurance">Pode conferir os dados no próximo passo. O pedido não realiza cobrança nem ativa uma conta.</p>}
+      {!received && !review && <div className="fo-actions"><button className="fb-btn fb-btn-primary" disabled={promotionChecking || busy} onClick={() => { if (availableGift && !s.promotion) { void issue(journey, s.composition, true); return } void openWhatsApp('implementation') }}>{availableGift && !s.promotion ? 'Conferir Essential com o Clube' : 'Quero avançar com esta solução'}</button><button className="fb-btn fb-btn-ghost" disabled={busy} onClick={() => void openWhatsApp('demonstration')}>Pedir demonstração com Pedro</button><button className="fb-link-btn" onClick={() => { setEditing(true); setChangedConfirmed(false) }}>Ajustar no configurador</button><button className="fb-link-btn" onClick={() => { setReview('question'); setConfirmed(false); update({ submissionId: undefined }); event('food_review_started') }}>Ainda tenho uma dúvida</button></div>}
+      {!review && <p className="fo-assurance">O WhatsApp abre com a sua solução na mensagem. Basta enviar para falar com Pedro. Sem cobrança ou ativação nesta etapa.</p>}
       {s.composition.priority !== 'retorno' && !review && (s.promotion || availableGift) && <LoyaltyGift promotion={(s.promotion || availableGift)!} now={serverNow} busy={busy} onDemo={() => event('food_demo_opened')} onContinue={() => {
         if (!s.promotion) { void issue(journey, s.composition, true); return }
-        setReview('implementation'); setConfirmed(false); update({ submissionId: undefined }); event('food_review_started'); window.setTimeout(() => document.querySelector('.fo-review')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50)
+        void openWhatsApp('implementation')
       }} />}
       {!review && <OfferBenefits snapshot={s} />}
       {review && !received && <form className="fo-review" onSubmit={submit}>
