@@ -33,6 +33,7 @@ export default async function ModulePage({ params }: { params: Promise<{ slug: s
   const i = MODULES.indexOf(m)
   const prev = MODULES[i - 1]
   const next = MODULES[i + 1]
+  const nextVideoModule = MODULES.slice(i + 1).find(item => videosFor(item.id).length)
 
   return (
     <article>
@@ -53,9 +54,9 @@ export default async function ModulePage({ params }: { params: Promise<{ slug: s
         </div>
       </header>
 
-      <section className="fb-section fm-demo-section" aria-labelledby="s-shots">
+      <section id="demonstracao" className="fb-section fm-demo-section" aria-labelledby="s-shots">
         <h2 id="s-shots" className="fm-demo-title">Veja o módulo em funcionamento</h2>
-        {videos.length ? <ModuleVideos videos={videos} title={m.title} poster={shots[0]?.src} /> : <><Gallery shots={shots} title={m.title} /><p className="fb-note">Imagens reais com dados de demonstração. Vídeo específico deste recurso ainda não disponível nesta página.</p></>}
+        {videos.length ? <ModuleVideos key={m.id} nextModule={nextVideoModule ? { href: `/configurar/${nextVideoModule.slug}#demonstracao`, title: nextVideoModule.title } : undefined} videos={videos} title={m.title} poster={shots[0]?.src} /> : <><Gallery shots={shots} title={m.title} /><p className="fb-note">Imagens reais com dados de demonstração. Vídeo específico deste recurso ainda não disponível nesta página.</p></>}
       </section>
 
       {MODULE_EXAMPLES[m.id] && <section className="fb-section fm-examples" aria-labelledby="s-examples"><span className="fb-eyebrow">No dia a dia do restaurante</span><h2 id="s-examples">Onde isso faz diferença</h2><div>{MODULE_EXAMPLES[m.id].map((example, index) => <article key={example.title}><span className="fm-example-number">0{index + 1}</span><h3>{example.title}</h3><p>{example.text}</p></article>)}</div><p className="fb-note">Exemplos ilustrativos. As regras e a configuração são definidas para a sua operação.</p></section>}

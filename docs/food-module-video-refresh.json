@@ -1,0 +1,138 @@
+[
+  {
+    "module": "orders-core",
+    "source": "2026-09-30-guia-wiki/final/cenlo-food-guia-02-pedidos-pt-BR.mp4",
+    "start": 24.5,
+    "end": 77.3,
+    "file": "demo-orders-core.mp4"
+  },
+  {
+    "module": "kitchen-display",
+    "source": "2026-09-30-guia-wiki/final/cenlo-food-guia-03-cozinha-pt-BR.mp4",
+    "start": 14.6,
+    "end": 65,
+    "file": "demo-kitchen-display.mp4"
+  },
+  {
+    "module": "auto-printing",
+    "source": "2026-09-30-guia-wiki/final/cenlo-food-guia-20-impressao-pt-BR.mp4",
+    "start": 12.7,
+    "end": 62,
+    "file": "demo-auto-printing.mp4"
+  },
+  {
+    "module": "ordering-site",
+    "source": "2026-09-30-guia-wiki/final/cenlo-food-guia-06-pedidos-online-pt-BR.mp4",
+    "start": 41.4,
+    "end": 90.1,
+    "file": "demo-ordering-site.mp4"
+  },
+  {
+    "module": "counter-phone",
+    "source": "2026-09-30-guia-wiki/final/cenlo-food-guia-02-pedidos-pt-BR.mp4",
+    "start": 48.4,
+    "end": 88.2,
+    "file": "demo-counter-phone.mp4"
+  },
+  {
+    "module": "scheduled-orders",
+    "source": "2026-09-30-guia-wiki/final/cenlo-food-guia-19-pedidos-agendados-pt-BR.mp4",
+    "start": 0,
+    "end": 59.3,
+    "file": "demo-scheduled-orders.mp4"
+  },
+  {
+    "module": "table-service",
+    "source": "2026-09-30-guia-wiki/final/cenlo-food-guia-07-app-de-mesa-pt-BR.mp4",
+    "start": 34.65,
+    "end": 86.2,
+    "file": "demo-table-service.mp4"
+  },
+  {
+    "module": "delivery-zones",
+    "source": "2026-09-30-guia-wiki/final/cenlo-food-guia-18-entrega-e-pagamentos-pt-BR.mp4",
+    "start": 11.3,
+    "end": 57.9,
+    "file": "demo-delivery-zones.mp4"
+  },
+  {
+    "module": "cenlo-delivery",
+    "source": "2026-09-30-guia-wiki/final/cenlo-food-guia-04-entregas-pt-BR.mp4",
+    "start": 58.15,
+    "end": 111,
+    "file": "demo-cenlo-delivery.mp4"
+  },
+  {
+    "module": "promotions",
+    "source": "2026-09-30-guia-wiki/final/cenlo-food-guia-11-promocoes-pt-BR.mp4",
+    "start": 17.1,
+    "end": 64.5,
+    "file": "demo-promotions.mp4"
+  },
+  {
+    "module": "customer-crm",
+    "source": "2026-09-30-guia-wiki/final/cenlo-food-guia-12-clientes-pt-BR.mp4",
+    "start": 14.3,
+    "end": 69.5,
+    "file": "demo-customer-crm.mp4"
+  },
+  {
+    "module": "cenlo-intelligence",
+    "source": "2026-09-30-guia-wiki/final/cenlo-food-guia-14-inteligencia-pt-BR.mp4",
+    "start": 14,
+    "end": 63.7,
+    "file": "demo-cenlo-intelligence.mp4"
+  },
+  {
+    "module": "forecasting",
+    "source": "2026-09-30-guia-wiki/final/cenlo-food-guia-14-inteligencia-pt-BR.mp4",
+    "start": 24.2,
+    "end": 54.7,
+    "file": "demo-forecasting.mp4"
+  },
+  {
+    "module": "insights-recommendations",
+    "source": "2026-09-30-guia-wiki/final/cenlo-food-guia-13-relatorios-pt-BR.mp4",
+    "start": 15.4,
+    "end": 70,
+    "file": "demo-insights-recommendations.mp4"
+  },
+  {
+    "module": "reports",
+    "source": "2026-09-30-guia-wiki/final/cenlo-food-guia-13-relatorios-pt-BR.mp4",
+    "start": 15.4,
+    "end": 70,
+    "file": "demo-reports.mp4"
+  },
+  {
+    "module": "closings-summaries",
+    "source": "2026-09-30-guia-wiki/final/cenlo-food-guia-21-fechamento-diario-pt-BR.mp4",
+    "start": 0,
+    "end": 48.1,
+    "file": "demo-closings-summaries.mp4"
+  },
+  {
+    "module": "team-permissions",
+    "source": "2026-09-30-guia-wiki/final/cenlo-food-guia-22-equipe-pt-BR.mp4",
+    "start": 10.4,
+    "end": 56.2,
+    "file": "demo-team-permissions.mp4"
+  },
+  {
+    "module": "whatsapp-assistant",
+    "source": "2026-09-27-na-pratica-whatsapp/final/cenlo-food-na-pratica-whatsapp-pt-BR.mp4",
+    "file": "demo-whatsapp-assistant.mp4"
+  },
+  {
+    "module": "customer-reactivation",
+    "source": "2026-09-30-guia-wiki/final/cenlo-food-guia-12-clientes-pt-BR.mp4",
+    "start": 53.9,
+    "end": 69.5,
+    "followedBy": {
+      "source": "2026-09-30-guia-wiki/final/cenlo-food-guia-16-assistente-pt-BR.mp4",
+      "start": 45.9,
+      "end": 64.6
+    },
+    "file": "demo-customer-reactivation.mp4"
+  }
+]

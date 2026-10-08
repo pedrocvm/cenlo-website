@@ -3,169 +3,92 @@ export type ModuleVideo = { src: string; title: string; seconds: number; width: 
 export const MODULE_VIDEOS: Partial<Record<ModuleId, ModuleVideo[]>> = {
   "orders-core": [
     {
-      "src": "/food-builder/videos/e02-filtros.mp4",
-      "title": "Encontre o pedido pelo estado, canal ou cliente",
-      "seconds": 14,
-      "width": 2000,
-      "height": 1250
-    },
-    {
-      "src": "/food-builder/videos/e02-novo.mp4",
-      "title": "Registre um pedido com os itens e a entrega",
-      "seconds": 22,
-      "width": 2000,
-      "height": 1250
+      "src": "/food-builder/videos/demo-orders-core.mp4",
+      "title": "Dos filtros ao pedido registrado no painel",
+      "seconds": 53,
+      "width": 1280,
+      "height": 720
     }
   ],
   "whatsapp-assistant": [
     {
-      "src": "/food-builder/videos/e05-abrir.mp4",
-      "title": "Abra a conversa que precisa de atenção",
-      "seconds": 7,
-      "width": 2000,
-      "height": 1250
-    },
-    {
-      "src": "/food-builder/videos/e05-responder.mp4",
-      "title": "Responda com o histórico à mão",
-      "seconds": 9,
-      "width": 2000,
-      "height": 1250
-    },
-    {
-      "src": "/food-builder/videos/e05-retomar.mp4",
-      "title": "Retome o atendimento após a intervenção humana",
-      "seconds": 5,
-      "width": 2000,
-      "height": 1250
+      "src": "/food-builder/videos/demo-whatsapp-assistant.mp4",
+      "title": "O assistente responde, confirma o pedido e envia à cozinha",
+      "seconds": 40,
+      "width": 720,
+      "height": 1280
     }
   ],
   "kitchen-display": [
     {
-      "src": "/food-builder/videos/e03-arrastar.mp4",
-      "title": "Mova o pedido para a próxima etapa",
-      "seconds": 5,
-      "width": 2000,
-      "height": 1250
-    },
-    {
-      "src": "/food-builder/videos/e03-detalhe.mp4",
-      "title": "Consulte o detalhe e inicie o preparo",
-      "seconds": 8,
-      "width": 2000,
-      "height": 1250
+      "src": "/food-builder/videos/demo-kitchen-display.mp4",
+      "title": "Acompanhe as etapas, mova o pedido e confira os detalhes",
+      "seconds": 50,
+      "width": 1280,
+      "height": 720
     }
   ],
   "auto-printing": [
     {
-      "src": "/food-builder/videos/e20-associar.mp4",
-      "title": "Associe o computador à impressão da cozinha",
-      "seconds": 8,
-      "width": 2000,
-      "height": 1250
+      "src": "/food-builder/videos/demo-auto-printing.mp4",
+      "title": "Prepare a impressão automática dos pedidos",
+      "seconds": 49,
+      "width": 1280,
+      "height": 720
     }
   ],
   "ordering-site": [
     {
-      "src": "/food-builder/videos/e08-aparencia.mp4",
-      "title": "Ajuste a aparência do site",
-      "seconds": 10,
-      "width": 2000,
-      "height": 1250
-    },
-    {
-      "src": "/food-builder/videos/e08-publicar.mp4",
-      "title": "Guarde e publique as alterações",
-      "seconds": 8,
-      "width": 2000,
-      "height": 1250
-    },
-    {
-      "src": "/food-builder/videos/e06-c-escolher.mp4",
-      "title": "Veja o cliente escolher os itens no celular",
-      "seconds": 9,
-      "width": 780,
-      "height": 1688
+      "src": "/food-builder/videos/demo-ordering-site.mp4",
+      "title": "Da escolha no cardápio ao pedido recebido pela loja",
+      "seconds": 49,
+      "width": 1280,
+      "height": 720
     }
   ],
   "counter-phone": [
     {
-      "src": "/food-builder/videos/e02-novo.mp4",
-      "title": "Do telefone ao pedido registrado no painel",
-      "seconds": 22,
-      "width": 2000,
-      "height": 1250
+      "src": "/food-builder/videos/demo-counter-phone.mp4",
+      "title": "Registre o pedido, a entrega e o pagamento",
+      "seconds": 40,
+      "width": 1280,
+      "height": 720
     }
   ],
   "scheduled-orders": [
     {
-      "src": "/food-builder/videos/e19-ligar.mp4",
-      "title": "Defina a capacidade para pedidos agendados",
-      "seconds": 7,
-      "width": 2000,
-      "height": 1250
-    },
-    {
-      "src": "/food-builder/videos/e19-data.mp4",
-      "title": "Ajuste o atendimento em datas especiais",
-      "seconds": 8,
-      "width": 2000,
-      "height": 1250
+      "src": "/food-builder/videos/demo-scheduled-orders.mp4",
+      "title": "Configure horários, capacidade e datas especiais",
+      "seconds": 59,
+      "width": 1280,
+      "height": 720
     }
   ],
   "table-service": [
     {
-      "src": "/food-builder/videos/e07-c-pedir.mp4",
-      "title": "O cliente escolhe os itens na mesa",
-      "seconds": 20,
-      "width": 780,
-      "height": 1688
-    },
-    {
-      "src": "/food-builder/videos/e07-c-enviar.mp4",
-      "title": "A comanda segue para a cozinha",
-      "seconds": 7,
-      "width": 780,
-      "height": 1688
-    },
-    {
-      "src": "/food-builder/videos/e07-c-chamar.mp4",
-      "title": "O cliente chama o atendimento e pede a conta",
-      "seconds": 10,
-      "width": 780,
-      "height": 1688
+      "src": "/food-builder/videos/demo-table-service.mp4",
+      "title": "Do pedido na mesa à cozinha e ao fechamento da conta",
+      "seconds": 52,
+      "width": 1280,
+      "height": 720
     }
   ],
   "delivery-zones": [
     {
-      "src": "/food-builder/videos/e18-nova-zona.mp4",
-      "title": "Cadastre uma área com sua taxa de entrega",
-      "seconds": 9,
-      "width": 2000,
-      "height": 1250
+      "src": "/food-builder/videos/demo-delivery-zones.mp4",
+      "title": "Configure taxas, zonas e condições de entrega",
+      "seconds": 47,
+      "width": 1280,
+      "height": 720
     }
   ],
   "cenlo-delivery": [
     {
-      "src": "/food-builder/videos/e04-regras.mp4",
-      "title": "Defina como organizar as saídas",
-      "seconds": 12,
-      "width": 2000,
-      "height": 1250
-    },
-    {
-      "src": "/food-builder/videos/e04-e-iniciar.mp4",
-      "title": "O entregador inicia a saída",
-      "seconds": 8,
-      "width": 780,
-      "height": 1688
-    },
-    {
-      "src": "/food-builder/videos/e04-e-entregar.mp4",
-      "title": "A entrega é confirmada pelo celular",
-      "seconds": 8,
-      "width": 780,
-      "height": 1688
+      "src": "/food-builder/videos/demo-cenlo-delivery.mp4",
+      "title": "Da saída automática às entregas acompanhadas no painel",
+      "seconds": 53,
+      "width": 1280,
+      "height": 720
     }
   ],
   "customer-updates": [
@@ -179,57 +102,29 @@ export const MODULE_VIDEOS: Partial<Record<ModuleId, ModuleVideo[]>> = {
   ],
   "promotions": [
     {
-      "src": "/food-builder/videos/e11-beneficio.mp4",
-      "title": "Defina o benefício da promoção",
-      "seconds": 11,
-      "width": 2000,
-      "height": 1250
-    },
-    {
-      "src": "/food-builder/videos/e11-c-pedido.mp4",
-      "title": "Veja o desconto aparecer no pedido",
-      "seconds": 12,
-      "width": 780,
-      "height": 1688
-    },
-    {
-      "src": "/food-builder/videos/e11-pausar.mp4",
-      "title": "Pause a promoção quando precisar",
-      "seconds": 5,
-      "width": 2000,
-      "height": 1250
+      "src": "/food-builder/videos/demo-promotions.mp4",
+      "title": "Crie a promoção e veja o desconto no pedido do cliente",
+      "seconds": 47,
+      "width": 1280,
+      "height": 720
     }
   ],
   "customer-crm": [
     {
-      "src": "/food-builder/videos/e12-busca.mp4",
-      "title": "Encontre o cliente na sua base",
-      "seconds": 8,
-      "width": 2000,
-      "height": 1250
-    },
-    {
-      "src": "/food-builder/videos/e12-ficha-rolar.mp4",
-      "title": "Consulte o histórico e os hábitos do cliente",
-      "seconds": 6,
-      "width": 2000,
-      "height": 1250
+      "src": "/food-builder/videos/demo-customer-crm.mp4",
+      "title": "Conheça os hábitos e identifique quem chamar de volta",
+      "seconds": 55,
+      "width": 1280,
+      "height": 720
     }
   ],
   "customer-reactivation": [
     {
-      "src": "/food-builder/videos/e16-reativacao.mp4",
-      "title": "Confira a configuração de reativação",
-      "seconds": 8,
-      "width": 2000,
-      "height": 1250
-    },
-    {
-      "src": "/food-builder/videos/e12-reativar.mp4",
-      "title": "Encontre clientes a reativar e uma mensagem sugerida",
-      "seconds": 9,
-      "width": 2000,
-      "height": 1250
+      "src": "/food-builder/videos/demo-customer-reactivation.mp4",
+      "title": "Encontre quem deixou de pedir e conheça as opções de reativação",
+      "seconds": 34,
+      "width": 1280,
+      "height": 720
     }
   ],
   "loyalty": [
@@ -257,86 +152,65 @@ export const MODULE_VIDEOS: Partial<Record<ModuleId, ModuleVideo[]>> = {
   ],
   "cenlo-intelligence": [
     {
-      "src": "/food-builder/videos/e14-clientes.mp4",
-      "title": "Consulte a análise da sua base de clientes",
-      "seconds": 6,
-      "width": 2000,
-      "height": 1250
-    },
-    {
-      "src": "/food-builder/videos/e14-qualidade.mp4",
-      "title": "Entenda a qualidade dos dados da operação",
-      "seconds": 6,
-      "width": 2000,
-      "height": 1250
+      "src": "/food-builder/videos/demo-cenlo-intelligence.mp4",
+      "title": "Entenda padrões, oportunidades e qualidade dos dados",
+      "seconds": 50,
+      "width": 1280,
+      "height": 720
     }
   ],
   "forecasting": [
     {
-      "src": "/food-builder/videos/e14-previsoes.mp4",
-      "title": "Consulte as previsões e a disponibilidade de dados",
-      "seconds": 6,
-      "width": 2000,
-      "height": 1250
+      "src": "/food-builder/videos/demo-forecasting.mp4",
+      "title": "Veja as previsões e o histórico necessário para calculá-las",
+      "seconds": 31,
+      "width": 1280,
+      "height": 720
     }
   ],
   "insights-recommendations": [
     {
-      "src": "/food-builder/videos/e13-insights.mp4",
-      "title": "Leia os insights a partir dos relatórios",
-      "seconds": 6,
-      "width": 2000,
-      "height": 1250
+      "src": "/food-builder/videos/demo-insights-recommendations.mp4",
+      "title": "Dos números do período aos pontos que merecem atenção",
+      "seconds": 55,
+      "width": 1280,
+      "height": 720
     }
   ],
   "reports": [
     {
-      "src": "/food-builder/videos/e13-evolucao.mp4",
-      "title": "Compare a evolução dos pedidos",
-      "seconds": 6,
-      "width": 2000,
-      "height": 1250
-    },
-    {
-      "src": "/food-builder/videos/e13-produtos.mp4",
-      "title": "Confira o desempenho dos produtos",
-      "seconds": 7,
-      "width": 2000,
-      "height": 1250
+      "src": "/food-builder/videos/demo-reports.mp4",
+      "title": "Explore resultados, produtos e fechamentos da operação",
+      "seconds": 55,
+      "width": 1280,
+      "height": 720
     }
   ],
   "closings-summaries": [
     {
-      "src": "/food-builder/videos/e13-fechamentos.mp4",
-      "title": "Consulte os fechamentos do período",
-      "seconds": 7,
-      "width": 2000,
-      "height": 1250
-    },
-    {
-      "src": "/food-builder/videos/e21-numero.mp4",
-      "title": "Defina quem recebe o resumo do dia",
-      "seconds": 8,
-      "width": 2000,
-      "height": 1250
+      "src": "/food-builder/videos/demo-closings-summaries.mp4",
+      "title": "Receba o resumo da operação no fechamento do dia",
+      "seconds": 48,
+      "width": 1280,
+      "height": 720
     }
   ],
   "team-permissions": [
     {
-      "src": "/food-builder/videos/e22-convidar.mp4",
-      "title": "Convide uma pessoa com unidade e função definidas",
-      "seconds": 13,
-      "width": 2000,
-      "height": 1250
+      "src": "/food-builder/videos/demo-team-permissions.mp4",
+      "title": "Escolha os acessos e convide sua equipe",
+      "seconds": 46,
+      "width": 1280,
+      "height": 720
     }
   ],
   "help-training": [
     {
-      "src": "/food-builder/videos/e02-novo.mp4",
-      "title": "Exemplo do conteúdo de formação: registrar um pedido",
-      "seconds": 22,
-      "width": 2000,
-      "height": 1250
+      "src": "/food-builder/videos/demo-orders-core.mp4",
+      "title": "Dos filtros ao pedido registrado no painel",
+      "seconds": 53,
+      "width": 1280,
+      "height": 720
     }
   ]
 }

@@ -3,7 +3,7 @@ const base = process.env.FOOD_OFFER_API_URL || 'https://api-crm.cenlo.pt/crm/pub
 async function proxy(req: NextRequest, ctx: { params: Promise<{ path: string[] }> }) {
   const { path } = await ctx.params
   const route = path.join('/')
-  const allowed = /^(status|catalog|offers|requests|offers\/[a-f0-9-]{36}(\/events)?)$/.test(route)
+  const allowed = /^(status|catalog|offers|requests|evaluations|offers\/[a-f0-9-]{36}(\/events)?)$/.test(route)
   if (!allowed) return NextResponse.json({ message: 'Não encontrado.' }, { status: 404 })
   const body = req.method === 'POST' ? await req.text() : undefined
   if (body && Buffer.byteLength(body) > 16384) return NextResponse.json({ message: 'O pedido é muito grande.' }, { status: 413 })
