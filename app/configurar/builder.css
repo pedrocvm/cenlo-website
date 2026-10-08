@@ -724,3 +724,47 @@ textarea.fb-input { resize: vertical; min-height: 96px; }
   .fo-actions button { justify-content:center; }
   .fb-diagnostic-welcome .fb-link-btn { display:block; margin:14px 0 0; }
 }
+
+/* Payment calendar: separate setup installments from the recurring fee. */
+.fo-calendar { margin:28px 0 18px; padding:28px; border:1px solid rgba(255,106,44,.32); border-radius:18px; background:var(--surface); }
+.fo-calendar-heading { display:flex; align-items:center; gap:14px; }
+.fo-calendar-icon { display:grid; place-items:center; flex-shrink:0; width:44px; height:44px; border-radius:12px; color:var(--terra); background:var(--terraBg); }
+.fo-calendar-icon .fb-ico { background:none; border:0; }
+.fo-journey .fo-calendar-heading h2 { margin:5px 0 0; font-size:clamp(21px,3vw,26px); line-height:1.25; letter-spacing:-.03em; }
+.fo-calendar-method { margin-left:auto; flex-shrink:0; font-size:11px; font-weight:600; padding:6px 10px; border:1px solid var(--line); border-radius:7px; color:var(--ink2); }
+.fo-journey .fo-calendar-intro { margin:20px 0 16px; font-size:13px; color:var(--ink2); }
+.fo-journey .fo-schedule { display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:12px; list-style:none; padding:0; margin:0; }
+.fo-journey .fo-schedule li { min-width:0; margin:0; padding:20px; border:1px solid var(--line); border-radius:12px; background:var(--bg2); }
+.fo-journey .fo-schedule li:first-child { border-color:rgba(255,106,44,.4); background:linear-gradient(135deg,var(--terraBg),var(--bg2)); }
+.fo-schedule-label { display:flex; gap:9px; align-items:center; font-size:12px; color:var(--ink2); margin-bottom:16px; }
+.fo-schedule-label>span:first-child { display:grid; place-items:center; width:25px; height:25px; flex-shrink:0; border-radius:50%; border:1px solid var(--line); color:var(--terraD); font-size:10px; font-weight:600; font-variant-numeric:tabular-nums; }
+.fo-schedule strong { display:block; font-size:30px; font-weight:700; line-height:1.15; letter-spacing:-.04em; font-variant-numeric:tabular-nums; color:var(--ink); }
+.fo-schedule li:first-child strong { color:var(--terraD); }
+.fo-journey .fo-schedule li>p { margin:12px 0 0; font-size:12px; color:var(--ink2); line-height:1.7; }
+.fo-recurring { display:flex; align-items:center; justify-content:space-between; gap:24px; padding-top:22px; margin-top:22px; border-top:1px solid var(--line); }
+.fo-recurring-label { display:flex; align-items:center; gap:9px; font-size:14px; font-weight:600; }
+.fo-recurring-label .fb-ico { color:var(--terra); background:none; border:0; width:20px; height:20px; }
+.fo-journey .fo-recurring p { margin:7px 0 0; font-size:12px; color:var(--ink2); }
+.fo-recurring strong { font-size:26px; letter-spacing:-.03em; white-space:nowrap; font-variant-numeric:tabular-nums; }
+.fo-recurring strong small { font-size:12px; color:var(--ink2); font-weight:400; margin-left:4px; letter-spacing:0; }
+.fo-journey .fo-calendar-note { font-size:11px; color:var(--ink2); margin:16px 0 0; }
+.fo-journey .fo-offer-validity { margin:0 0 28px; padding:0 4px; font-size:12px; line-height:1.7; color:var(--ink2); }
+.fo-review-actions { display:flex; align-items:center; flex-wrap:wrap; gap:12px; margin-top:28px; }
+.fo-journey .fo-review-notice { margin:18px 0 0; font-size:12px; line-height:1.75; color:var(--ink2); max-width:680px; }
+@media(max-width:600px) {
+  .fo-calendar { padding:20px 16px; margin-top:24px; }
+  .fo-calendar-heading { gap:10px; flex-wrap:wrap; }
+  .fo-calendar-heading>div { flex:1; min-width:0; }
+  .fo-calendar-heading .fc-kicker { font-size:9px; }
+  .fo-calendar-icon { width:36px; height:36px; border-radius:10px; }
+  .fo-calendar-method { margin-left:46px; }
+  .fo-journey .fo-schedule { grid-template-columns:1fr; gap:10px; }
+  .fo-journey .fo-schedule li { padding:17px; }
+  .fo-schedule-label { margin-bottom:12px; }
+  .fo-schedule strong { font-size:28px; }
+  .fo-recurring { align-items:flex-start; flex-direction:column; gap:12px; }
+  .fo-review { padding:22px 18px; }
+  .fo-review-actions { flex-direction:column; align-items:stretch; gap:10px; margin-top:24px; }
+  .fo-review-actions .fb-btn { width:100%; justify-content:center; }
+  .fo-journey .fo-review-notice { margin-top:20px; }
+}
