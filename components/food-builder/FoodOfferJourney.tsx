@@ -258,7 +258,6 @@ export default function FoodOfferJourney({ entry = 'builder' }: { entry?: 'build
     {s && !editing && <>
       <p className="fb-lede">{s.reason}</p>
       <p className="fo-route">Suas escolhas <span aria-hidden="true">→</span> <strong>Sua oferta</strong> <span aria-hidden="true">→</span> Pedido de implantação</p>
-      <OfferValue selected={s.included.filter(c => s.composition.moduleIds.includes(c.id))} priority={s.composition.priority} diagnostic={journey.entry === 'diagnostic'} onDemo={() => event('food_demo_opened')} />
       <div className="fo-prices"><div><span>Implantação · {cash ? 'à vista' : 'parcelada'}</span><strong>{money(received ? received.snapshot.payment.totalCents : total)}</strong><small>Base: {money(s.setupCents)}{cash && s.payment.cash ? ` · ${s.payment.cash.discountPercent}% à vista` : ''}</small></div><div><span>Mensalidade por unidade</span><strong>{money(s.monthlyCents)}</strong><small>{s.policy.monthlyStart}</small></div></div>
       <p>{s.policy.taxText}</p>
       {!received && <fieldset className="fo-payment"><legend>Escolha como prefere pagar a implantação</legend><label><input type="radio" name="payment" checked={cash} onChange={() => { update({ payment: 'cash', submissionId: undefined }); setConfirmed(false) }} />À vista: {money(s.payment.cash?.cents ?? s.setupCents)}</label>{s.payment.split && <label><input type="radio" name="payment" checked={!cash} onChange={() => { update({ payment: 'split', submissionId: undefined }); setConfirmed(false) }} />Parcelado: total de {money(s.setupCents)}</label>}</fieldset>}
@@ -266,6 +265,7 @@ export default function FoodOfferJourney({ entry = 'builder' }: { entry?: 'build
       <p>Mensalidade: {s.policy.monthlyStart}</p><p>{s.policy.validityText}</p>
       {!received && !review && <div className="fo-actions"><button className="fb-btn fb-btn-primary" onClick={() => { setReview('implementation'); event('food_review_started') }}>Avançar com esta solução</button><button className="fb-btn fb-btn-ghost" onClick={() => { setEditing(true); setChangedConfirmed(false) }}>Ajustar os recursos</button><button className="fb-link-btn" onClick={() => { setReview('question'); event('food_review_started') }}>Ainda tenho uma dúvida</button></div>}
       {!review && <p className="fo-assurance">Você confere os dados no próximo passo. O pedido não realiza cobrança nem ativa uma conta.</p>}
+      {!review && <OfferValue selected={s.included.filter(c => s.composition.moduleIds.includes(c.id))} priority={s.composition.priority} diagnostic={journey.entry === 'diagnostic'} onDemo={() => event('food_demo_opened')} />}
       {review && !received && <form className="fo-review" onSubmit={submit}>
         <h2>{review === 'implementation' ? 'Sua solução está escolhida. Vamos organizar o próximo passo.' : 'O que você precisa entender antes de decidir?'}</h2>
         <p>{s.label} · Implantação {money(total)} · Mensalidade {money(s.monthlyCents)}. {cash ? 'À vista.' : 'Parcelado conforme os vencimentos acima.'}</p>
