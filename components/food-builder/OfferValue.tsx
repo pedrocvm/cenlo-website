@@ -3,29 +3,31 @@ import { useState } from 'react'
 import { MODULES } from '@/lib/food-builder/catalog'
 import { MODULE_BENEFITS } from '@/lib/food-builder/benefits'
 import { videosFor } from '@/lib/food-builder/videos'
+import { recommendationOrder } from '@/lib/food-builder/recommendation'
 import ModuleIcon from './ModuleIcon'
 import ModuleVideos from './ModuleVideos'
 
 type Item = { id: string; label: string; condition?: string }
 const priorities: Record<string, string> = {
-  atendimento: 'Dar mais atenção ao cliente, mesmo no horário de movimento.',
+  atendimento: 'Da conversa ao pedido organizado para a cozinha.',
   erros: 'Organizar os pedidos e reduzir o trabalho de repassar informações.',
   cozinha: 'Deixar mais claro o que entrou e o que precisa ser preparado.',
   entregas: 'Organizar o caminho do pedido até a entrega.',
-  salao: 'Dar mais fluidez ao atendimento no salão.',
-  retorno: 'Criar uma relação com quem já comprou de você.',
+  salao: 'Dar mais fluidez ao atendimento à mesa.',
+  retorno: 'Dar aos seus clientes um motivo para voltar.',
   direto: 'Fortalecer os canais de pedido do seu restaurante.',
   movimento: 'Preparar sua operação para receber e atender melhor os clientes.',
 }
 export default function OfferValue({ selected, priority, diagnostic, onDemo, offered = true }: { selected: Item[]; priority: string; diagnostic: boolean; onDemo: () => void; offered?: boolean }) {
   const [active, setActive] = useState<string | null>(null)
-  const cards = [...selected.filter(c => c.id !== 'orders-core'), ...selected.filter(c => c.id === 'orders-core')].slice(0, 3)
+  const order = recommendationOrder(priority)
+  const cards = [...selected].sort((a, b) => (order.indexOf(a.id) < 0 ? 99 : order.indexOf(a.id)) - (order.indexOf(b.id) < 0 ? 99 : order.indexOf(b.id))).slice(0, 3)
   return <section className="fv" aria-label="O valor da sua solução">
-    <span className="fc-kicker">{diagnostic ? 'Do seu diagnóstico à prática' : 'O que suas escolhas resolvem'}</span>
+    <span className="fc-kicker">{diagnostic ? 'Do seu diagnóstico à prática' : 'Das suas escolhas à prática'}</span>
     <h2>{priorities[priority] || 'Uma operação mais organizada começa pelas suas escolhas.'}</h2>
-    <p className="fv-intro">Veja alguns destaques dos recursos que você escolheu. Confira como podem ajudar na rotina e veja as condições de cada um.</p>
+    <p className="fv-intro">Estes recursos respondem à sua prioridade. Veja as gravações do produto com dados de demonstração, sem deixar contacto.</p>
     <div className="fv-cards">{cards.map(c => {
-      const m = MODULES.find(m => m.id === (c.id === 'conversation-order' ? 'whatsapp-assistant' : c.id))
+      const m = MODULES.find(m => m.id === (c.id === 'conversation-order' ? 'whatsapp-assistant' : c.id === 'online-ordering' ? 'ordering-site' : c.id))
       const videos = m ? videosFor(m.id) : []
       const open = active === c.id
       return <article key={c.id} className={open ? 'is-open' : ''}>
