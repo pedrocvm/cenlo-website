@@ -1,0 +1,44 @@
+{
+  "food/diagnostico.html": {
+    "status": 200,
+    "matchesSource": true,
+    "sha256": "85eea850acf1ad7eab54be68def9077b952035e05328eb309c840434831137df"
+  },
+  "shared/food-acquisition.js": {
+    "status": 200,
+    "matchesSource": true,
+    "sha256": "c4c8a3f23df3fbe238db15f2320aa9b6e17a8d4d7c43bc1d69dec061309e5d86"
+  },
+  "shared/food-acquisition-core.js": {
+    "status": 200,
+    "matchesSource": true,
+    "sha256": "96275215716cac4e1adb5bb0e8c5cc9669df8c1ff44a3d3f2f492866bfc353a8"
+  },
+  "shared/acquisition.js": {
+    "status": 200,
+    "matchesSource": true,
+    "sha256": "659ab86fba3c07cfc3affac72425da3601c69789e57e5183a8e1d18e69326446"
+  },
+  "beautyUnchanged": true,
+  "commercialSnapshotUnchanged": true,
+  "crmLoginStatus": 200,
+  "offerActions": {
+    "offerId": "a78b3ff1-84ce-4e21-8480-02a72863763f",
+    "isTest": true,
+    "actions": {
+      "implementation": {
+        "whatsapp": true,
+        "correctPhone": true,
+        "offerReference": true,
+        "shareLink": true
+      },
+      "demonstration": {
+        "whatsapp": true,
+        "correctPhone": true,
+        "offerReference": true,
+        "shareLink": true
+      }
+    },
+    "sharedPageStatus": 200
+  }
+}
