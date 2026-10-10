@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
 import { BASE_SELECTION_IDS, readSelection, replaceSelection, mergeSelectionIntoComposition } from './selection'
 import ModuleIcon from './ModuleIcon'
+import IncludedBase from './IncludedBase'
 import AnimatedDetails from './AnimatedDetails'
 import OfferValue from './OfferValue'
 import LoyaltyGift, { type LoyaltyPromotion } from './LoyaltyGift'
@@ -236,6 +237,9 @@ export default function FoodOfferJourney({ entry = 'builder' }: { entry?: 'build
   const contact = journey.contact || { name: '', business: '', phone: '', email: '' }
   const received = journey.receipt
   const removed = journey.offer?.snapshot.composition.moduleIds.filter(id => !composition.moduleIds.includes(id)) || []
+  const baseCaps = caps.filter(c => c.plan === 'essential')
+  const optionalGroups = GROUPS.map(group => ({ ...group, items: caps.filter(c => c.plan !== 'essential' && (MODULES.find(m => m.id === c.id)?.group || (c.id === 'menu-import' ? 'structure' : 'operations')) === group.id) })).filter(group => group.items.length)
+  const selectedExtras = composition.moduleIds.filter(id => !BASE_SELECTION_IDS.includes(id) && !baseCaps.some(c => c.id === id))
   async function submit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
     if (!confirmed || !review || !journey?.offer || lock.current || promotionExpired || promotionChecking) return
@@ -311,18 +315,22 @@ export default function FoodOfferJourney({ entry = 'builder' }: { entry?: 'build
       <p className="fc-intro">{journey.entry === 'diagnostic' ? 'Trouxemos as escolhas do seu diagnóstico. Confira os itens marcados e adicione ou retire o que fizer sentido. Na próxima etapa, pode conferir a oferta e os valores atualizados.' : 'Escolha o que faz sentido para o seu restaurante. Na próxima etapa, pode conferir a solução e os valores.'}</p>
       <div className="fc-layout"><div className="fc-main">
         <section className="fc-operation" aria-labelledby="fc-operation-title"><div className="fc-section-label"><ModuleIcon name="stores" /><div><span>01 · Sua operação</span><h2 id="fc-operation-title">Vamos começar pelo básico.</h2></div></div><div className="fo-fields"><label>Quantas unidades?<input type="number" min="1" max="200" value={composition.units} onChange={e => editComposition({ ...composition, units: Number(e.target.value) })} /></label><label>Precisa conectar outro sistema?<select value={composition.integration} onChange={e => editComposition({ ...composition, integration: e.target.value })}><option value="none">Não preciso de integração</option><option value="required">Sim, é indispensável</option><option value="unknown">Ainda não sei</option></select></label></div></section>
-        <div className="fc-section-label fc-resource-heading"><span className="fc-section-number">02</span><div><span>Os recursos da sua solução</span><h2>O que não pode faltar?</h2></div></div>
-        <div className="fc-groups">{GROUPS.map((group, index) => {
-          const items = caps.filter(c => (MODULES.find(m => m.id === c.id)?.group || (c.id === 'menu-import' ? 'structure' : 'operations')) === group.id)
-          if (!items.length) return null
+        <IncludedBase items={baseCaps} />
+        <section className="fc-extras" aria-labelledby="fc-extras-title">
+        <div className="fc-section-label fc-resource-heading"><span className="fc-section-number">02</span><div><span>Personalize a sua solução</span><h2 id="fc-extras-title">O que quer adicionar?</h2></div></div>
+        <p className="fc-extras-intro">Escolha os recursos adicionais que fazem sentido para o seu negócio. A base já está garantida.</p>
+        {!caps.length && !error && <p role="status" className="fc-extras-intro">A carregar os recursos disponíveis…</p>}
+        <div className="fc-groups">{optionalGroups.map((group, index) => {
+          const items = group.items
           const selected = items.filter(c => composition.moduleIds.includes(c.id)).length
           return <AnimatedDetails className="fc-group" key={group.id} open={index === 0}><summary><ModuleIcon name={MODULES.find(m => m.group === group.id)?.icon || 'orders'} /><span className="fc-group-title">{group.title}<small>{items.length} recursos disponíveis para escolher</small></span><span className={`fc-group-count${selected ? ' has-selection' : ''}`}>{selected ? `${selected} ${selected === 1 ? 'selecionado' : 'selecionados'}` : 'Explorar'}</span><span className="fc-chevron" aria-hidden="true">⌄</span></summary><div className="fc-cards">{items.map(c => {
             const checked = composition.moduleIds.includes(c.id)
-            return <article className={`fc-card${checked ? ' is-selected' : ''}`} key={c.id}><label><ModuleIcon name={MODULES.find(m => m.id === c.id)?.icon || 'orders'} /><span className="fc-card-title">{c.label}<span className="fc-card-benefit">{MODULE_BENEFITS[c.id]}</span><small>{c.id === 'loyalty' && campaignActive && composition.moduleIds.every(id => BASE_SELECTION_IDS.includes(id) || id === 'loyalty') ? 'Presente no Essential · por tempo limitado' : c.plan === 'essential' ? 'Básico · já incluído em todos os planos' : c.state === 'evaluation' ? 'Sujeito a confirmação' : checked ? 'Na sua seleção' : 'Adicionar à solução'}</small></span><input type="checkbox" checked={checked} disabled={c.plan === 'essential'} onChange={e => editComposition({ ...composition, moduleIds: e.target.checked ? [...composition.moduleIds, c.id] : composition.moduleIds.filter(x => x !== c.id) })} /></label>{c.condition && <AnimatedDetails className="fc-card-detail"><summary>O que considerar <span aria-hidden="true">+</span></summary><p>{c.condition}</p></AnimatedDetails>}</article>
+            return <article className={`fc-card${checked ? ' is-selected' : ''}`} key={c.id}><label><ModuleIcon name={MODULES.find(m => m.id === c.id)?.icon || 'orders'} /><span className="fc-card-title">{c.label}<span className="fc-card-benefit">{MODULE_BENEFITS[c.id]}</span><small>{c.id === 'loyalty' && campaignActive && composition.moduleIds.every(id => BASE_SELECTION_IDS.includes(id) || id === 'loyalty') ? 'Presente no Essential · por tempo limitado' : c.state === 'evaluation' ? 'Sujeito a confirmação' : checked ? 'Na sua seleção' : 'Adicionar à solução'}</small></span><input type="checkbox" checked={checked} onChange={e => editComposition({ ...composition, moduleIds: e.target.checked ? [...composition.moduleIds, c.id] : composition.moduleIds.filter(x => x !== c.id) })} /></label>{c.condition && <AnimatedDetails className="fc-card-detail"><summary>O que considerar <span aria-hidden="true">+</span></summary><p>{c.condition}</p></AnimatedDetails>}</article>
           })}</div></AnimatedDetails>
         })}</div>
+        </section>
       </div>
-      <aside className={`fc-selection${cartOpen ? ' is-open' : ''}`} aria-label="Sua seleção" onKeyDown={e => { if (e.key === 'Escape') { setCartOpen(false); cartToggle.current?.focus() } }}><div className="fc-cart-panel" id="fc-cart-details"><div className="fc-cart-content"><span className="fc-kicker">Montado por si</span><div className="fc-selection-title"><h2 id="fc-selection-title">Sua seleção</h2><span aria-live="polite">{composition.moduleIds.length}</span></div><p>A base completa já está incluída. Adicione o que precisa e veja o menor plano que atende à sua operação.</p><ul className="fc-selected-list">{composition.moduleIds.map(id => <li key={id}><span aria-hidden="true">✓</span>{caps.find(c => c.id === id)?.label || MODULES.find(m => m.id === id)?.title || 'Recurso selecionado'}</li>)}</ul>
+      <aside className={`fc-selection${cartOpen ? ' is-open' : ''}`} aria-label="Sua seleção" onKeyDown={e => { if (e.key === 'Escape') { setCartOpen(false); cartToggle.current?.focus() } }}><div className="fc-cart-panel" id="fc-cart-details"><div className="fc-cart-content"><span className="fc-kicker">Montado por si</span><div className="fc-selection-title"><h2 id="fc-selection-title">Seus adicionais</h2><span aria-live="polite">{selectedExtras.length}</span></div><p>Os recursos que escolheu para complementar a base.</p><div className="fc-cart-base"><span aria-hidden="true">✓</span> Base incluída em todos os planos</div>{selectedExtras.length ? <ul className="fc-selected-list">{selectedExtras.map(id => <li key={id}><span aria-hidden="true">✓</span>{caps.find(c => c.id === id)?.label || MODULES.find(m => m.id === id)?.title || 'Recurso selecionado'}</li>)}</ul> : <p className="fc-selection-empty">Nenhum adicional por enquanto. Pode continuar só com a base ou escolher os recursos nesta página.</p>}
       {journey.offer && removed.length > 0 && <AnimatedDetails className="fc-changes"><summary>{removed.length} {removed.length === 1 ? 'item retirado' : 'itens retirados'} nesta revisão <span aria-hidden="true">+</span></summary><p>{removed.map(id => caps.find(c => c.id === id)?.label || id).join(', ')}.</p></AnimatedDetails>}
       {(journey.offer || journey.previousOfferId) && <label className="fc-confirm"><input type="checkbox" checked={changedConfirmed} onChange={e => setChangedConfirmed(e.target.checked)} /><span>Confirmo minhas alterações e quero conferir a nova oferta.</span></label>}
       <button className="fc-continue fc-desktop-continue" disabled={busy || !caps.length || (!!(journey.offer || journey.previousOfferId) && !changedConfirmed)} onClick={() => void issue(journey, composition, changedConfirmed)}>{busy ? 'A preparar sua oferta…' : <>Ver minha oferta <span aria-hidden="true">→</span></>}</button>
@@ -330,7 +338,7 @@ export default function FoodOfferJourney({ entry = 'builder' }: { entry?: 'build
       <p className="fc-footnote">Pode conferir os valores antes de decidir. Nada é cobrado nesta etapa.</p></div></div>
       <div className="fc-cart-bar">
         <button ref={cartToggle} type="button" className="fc-cart-toggle" aria-expanded={cartOpen} aria-controls="fc-cart-details" onClick={() => setCartOpen(!cartOpen)}>
-          <span><small>Sua seleção</small><strong aria-live="polite">{composition.moduleIds.length} {composition.moduleIds.length === 1 ? 'item' : 'itens'}</strong></span>
+          <span><small>Base incluída · seus adicionais</small><strong aria-live="polite">{selectedExtras.length} {selectedExtras.length === 1 ? 'adicional' : 'adicionais'}</strong></span>
           <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="m6 15 6-6 6 6" /></svg>
         </button>
         <button type="button" className="fc-continue fc-mobile-continue" disabled={busy || !caps.length} onClick={() => {
