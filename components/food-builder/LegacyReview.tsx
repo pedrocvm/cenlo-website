@@ -2,12 +2,13 @@
 import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { BASE_MODULES, BUSINESS_TYPES, GROUPS, MODULES } from '@/lib/food-builder/catalog'
+import { BUSINESS_TYPES, GROUPS, MODULES } from '@/lib/food-builder/catalog'
 import { normalizePhone, type FieldError } from '@/lib/food-builder/submission'
 import ModuleIcon from './ModuleIcon'
-import { removeModule, useSelection } from './selection'
+import { BASE_SELECTION_MODULES, removeModule, useSelection } from './selection'
 import { TierBadge } from './SelectToggle'
 import { readAttribution } from './CaptureAttribution'
+import IncludedBase from './IncludedBase'
 
 export const SENT_KEY = 'cenlo-food-builder:sent:v1'
 
@@ -129,23 +130,8 @@ export default function LegacyReview() {
 
       <div className="fb-review-grid">
         <div>
-          <div className="fb-rgroup">
-            <h2>Base Cenlo Food incluída · {BASE_MODULES.length} módulos</h2>
-            <div className="fb-ritem fb-base-box">
-              {GROUPS.map(g => {
-                const items = BASE_MODULES.filter(m => m.group === g.id)
-                if (!items.length) return null
-                return (
-                  <div key={g.id} className="fb-base-row">
-                    <span>{g.title}</span>
-                    <ul className="fb-chips">
-                      {items.map(m => <li key={m.id}><Link href={`/configurar/${m.slug}`} className="fb-chip">✓ {m.title}</Link></li>)}
-                    </ul>
-                  </div>
-                )
-              })}
-            </div>
-          </div>
+          <IncludedBase items={BASE_SELECTION_MODULES.map(m => ({ id: m.id, label: m.title }))} />
+          <div className="fc-section-label fc-resource-heading"><div><span>Personalize a sua solução</span><h2>Seus módulos adicionais</h2></div></div>
 
           {GROUPS.map(g => {
             const items = selected.filter(m => m.group === g.id)
