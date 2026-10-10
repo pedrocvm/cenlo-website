@@ -634,6 +634,14 @@ textarea.fb-input { resize: vertical; min-height: 96px; }
 .fm-video-toolbar button,.fm-video-chapters button,.fm-video-next button,.fm-next-arrow { transition:transform .18s ease-out,background .18s ease; }
 .fm-video-toolbar button:hover,.fm-video-next button:hover { background:var(--terraBg); }
 .fm-next-link:hover .fm-next-arrow { transform:translateX(4px); }
+.fm-module-nav { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr)); gap:12px; margin-top:22px; }
+.fm-module-nav .fm-next-link { margin-top:0; }
+.fm-prev-link { background:var(--surface2); border-color:var(--line); }
+.fm-prev-link:hover { background:var(--terraBg); border-color:var(--terra); }
+.fm-prev-link .fm-next-arrow { background:var(--line2); }
+.fm-prev-link:hover .fm-next-arrow { transform:translateX(-4px); }
+@media(max-width:600px) { .fm-module-nav { grid-template-columns:minmax(0,1fr); margin-top:18px; } }
+
 .fm-video-toolbar button:active,.fm-video-chapters button:active { transform:scale(.98); }
 .fr-details summary>b,.fc-card-detail summary>span,.fc-changes summary>span,.fc-chevron { transition:transform .3s cubic-bezier(.22,1,.36,1); }
 @keyframes fm-reveal { from { opacity:0; transform:translateY(5px); } to { opacity:1; transform:translateY(0); } }
