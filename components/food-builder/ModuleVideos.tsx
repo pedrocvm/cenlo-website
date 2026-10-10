@@ -4,8 +4,8 @@ import { useRouter } from 'next/navigation'
 import type { ModuleVideo } from '@/lib/food-builder/videos'
 
 const duration = (seconds: number) => `${Math.floor(seconds / 60)}:${String(Math.floor(seconds % 60)).padStart(2, '0')}`
-type NextModule = { href: string; title: string }
-export default function ModuleVideos({ videos, title, poster, nextModule }: { videos: ModuleVideo[]; title: string; poster?: string; nextModule?: NextModule }) {
+type ModuleDestination = { href: string; title: string }
+export default function ModuleVideos({ videos, title, poster, nextModule, previousModule }: { videos: ModuleVideo[]; title: string; poster?: string; nextModule?: ModuleDestination; previousModule?: ModuleDestination }) {
   const router = useRouter()
   const player = useRef<HTMLVideoElement>(null)
   const container = useRef<HTMLDivElement>(null)
@@ -69,7 +69,10 @@ export default function ModuleVideos({ videos, title, poster, nextModule }: { vi
     {failed && <p className="fb-note">Não foi possível carregar a gravação. <a href={video.src}>Abrir vídeo</a></p>}
     <p key={video.title} className="fm-video-caption">{video.title}</p>
     {videos.length > 1 && <div className="fm-video-chapters" role="group" aria-label="Escolher trecho">{videos.map((clip,i) => <button key={clip.src} type="button" aria-pressed={i===index} onClick={() => select(i)}><span aria-hidden="true">{i===index ? '▶' : String(i+1).padStart(2,'0')}</span><span>{clip.title}</span><small>{duration(clip.seconds)}</small></button>)}</div>}
-    {nextModule && countdown === null && <button className="fm-next-link" type="button" onClick={() => router.push(nextModule.href)}><span className="fm-next-copy"><small>Próximo módulo</small><strong>{nextModule.title}</strong></span><span className="fm-next-arrow" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M13 6l6 6-6 6" /></svg></span></button>}
+    {(previousModule || (nextModule && countdown === null)) && <nav className="fm-module-nav" aria-label="Navegar pelas demonstrações">
+      {previousModule && <button className="fm-next-link fm-prev-link" type="button" onClick={() => { setCountdown(null); player.current?.pause(); router.push(previousModule.href) }}><span className="fm-next-arrow" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5m6-6-6 6 6 6" /></svg></span><span className="fm-next-copy"><small>Módulo anterior</small><strong>{previousModule.title}</strong></span></button>}
+      {nextModule && countdown === null && <button className="fm-next-link" type="button" onClick={() => router.push(nextModule.href)}><span className="fm-next-copy"><small>Próximo módulo</small><strong>{nextModule.title}</strong></span><span className="fm-next-arrow" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M13 6l6 6-6 6" /></svg></span></button>}
+    </nav>}
     <p className="fb-note">Gravações do produto com dados de demonstração. As condições de configuração e ativação continuam valendo para cada recurso.</p>
   </div>
 }
