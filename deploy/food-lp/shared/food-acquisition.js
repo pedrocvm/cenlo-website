@@ -31,7 +31,7 @@ window.CenloAcquisition={
 };
 // Preferences remain accessible in the footer; collapsed consent never floats over content.
 const trigger=document.createElement('button');trigger.type='button';trigger.className='food-privacy-preferences';trigger.textContent='Preferências de privacidade';trigger.setAttribute('aria-controls','food-privacy');trigger.setAttribute('aria-expanded','false');
-let footer=document.querySelector('.fb-footer nav, footer nav, footer');
+let footer=document.querySelector('.fb-footer nav')||document.querySelector('footer nav')||document.querySelector('footer');
 if(!footer){footer=document.createElement('footer');footer.className='food-privacy-footer';document.body.append(footer);}
 footer.append(trigger);
 trigger.addEventListener('click',()=>document.querySelector('#food-privacy .privacy-toggle')?.click());
