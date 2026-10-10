@@ -173,10 +173,10 @@ export class AcquisitionClient {
     return out.href;
   }
 }
-export function consentControls(client, mount, { privacyUrl='https://pedro.cenlo.pt/privacidade.html', enabled=true }={}) {
+export function consentControls(client, mount, { privacyUrl='https://pedro.cenlo.pt/privacidade.html', enabled=true, onExpandedChange=()=>{} }={}) {
   const box=document.createElement('div');box.className='consent-controls';mount.append(box);const choice=storageGet('cenlo-acquisition-choice-v1');let expanded=enabled&&(!choice||(choice==='accepted'&&!client.receipt)),feedback='',metaChecked=false;
   const draw=()=>{
-    box.replaceChildren();const toggle=document.createElement('button');toggle.type='button';toggle.className='privacy-toggle';toggle.textContent='Privacidade';toggle.addEventListener('click',()=>{expanded=!expanded;draw();});box.append(toggle);
+    box.replaceChildren();const toggle=document.createElement('button');toggle.type='button';toggle.className='privacy-toggle';toggle.textContent='Privacidade';toggle.addEventListener('click',()=>{expanded=!expanded;draw();});toggle.setAttribute('aria-expanded',String(expanded));box.append(toggle);onExpandedChange(expanded);
     if (!expanded) return;
     const p=document.createElement('p');p.textContent=feedback||(!enabled&&!client.receipt?'A medição está desativada nesta experiência. Pode usar a bio, o teste, o diagnóstico e o contacto normalmente.':'Pode usar tudo sem medição. Se permitir, o Cenlo acompanha cliques e etapas entre a bio, o teste e o diagnóstico por até 90 dias. Pode retirar aqui a qualquer momento.'+(client.receipt?(client.marketing?' Também autorizou a Meta a usar estes dados para anúncios.':' A Meta não recebe nada.'):''));box.append(p);
     if(enabled&&!client.receipt){const label=document.createElement('label');label.className='consent-meta';const cb=document.createElement('input');cb.type='checkbox';cb.checked=metaChecked;cb.addEventListener('change',()=>{metaChecked=cb.checked;});label.append(cb,document.createTextNode(' Também deixar a Meta usar estes dados para mostrar anúncios do Cenlo no Instagram e no Facebook.'));box.append(label);}
