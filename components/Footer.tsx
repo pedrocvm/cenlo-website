@@ -31,6 +31,7 @@ export default function Footer() {
             <h2>Cenlo</h2>
             <ul>
               <li><Link href="/produtos">Produtos</Link></li>
+              <li><Link href="/demo">Demo ao vivo</Link></li>
               <li><Link href="/sobre">Sobre</Link></li>
               <li><Link href="/contacto">Contato</Link></li>
             </ul>

@@ -2,7 +2,7 @@ import type { MetadataRoute } from 'next'
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const base = 'https://cenlo.pt'
-  const routes = ['', '/produtos', '/sobre', '/contacto', '/politica-de-privacidade', '/termos']
+  const routes = ['', '/produtos', '/demo', '/sobre', '/contacto', '/politica-de-privacidade', '/termos']
   const legal = ['/politica-de-privacidade', '/termos']
   return routes.map(r => ({
     url: `${base}${r}`,

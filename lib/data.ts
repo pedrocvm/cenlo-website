@@ -12,6 +12,7 @@ export type Product = {
   notes: { title: string; desc: string }[]
   cta: { label: string; href: string }
   secondary: { label: string; href: string }
+  demo?: { place: string; kind: string; url: string }
 }
 
 export const products: Product[] = [
@@ -33,8 +34,9 @@ export const products: Product[] = [
       { title: 'Pizza tem tratamento próprio.', desc: 'Inteira ou meio a meio com até dois sabores, extras por tamanho, convivendo com o resto do cardápio.' },
       { title: 'Os apps de entrega podem ficar.', desc: 'Bolt Food, Uber Eats, Glovo e Wolt trazem cliente novo. O Cenlo Food organiza os canais que são seus.' },
     ],
-    cta: { label: 'Fazer o diagnóstico grátis', href: 'https://cenlofood.cenlo.pt/#diagnostico' },
+    cta: { label: 'Fazer o diagnóstico grátis', href: 'https://cenlofood.cenlo.pt/diagnostico' },
     secondary: { label: 'Conhecer o Cenlo Food', href: 'https://cenlofood.cenlo.pt/' },
+    demo: { place: 'Bella Napoli', kind: 'pizzaria de demonstração', url: 'https://food.cenlo.pt/demo/food' },
   },
   {
     id: 'beauty',
@@ -54,8 +56,9 @@ export const products: Product[] = [
       { title: 'A foto chega antes do horário.', desc: 'Ela pediu gel e a unha pede o dobro? A foto ajusta o tempo antes de a hora ser fechada.' },
       { title: 'Fresha e Booksy podem ficar.', desc: 'Trazem cliente nova, e a nota que você já tem lá aparece na sua vitrine.' },
     ],
-    cta: { label: 'Fazer o diagnóstico grátis', href: 'https://cenlobeauty.cenlo.pt/#diagnostico' },
+    cta: { label: 'Fazer o diagnóstico grátis', href: 'https://cenlobeauty.cenlo.pt/diagnostico' },
     secondary: { label: 'Conhecer o Cenlo Beauty', href: 'https://cenlobeauty.cenlo.pt/' },
+    demo: { place: 'Studio Aurora', kind: 'studio de demonstração', url: 'https://cenlobeauty.cenlo.pt/demo' },
   },
   {
     id: 'fornada',

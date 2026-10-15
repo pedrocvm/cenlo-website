@@ -119,6 +119,7 @@ export default function Home() {
                       <a href={p.cta.href} className="btn btn-primary">{p.cta.label} <Arrow /></a>
                       <a href={p.secondary.href} className="btn btn-line">{p.secondary.label}</a>
                     </div>
+                    {p.demo && <Link href={`/demo?produto=${p.id}`} className="text-link panel-demo">Testar a demo ao vivo <Arrow /></Link>}
                   </div>
                   <div className="panel-media">
                     <ProductVisual id={p.id} />

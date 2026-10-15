@@ -59,6 +59,7 @@ export default function ProdutosPage() {
                 <a href={p.cta.href} className="btn btn-primary">{p.cta.label} <Arrow /></a>
                 <a href={p.secondary.href} className="btn btn-ghost">Ver o site</a>
               </div>
+              {p.demo && <Link href={`/demo?produto=${p.id}`} className="text-link" data-reveal style={{ justifySelf: 'start' }}>Testar a demo ao vivo da {p.demo.place} <Arrow /></Link>}
             </div>
             <div className="pdetail-main">
               <div className="pdetail-media" data-reveal>
