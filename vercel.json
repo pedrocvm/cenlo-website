@@ -7,6 +7,16 @@
       "permanent": true
     },
     {
+      "source": "/food",
+      "destination": "https://cenlofood.cenlo.pt/",
+      "permanent": false
+    },
+    {
+      "source": "/beauty",
+      "destination": "https://cenlobeauty.cenlo.pt/",
+      "permanent": false
+    },
+    {
       "source": "/pedro",
       "destination": "https://pedro.cenlo.pt",
       "permanent": false
@@ -25,16 +35,6 @@
       "source": "/food/montar/:path*",
       "destination": "https://cenlofood.cenlo.pt/configurar/:path*",
       "permanent": false
-    }
-  ],
-  "rewrites": [
-    {
-      "source": "/food",
-      "destination": "https://pedro.cenlo.pt/food"
-    },
-    {
-      "source": "/beauty",
-      "destination": "https://pedro.cenlo.pt/beauty"
     }
   ]
 }
