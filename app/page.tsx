@@ -146,7 +146,6 @@ export default function Home() {
           <div className="wrap">
             <div className="film" data-reveal>
               <video autoPlay muted loop playsInline preload="metadata" poster="/media/cenlo-central-poster.jpg" aria-label="Animação: mensagens de vários canais entram na Cenlo e saem como pedido, marcação e aviso de fornada">
-                <source src="/media/cenlo-central.webm" type="video/webm" />
                 <source src="/media/cenlo-central.mp4" type="video/mp4" />
               </video>
             </div>
