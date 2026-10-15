@@ -9,43 +9,45 @@ export default function Footer() {
   if (usePathname().startsWith('/configurar')) return null
 
   return (
-    <footer style={{ background: 'var(--panel)', color: '#E8DECE', marginTop: 'auto' }}>
-      <div style={{ maxWidth: 1160, margin: '0 auto', padding: '56px 24px 30px' }}>
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 40, justifyContent: 'space-between' }}>
-          <div style={{ maxWidth: 340 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
+    <footer className="site-footer">
+      <div className="wrap">
+        <div className="footer-top">
+          <div>
+            <Link href="/" className="brand" aria-label="Cenlo, início">
               <Logo />
-              <span style={{ fontFamily: 'var(--font-schibsted)', fontWeight: 800, fontSize: 21, color: '#fff' }}>Cenlo</span>
-            </div>
-            <p style={{ fontSize: 14.5, color: '#C7BCAB', lineHeight: 1.6 }}>
-              Centrais inteligentes para organizar atendimento, clientes e operação diária, e faturar mais. Construído em Portugal, para quem atende clientes todos os dias.
-            </p>
+              <span className="brand-word">Cenlo</span>
+            </Link>
+            <p>Centrais para negócios locais. Feito em Portugal, para quem atende cliente todo dia.</p>
           </div>
-
-          <div style={{ display: 'flex', gap: 54, flexWrap: 'wrap' }}>
-            <div>
-              <div style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: '.1em', color: '#B7AC9A', marginBottom: 14 }}>Produtos</div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 11, fontSize: 14.5 }}>
-                <Link href="/pizza" style={{ color: '#E8DECE' }}>Cenlo Pizza</Link>
-                <Link href="/produtos" style={{ color: '#E8DECE' }}>Cenlo Food</Link>
-                <Link href="/produtos" style={{ color: '#E8DECE' }}>Cenlo Night</Link>
-                <Link href="/produtos" style={{ color: '#E8DECE' }}>Cenlo Services</Link>
-              </div>
-            </div>
-            <div>
-              <div style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: '.1em', color: '#B7AC9A', marginBottom: 14 }}>Empresa</div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 11, fontSize: 14.5 }}>
-                <Link href="/sobre" style={{ color: '#E8DECE' }}>Sobre</Link>
-                <Link href="/contacto" style={{ color: '#E8DECE' }}>Contacto</Link>
-                <button onClick={openModal} style={{ background: 'none', border: 'none', color: '#E8DECE', textAlign: 'left', padding: 0, fontSize: 14.5, cursor: 'pointer' }}>Política de Privacidade</button>
-                <Link href="/termos" style={{ color: '#E8DECE' }}>Termos</Link>
-              </div>
-            </div>
+          <div className="footer-col">
+            <h2>Produtos</h2>
+            <ul>
+              <li><a href="https://cenlofood.cenlo.pt/">Cenlo Food</a></li>
+              <li><a href="https://cenlobeauty.cenlo.pt/">Cenlo Beauty</a></li>
+              <li><a href="https://fornadacerta.cenlo.pt/">Fornada Certa</a></li>
+            </ul>
+          </div>
+          <div className="footer-col">
+            <h2>Cenlo</h2>
+            <ul>
+              <li><Link href="/produtos">Produtos</Link></li>
+              <li><Link href="/sobre">Sobre</Link></li>
+              <li><Link href="/contacto">Contato</Link></li>
+            </ul>
+          </div>
+          <div className="footer-col">
+            <h2>Legal</h2>
+            <ul>
+              <li><button type="button" onClick={openModal}>Privacidade</button></li>
+              <li><Link href="/termos">Termos</Link></li>
+              <li><a href="mailto:ola@cenlo.pt">ola@cenlo.pt</a></li>
+            </ul>
           </div>
         </div>
-
-        <div style={{ borderTop: '1px solid #3A322A', marginTop: 38, paddingTop: 22 }}>
-          <span style={{ fontSize: 13, color: '#B7AC9A' }}>© 2026 Cenlo · central + local</span>
+        <div className="footer-word" aria-hidden="true">cenlo</div>
+        <div className="footer-bottom">
+          <span>© 2026 Cenlo · central + local</span>
+          <span>Feito em Portugal</span>
         </div>
       </div>
     </footer>

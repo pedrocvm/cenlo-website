@@ -1,8 +1,8 @@
-export default function Logo({ size = 26 }: { size?: number }) {
+export default function Logo({ size = 28, arc = 'currentColor', dot = '#F26522' }: { size?: number; arc?: string; dot?: string }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M17.8 7.2 A 7.5 7.5 0 1 0 17.8 16.8" fill="none" stroke="#FF6A2C" strokeWidth="3" strokeLinecap="round" />
-      <circle cx="13.4" cy="12" r="2.6" fill="#FF6A2C" />
+    <svg width={size} height={size} viewBox="0 0 48 48" aria-hidden="true">
+      <path className="logo-arc" d="M35.4 17.1 A13.2 13.2 0 1 0 35.4 30.9" fill="none" stroke={arc} strokeWidth="5.1" strokeLinecap="round" />
+      <circle className="logo-dot" cx="26.6" cy="24" r="5.7" fill={dot} />
     </svg>
   )
 }

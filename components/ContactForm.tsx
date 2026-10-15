@@ -6,14 +6,15 @@ type Form = { nome: string; negocio: string; cidade: string; segmento: string; t
 
 const empty: Form = { nome: '', negocio: '', cidade: '', segmento: '', telefone: '', email: '', mensagem: '' }
 
-type Field = { key: keyof Omit<Form,'mensagem'>; label: string; ph: string; type?: string; required?: boolean; pattern?: string; title?: string }
+const segments = ['Restaurante ou delivery', 'Studio de beleza', 'Padaria', 'Outro tipo de negócio']
+
+type Field = { key: 'nome' | 'negocio' | 'cidade' | 'telefone' | 'email'; label: string; ph: string; type?: string; required?: boolean; pattern?: string; title?: string; auto?: string }
 const fields: Field[] = [
-  { key: 'nome',     label: 'Nome *',            ph: 'O seu nome',          required: true },
-  { key: 'negocio',  label: 'Negócio',            ph: 'Nome do seu negócio' },
-  { key: 'cidade',   label: 'Cidade',             ph: 'Ex.: Porto' },
-  { key: 'segmento', label: 'Segmento',           ph: 'Ex.: Pizzaria' },
-  { key: 'telefone', label: 'Telefone *',         ph: 'Telemóvel',           type: 'tel', required: true, pattern: '[+0-9 \\-]{9,}', title: 'Use pelo menos 9 caracteres. Pode incluir +, números, espaços e hífen.' },
-  { key: 'email',    label: 'Email (opcional)',   ph: 'nome@email.pt',       type: 'email' },
+  { key: 'nome', label: 'Nome *', ph: 'Como você se chama', required: true, auto: 'name' },
+  { key: 'negocio', label: 'Negócio', ph: 'Nome da casa ou do studio', auto: 'organization' },
+  { key: 'cidade', label: 'Cidade', ph: 'Ex.: Porto', auto: 'address-level2' },
+  { key: 'telefone', label: 'Celular / WhatsApp *', ph: '+351 9xx xxx xxx', type: 'tel', required: true, pattern: '[+0-9 \\-]{9,}', title: 'Use pelo menos 9 caracteres. Pode incluir +, números, espaços e hífen.', auto: 'tel' },
+  { key: 'email', label: 'Email (opcional)', ph: 'nome@email.com', type: 'email', auto: 'email' },
 ]
 
 export default function ContactForm() {
@@ -25,9 +26,7 @@ export default function ContactForm() {
   const [apiErr, setApiErr] = useState(false)
   const { openModal } = usePrivacy()
 
-  function setField(k: keyof Form, v: string) {
-    setForm(f => ({ ...f, [k]: v }))
-  }
+  const setField = (k: keyof Form, v: string) => setForm(f => ({ ...f, [k]: v }))
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -41,12 +40,11 @@ export default function ContactForm() {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(form),
-    })
+    }).catch(() => null)
     setSending(false)
-    if (!res.ok) { setApiErr(true); return }
+    if (!res?.ok) { setApiErr(true); return }
     setSent(true)
     setShowErr(false)
-    window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
   function reset() {
@@ -55,77 +53,60 @@ export default function ContactForm() {
     setSent(false)
   }
 
-  const inputStyle: React.CSSProperties = { width: '100%', background: 'var(--bg)', border: '1px solid var(--line)', borderRadius: 10, padding: '11px 13px', fontSize: 15, fontFamily: 'inherit', color: 'var(--ink)' }
-
   if (sent) {
     return (
-      <div role="status" aria-live="polite" style={{ textAlign: 'center', padding: '30px 10px' }}>
-        <div style={{ width: 52, height: 52, borderRadius: '50%', background: 'var(--oliveBg)', color: 'var(--olive)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24, margin: '0 auto', fontWeight: 700 }}>✓</div>
-        <h3 style={{ fontSize: 22, marginTop: 18, fontFamily: 'var(--font-schibsted)' }}>Pedido enviado</h3>
-        <p style={{ fontSize: 15, color: 'var(--ink2)', marginTop: 8, lineHeight: 1.6 }}>
-          Recebemos o seu pedido de demonstração. Entramos em contacto em breve.
-        </p>
-        <button onClick={reset} style={{ display: 'block', margin: '24px auto 0', background: 'none', border: '1px solid var(--line)', padding: '10px 18px', borderRadius: 10, fontWeight: 600, fontSize: 14, cursor: 'pointer', color: 'var(--ink)' }}>Preencher novamente</button>
+      <div role="status" aria-live="polite" style={{ textAlign: 'center', padding: '36px 8px' }}>
+        <div style={{ width: 56, height: 56, borderRadius: '50%', background: 'rgba(63,203,142,.14)', color: 'var(--c-ok)', display: 'grid', placeItems: 'center', margin: '0 auto' }}>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5" /></svg>
+        </div>
+        <h2 style={{ fontSize: 26, marginTop: 20 }}>Recebido.</h2>
+        <p style={{ color: 'var(--c-ink2)', marginTop: 10 }}>Uma pessoa da equipe vai falar com você, normalmente no mesmo dia útil.</p>
+        <button type="button" onClick={reset} className="btn btn-ghost btn-sm" style={{ marginTop: 24 }}>Enviar outra mensagem</button>
       </div>
     )
   }
 
   return (
     <form onSubmit={handleSubmit} noValidate>
-      <div className="grid-two" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
-        {fields.map(f => (
-          <label key={f.key} htmlFor={f.key}>
-            <span style={{ display: 'block', fontSize: 13, fontWeight: 600, color: 'var(--ink2)', marginBottom: 6 }}>{f.label}</span>
-            <input
-              id={f.key}
-              name={f.key}
-              type={f.type || 'text'}
-              value={form[f.key]}
-              onChange={e => setField(f.key, e.target.value)}
-              placeholder={f.ph}
-              required={f.required}
-              pattern={f.pattern}
-              title={f.title}
-              autoComplete={f.key === 'telefone' ? 'tel' : f.key === 'email' ? 'email' : undefined}
-              style={inputStyle}
-            />
+      <div className="form-grid">
+        {fields.slice(0, 3).map(f => (
+          <label key={f.key} className="field" htmlFor={f.key}>
+            <span>{f.label}</span>
+            <input id={f.key} name={f.key} className="input" type={f.type || 'text'} value={form[f.key]} onChange={e => setField(f.key, e.target.value)} placeholder={f.ph} required={f.required} autoComplete={f.auto} />
           </label>
         ))}
-        <label htmlFor="mensagem" style={{ gridColumn: '1 / -1' }}>
-          <span style={{ display: 'block', fontSize: 13, fontWeight: 600, color: 'var(--ink2)', marginBottom: 6 }}>Mensagem</span>
-          <textarea
-            id="mensagem"
-            name="mensagem"
-            value={form.mensagem}
-            onChange={e => setField('mensagem', e.target.value)}
-            rows={3}
-            placeholder="Como é a sua operação hoje e como o podemos ajudar?"
-            style={{ ...inputStyle, resize: 'vertical' }}
-          />
+        <label className="field" htmlFor="segmento">
+          <span>Tipo de negócio</span>
+          <select id="segmento" name="segmento" className="input" value={form.segmento} onChange={e => setField('segmento', e.target.value)}>
+            <option value="">Escolha uma opção</option>
+            {segments.map(s => <option key={s} value={s}>{s}</option>)}
+          </select>
+        </label>
+        {fields.slice(3).map(f => (
+          <label key={f.key} className="field" htmlFor={f.key}>
+            <span>{f.label}</span>
+            <input id={f.key} name={f.key} className="input" type={f.type || 'text'} value={form[f.key]} onChange={e => setField(f.key, e.target.value)} placeholder={f.ph} required={f.required} pattern={f.pattern} title={f.title} autoComplete={f.auto} />
+          </label>
+        ))}
+        <label className="field field-full" htmlFor="mensagem">
+          <span>Mensagem</span>
+          <textarea id="mensagem" name="mensagem" className="input" value={form.mensagem} onChange={e => setField('mensagem', e.target.value)} rows={4} placeholder="Como os pedidos ou as marcações chegam hoje? O que mais dá trabalho?" />
         </label>
       </div>
 
-      <label htmlFor="consent" style={{ display: 'flex', gap: 11, alignItems: 'flex-start', marginTop: 16, cursor: 'pointer' }}>
-        <input
-          id="consent"
-          type="checkbox"
-          checked={consent}
-          onChange={e => { setConsent(e.target.checked); setShowErr(false) }}
-          required
-          style={{ marginTop: 3, width: 17, height: 17, accentColor: 'var(--terra)', flexShrink: 0 }}
-        />
-        <span style={{ fontSize: 12.5, color: 'var(--muted)', lineHeight: 1.5 }}>
-          Aceito que a Cenlo utilize estes dados para responder ao meu pedido de contacto/demonstração. Os dados não serão partilhados com terceiros. Consulte a{' '}
-          <button type="button" onClick={openModal} style={{ background: 'none', border: 'none', padding: 0, font: 'inherit', color: 'var(--terra)', fontWeight: 600, cursor: 'pointer', textDecoration: 'underline' }}>Política de Privacidade</button>.
+      <label htmlFor="consent" className="consent">
+        <input id="consent" type="checkbox" checked={consent} onChange={e => { setConsent(e.target.checked); setShowErr(false) }} required />
+        <span>
+          Aceito que a Cenlo use estes dados para responder ao meu pedido de contato. Os dados não são compartilhados com terceiros. Veja a{' '}
+          <button type="button" onClick={openModal} className="inline-link">Política de Privacidade</button>.
         </span>
       </label>
 
-      <button type="submit" disabled={sending} className="cta-primary" style={{ width: '100%', marginTop: 18, background: 'var(--terraBtn)', color: '#fff', border: 'none', padding: 14, borderRadius: 11, fontWeight: 700, fontSize: 16, cursor: sending ? 'default' : 'pointer', opacity: sending ? 0.7 : 1 }}>
-        {sending ? 'A enviar…' : 'Pedir demonstração'}
+      <button type="submit" disabled={sending} className="btn btn-primary" style={{ width: '100%', marginTop: 20, opacity: sending ? 0.7 : 1 }}>
+        {sending ? 'Enviando…' : 'Enviar mensagem'}
       </button>
-      <p style={{ fontSize: 13, color: 'var(--muted)', textAlign: 'center', marginTop: 8 }}>Demonstração curta, sem compromisso.</p>
-      {showErr && <p role="alert" style={{ fontSize: 13, color: 'var(--terraD)', marginTop: 10, textAlign: 'center' }}>Preencha o nome, o telefone e aceite o consentimento para enviar.</p>}
-      {apiErr && <p role="alert" style={{ fontSize: 13, color: 'var(--terraD)', marginTop: 10, textAlign: 'center' }}>Erro ao enviar. Tente novamente ou contacte-nos em ola@cenlo.pt.</p>}
+      {showErr && <p role="alert" className="form-msg">Preencha o nome, o celular e aceite o uso dos dados para enviar.</p>}
+      {apiErr && <p role="alert" className="form-msg">Não conseguimos enviar agora. Tente de novo ou escreva para ola@cenlo.pt.</p>}
     </form>
   )
 }

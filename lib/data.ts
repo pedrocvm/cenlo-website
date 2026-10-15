@@ -1,150 +1,130 @@
-export const pains = [
-  { tag: 'Pedidos perdidos nas mensagens', text: 'A Cenlo estrutura cada conversa num pedido claro, sem nada por anotar.' },
-  { tag: 'Equipa a copiar tudo à mão', text: 'O pedido chega pronto à operação, sem retrabalho nem enganos.' },
-  { tag: 'Reservas que se perdem nas mensagens', text: 'Cada marcação fica registada e visível para a equipa.' },
-  { tag: 'Clientes antigos esquecidos', text: 'Histórico organizado para reativar quem já é cliente e voltar a faturar.' },
-  { tag: 'Orçamentos parados sem resposta', text: 'Os pedidos ficam à vista, prontos para retomar e fechar.' },
-  { tag: 'Fim do dia sem saber os números', text: 'Fecho diário com o que realmente aconteceu e quanto rendeu.' },
+export type ProductId = 'food' | 'beauty' | 'fornada'
+
+export type Product = {
+  id: ProductId
+  anchor: string
+  name: string
+  segment: string
+  hook: string
+  lede: string
+  facts: { value: string; label: string }[]
+  areas: string[]
+  notes: { title: string; desc: string }[]
+  cta: { label: string; href: string }
+  secondary: { label: string; href: string }
+}
+
+export const products: Product[] = [
+  {
+    id: 'food',
+    anchor: 'food',
+    name: 'Cenlo Food',
+    segment: 'Restaurantes e delivery',
+    hook: 'Todos os pedidos num lugar só, venham de onde vierem.',
+    lede: 'WhatsApp, link de pedido, site, mesa, telefone e balcão caem na mesma central. A cozinha recebe a comanda limpa e o dia fecha com números reais, sem comissão por pedido.',
+    facts: [
+      { value: '6', label: 'canais na mesma central' },
+      { value: '9', label: 'áreas no ar hoje' },
+      { value: '0 €', label: 'de comissão por pedido' },
+    ],
+    areas: ['Pedidos', 'Cozinha e comandas', 'Cardápio', 'Entregas e horários', 'Clientes e recompra', 'Relatórios', 'Inteligência', 'Equipe e segurança', 'Mais de uma loja'],
+    notes: [
+      { title: 'A cozinha lê, não decifra.', desc: 'Hambúrguer ao ponto e sem cebola chega escrito assim, na ordem certa e com o estado à vista.' },
+      { title: 'Pizza tem tratamento próprio.', desc: 'Inteira ou meio a meio com até dois sabores, extras por tamanho, convivendo com o resto do cardápio.' },
+      { title: 'Os apps de entrega podem ficar.', desc: 'Bolt Food, Uber Eats, Glovo e Wolt trazem cliente novo. O Cenlo Food organiza os canais que são seus.' },
+    ],
+    cta: { label: 'Fazer o diagnóstico grátis', href: 'https://cenlofood.cenlo.pt/#diagnostico' },
+    secondary: { label: 'Conhecer o Cenlo Food', href: 'https://cenlofood.cenlo.pt/' },
+  },
+  {
+    id: 'beauty',
+    anchor: 'beauty',
+    name: 'Cenlo Beauty',
+    segment: 'Studios de beleza e hora marcada',
+    hook: 'A agenda inteira num lugar só, venha a cliente de onde vier.',
+    lede: 'Vitrine, WhatsApp, Instagram, telefone, recepção e lista de espera na mesma agenda. A cliente marca sozinha, o tempo reservado é o tempo real do serviço e o mês fecha com a receita de verdade.',
+    facts: [
+      { value: '6', label: 'portas para a mesma agenda' },
+      { value: '10', label: 'áreas no ar hoje' },
+      { value: '0 €', label: 'de comissão por marcação' },
+    ],
+    areas: ['Agenda', 'Vitrine', 'Foto antes', 'Conversas', 'Clientes', 'Serviços', 'Equipe', 'Regras', 'Relatórios', 'Retorno'],
+    notes: [
+      { title: 'Nunca duas na mesma cadeira.', desc: 'Os horários vêm da agenda, com a duração e a arrumação de cada serviço já reservadas.' },
+      { title: 'A foto chega antes do horário.', desc: 'Ela pediu gel e a unha pede o dobro? A foto ajusta o tempo antes de a hora ser fechada.' },
+      { title: 'Fresha e Booksy podem ficar.', desc: 'Trazem cliente nova, e a nota que você já tem lá aparece na sua vitrine.' },
+    ],
+    cta: { label: 'Fazer o diagnóstico grátis', href: 'https://cenlobeauty.cenlo.pt/#diagnostico' },
+    secondary: { label: 'Conhecer o Cenlo Beauty', href: 'https://cenlobeauty.cenlo.pt/' },
+  },
+  {
+    id: 'fornada',
+    anchor: 'fornada-certa',
+    name: 'Fornada Certa',
+    segment: 'Padarias',
+    hook: 'O pão saiu. O aviso chegou. Por SMS.',
+    lede: 'A equipe confirma a fornada com um toque e quem está esperando aquele produto recebe um SMS, enviado pelo celular da própria padaria. O cliente não instala app, não cria conta e não abre link.',
+    facts: [
+      { value: '19,90 €', label: 'por mês, ativação incluída' },
+      { value: '1', label: 'toque para avisar a fornada' },
+      { value: '0', label: 'meses de fidelização' },
+    ],
+    areas: ['Hoje', 'Fornadas', 'Clientes', 'Resultados', 'Configuração'],
+    notes: [
+      { title: 'O cliente responde com um número.', desc: '1 se já comprou, 2 para pausar hoje, 0 para sair dos avisos.' },
+      { title: 'Esgotou? A fila para.', desc: 'Marque a fornada como esgotada e os envios que ainda não saíram são interrompidos.' },
+      { title: 'Sem rede, sem aviso.', desc: 'Se o celular da loja ficar sem sinal, o painel avisa e nenhuma fornada é publicada.' },
+    ],
+    cta: { label: 'Começar por 19,90 €/mês', href: 'https://fornadacerta.cenlo.pt/#preco' },
+    secondary: { label: 'Conhecer a Fornada Certa', href: 'https://fornadacerta.cenlo.pt/' },
+  },
 ]
 
-export const flowMini = [
-  { n: '1', title: 'O cliente fala', desc: 'WhatsApp, mensagem ou contacto direto, como já é hábito.', showLine: true },
-  { n: '2', title: 'A Cenlo organiza', desc: 'Entende e estrutura o que foi pedido.', showLine: true },
-  { n: '3', title: 'A operação recebe', desc: 'Pedido, reserva ou marcação aparece claro para a equipa.', showLine: true },
-  { n: '4', title: 'O dono acompanha', desc: 'Estados, clientes e números num só lugar.', showLine: false },
+export const moments = [
+  { time: 'sex · 21:14', place: 'Restaurante', text: 'Três conversas abertas no WhatsApp e um pedido sem endereço. A cozinha está esperando.' },
+  { time: 'qui · 15:00', place: 'Studio', text: 'A cliente marcou pelo Instagram ontem à noite. Ninguém viu, e agora tem duas pessoas para a mesma cadeira.' },
+  { time: 'sáb · 16:20', place: 'Padaria', text: 'O pão de mistura saiu quentinho. Quem queria só ficou sabendo no dia seguinte.' },
 ]
 
-export const verticals = [
-  { name: 'Cenlo Pizza', status: 'Disponível' as const, desc: 'Central inteligente para a sua pizzaria. Organiza o atendimento, estrutura pedidos, envia para a cozinha, regista clientes e reativa quem já comprou.', cta: 'Ver Cenlo Pizza', href: '/pizza' },
-  { name: 'Cenlo Food', status: 'Em breve' as const, desc: 'Atendimento, pedidos e operação para restaurantes, hamburguerias, sushi, cafés e pastelarias.', cta: 'Quero saber quando estiver disponível', href: '/contacto' },
-  { name: 'Cenlo Night', status: 'Em breve' as const, desc: 'Reservas, listas, atendimento e operação para discotecas, bares e espaços noturnos.', cta: 'Falar sobre este segmento', href: '/contacto' },
-  { name: 'Cenlo Services', status: 'Em breve' as const, desc: 'Orçamentos, marcações, follow-up e atendimento para empresas de serviços.', cta: 'Falar sobre este segmento', href: '/contacto' },
+export const steps = [
+  { n: '01', title: 'O cliente fala do jeito dele', desc: 'Mensagem, link, story, ligação ou balcão. Ninguém precisa baixar app nem criar conta.' },
+  { n: '02', title: 'A central organiza', desc: 'Cada pedido, marcação ou fornada ganha um lugar, um estado e um fim. Preço e duração saem do que você publicou, nunca da IA.' },
+  { n: '03', title: 'A sua equipe decide', desc: 'Quando alguém da casa entra na conversa, o automático sai daquele atendimento. Você escolhe até onde ele vai.' },
+  { n: '04', title: 'O dia fecha com número de verdade', desc: 'Fechamento do dia, histórico de cada cliente e a lista de quem vale chamar de volta.' },
 ]
 
-export const pizzaPills = [
-  'Atendimento organizado no WhatsApp',
-  'Pedidos claros enviados para a cozinha',
-  'Clientes e histórico sempre à mão',
-  'Fecho diário com os números reais',
+export const principles = [
+  { title: 'A IA nunca decide preço.', desc: 'O valor vem sempre do cardápio ou do catálogo publicado. Um pedido é um pedido, entre por onde entrar.' },
+  { title: 'Quem manda é a sua equipe.', desc: 'Basta alguém da casa responder e o automático sai da conversa. Só volta quando vocês quiserem.' },
+  { title: 'Os canais continuam seus.', desc: 'Sem comissão por pedido nem por marcação. O cliente fica no seu histórico, não no de um marketplace.' },
+  { title: 'O cliente não instala nada.', desc: 'Link, mensagem ou SMS. Funciona no celular que ele já tem, do jeito que ele já usa.' },
 ]
 
-export const soon = [
-  { name: 'Cenlo Food', para: 'Restaurantes, hamburguerias, sushi, cafés, pastelarias e outros negócios de comida.', resolve: 'Pedidos dispersos, atendimento manual, cozinha desorganizada, falta de histórico de clientes e pouca clareza dos números do dia.', cta: 'Quero saber quando estiver disponível' },
-  { name: 'Cenlo Night', para: 'Discotecas, bares, lounges e eventos.', resolve: 'Reservas, listas, atendimento por mensagem, comunicação com clientes e organização operacional em noites movimentadas.', cta: 'Falar sobre este segmento' },
-  { name: 'Cenlo Services', para: 'Empresas de serviços, salões, clínicas, oficinas, estética, manutenção e prestadores.', resolve: 'Pedidos de orçamento, marcações, mensagens perdidas, follow-up manual, histórico de clientes e organização do atendimento.', cta: 'Falar sobre este segmento' },
-]
-
-export const glossary = [
-  { term: 'Cenlo Pizza', def: 'Central de atendimento, pedidos e clientes para pizzarias. Disponível.' },
-  { term: 'Cenlo Food', def: 'Atendimento e pedidos para negócios de comida. Em breve.' },
-  { term: 'Cenlo Night', def: 'Reservas e listas para espaços noturnos. Em breve.' },
-  { term: 'Cenlo Services', def: 'Orçamentos e marcações para serviços. Em breve.' },
-]
-
-export const pizzaFor = [
-  'Pizzarias onde já houve pedidos perdidos nas mensagens',
-  'Donos que gerem a operação por mensagem, papel ou memória',
-  'Operações com entrega e recolha em simultâneo',
-  'Quem quer fechar o dia sabendo o que vendeu, sem reconstituir tudo da memória',
-  'Pizzarias nos apps de entrega que querem organizar também o canal próprio',
-]
-
-export const pizzaProblems = [
-  'Pedido perdido no meio da conversa.',
-  'Cliente que envia o pedido incompleto.',
-  'Colaborador que copia tudo manualmente.',
-  'Cozinha que recebe o pedido confuso.',
-  'Dono que só repara nos erros ao fim do dia.',
-  'Cliente antigo esquecido, sem recompra.',
-  'Falta de histórico de pedidos e clientes.',
-  'Falta de números simples sobre o dia.',
-]
-
-export const pizzaSteps = [
-  { n: '1', title: 'O cliente fala', desc: 'Pede pelo WhatsApp, como já é hábito.' },
-  { n: '2', title: 'A Cenlo entende', desc: 'Organiza e estrutura o pedido.' },
-  { n: '3', title: 'Valida o menu', desc: 'Tamanhos, sabores, extras e entrega.' },
-  { n: '4', title: 'Aparece na dashboard', desc: 'Pedido claro, pronto a confirmar.' },
-  { n: '5', title: 'A cozinha recebe', desc: 'Sem ruído nem cópia à mão.' },
-  { n: '6', title: 'O dono acompanha', desc: 'Estados, clientes e números.' },
-  { n: '7', title: 'Apoia a recompra', desc: 'Ajuda no follow-up manual com clientes.' },
-]
-
-export const pizzaFeatures = [
-  { i: '01', title: 'Atendimento organizado no WhatsApp', desc: 'Conversas estruturadas, sem perder pedidos.' },
-  { i: '02', title: 'Gestão de pedidos', desc: 'Cada pedido com estado claro, do início ao fim.' },
-  { i: '03', title: 'Painel de cozinha', desc: 'A cozinha vê o que preparar, sem dúvidas.' },
-  { i: '04', title: 'Menu estruturado', desc: 'Tamanhos, sabores e extras configurados pela pizzaria.' },
-  { i: '05', title: 'Clientes e histórico', desc: 'Quem pede, o que pede e quando voltou.' },
-  { i: '06', title: 'Fecho diário', desc: 'Os números do dia, sem fechar a caixa.' },
-]
-
-export const benefits = [
-  { who: 'Para o dono', items: ['Vê os números do dia sem fechar a caixa', 'Clientes e histórico registados', 'Menos erros, menos retrabalho'] },
-  { who: 'Para o atendimento', items: ['Conversas organizadas, não perdidas', 'Pedido estruturado sem copiar à mão', 'Passagem para um humano quando é preciso'] },
-  { who: 'Para a cozinha', items: ['Pedido claro, sem dúvidas', 'Estados de preparação visíveis', 'Menos confusão nas horas de ponta'] },
-]
-
-export const pizzaNot = [
-  'Não é mais um chatbot genérico.',
-  'Não é um marketplace.',
-  'Não é um sistema de caixa.',
-  'Não é só um menu digital.',
-]
-
-export const demoSteps = [
-  { n: '1', t: 'Marcamos uma conversa curta sobre a sua pizzaria.' },
-  { n: '2', t: 'Mostramos a central com o menu e o fluxo da sua operação.' },
-  { n: '3', t: 'Acompanhamos os primeiros dias de perto.' },
-]
-
-export const pizzaE2ESteps = [
-  { n: 'A', title: 'O cliente encontra a pizzaria no Google', desc: 'O perfil da pizzaria aparece quando alguém pesquisa pizza perto de si. Um perfil bem preenchido é o que faz o cliente clicar.' },
-  { n: 'B', title: 'Abre o site e escolhe o pedido', desc: 'O site da pizzaria mostra o menu. O cliente escolhe e monta o pedido pelo telemóvel.' },
-  { n: 'C', title: 'Pede pelo WhatsApp com um clique', desc: 'O site monta o pedido e abre o WhatsApp com tudo preenchido. O cliente clica em enviar.' },
-  { n: 'D', title: 'O pedido entra no Cenlo, vai para a cozinha', desc: 'O pedido aparece na dashboard e segue para o painel de cozinha. O cliente fica registado para recompra futura.' },
-]
-
-export const faqs = [
-  { q: 'Funciona com o WhatsApp da pizzaria?', a: 'Sim. O Cenlo Pizza trabalha sobre o canal de WhatsApp da própria pizzaria, o mesmo onde os clientes já falam consigo.' },
-  { q: 'Preciso de trocar o meu sistema atual?', a: 'Não é o objetivo. O Cenlo organiza o atendimento e os pedidos do seu canal próprio; pode conviver com a forma como já trabalha hoje.' },
-  { q: 'Serve para uma pizzaria pequena?', a: 'Sim. Foi pensado para qualquer pizzaria que atende por mensagem. Quanto mais o atendimento depende de mensagens soltas, mais cedo se nota a diferença.' },
-  { q: 'Dá para usar em conjunto com apps de entrega?', a: 'Dá. Os apps de entrega podem continuar a existir. O Cenlo serve para organizar o canal próprio, que é seu.' },
-  { q: 'A IA calcula os preços?', a: 'Não. O preço é sempre calculado pelo sistema a partir do menu configurado pela pizzaria, nunca pela IA.' },
-  { q: 'A cozinha vê os pedidos onde?', a: 'Num painel de cozinha próprio, com o pedido estruturado e o estado de preparação, sem cópias à mão.' },
-  { q: 'O cliente recebe confirmação?', a: 'O atendimento confirma o pedido na conversa, com o pedido já estruturado pela central, de forma clara para o cliente.' },
-  { q: 'Como começa a demonstração?', a: 'Marcamos uma conversa curta, configuramos o menu e o fluxo da sua pizzaria e acompanhamos os primeiros dias de perto.' },
-]
+export const channels = ['Pedido pelo WhatsApp', 'Marcação pelo Instagram', 'Fornada das 16:20', 'Mesa 7 pelo QR', 'Ligação no balcão', 'Link na bio', 'Lista de espera', 'Pedido pelo site', 'Aviso por SMS']
 
 export const values = [
-  { t: 'Organização', d: 'Tirar o atendimento do improviso e dar-lhe estrutura.' },
-  { t: 'Proximidade', d: 'Pensado para quem atende clientes todos os dias, com acompanhamento próximo.' },
-  { t: 'Foco na faturação', d: 'A organização existe para um fim: fechar mais negócio e trazer de volta quem já é cliente.' },
-]
-
-export const beforeAfter = [
-  { before: 'Mensagens soltas e contactos perdidos', after: 'Atendimento estruturado num só lugar' },
-  { before: 'Anotações à mão e de memória', after: 'Tudo registado e visível para a equipa' },
-  { before: 'Clientes antigos esquecidos', after: 'Histórico e reativação à mão' },
-  { before: 'Fim do dia sem números', after: 'Fecho diário com os dados reais' },
+  { t: 'Perto do balcão', d: 'Cada produto nasce de uma sexta à noite na cozinha, de uma semana cheia no studio ou de uma fornada que saiu sem ninguém saber. Não de uma planilha.' },
+  { t: 'Regra antes de IA', d: 'A inteligência ajuda a entender o cliente. Preço, duração e disponibilidade vêm de regras que você controla.' },
+  { t: 'Sem prender ninguém', d: 'Sem comissão por pedido, com gente acompanhando os primeiros dias e com os dados de cada negócio isolados dos outros.' },
 ]
 
 export const terms = [
-  { t: 'Aceitação dos termos', d: 'Ao aceder e utilizar o site da Cenlo, concorda com estes termos. Se não concordar, pedimos que não utilize o site nem os formulários disponibilizados.' },
-  { t: 'O que a Cenlo oferece', d: 'A Cenlo desenvolve centrais inteligentes de atendimento e operação para negócios locais. Este site serve para apresentar os produtos e permitir o pedido de demonstração. O acesso aos produtos é feito mediante acordo comercial próprio.' },
-  { t: 'Utilização do site', d: 'O site destina-se a fins informativos e ao contacto comercial. Compromete-se a fornecer informação verdadeira nos formulários e a não utilizar o site para fins ilícitos, fraudulentos ou que prejudiquem o funcionamento do serviço.' },
-  { t: 'Pedidos de demonstração', d: 'O envio de um pedido de demonstração não constitui qualquer contrato nem obrigação de fornecimento. A Cenlo entra em contacto para avaliar, em conjunto, se o produto faz sentido para o seu negócio.' },
-  { t: 'Propriedade intelectual', d: 'A marca Cenlo, os textos, o design e o software associados são propriedade da Cenlo. Não é permitida a reprodução, cópia ou utilização sem autorização escrita.' },
+  { t: 'Aceitação dos termos', d: 'Ao acessar e usar o site da Cenlo, você concorda com estes termos. Se não concordar, pedimos que não use o site nem os formulários disponíveis.' },
+  { t: 'O que a Cenlo oferece', d: 'A Cenlo desenvolve centrais de atendimento e operação para negócios locais: Cenlo Food, Cenlo Beauty e Fornada Certa. Este site apresenta esses produtos e permite pedir contato ou demonstração. O acesso a cada produto segue as condições comerciais próprias de cada um.' },
+  { t: 'Uso do site', d: 'O site serve para informação e contato comercial. Você se compromete a fornecer informações verdadeiras nos formulários e a não usar o site para fins ilícitos, fraudulentos ou que prejudiquem o funcionamento do serviço.' },
+  { t: 'Pedidos de contato e demonstração', d: 'Enviar um pedido de contato ou de demonstração não cria contrato nem obrigação de fornecimento. A Cenlo entra em contato para avaliar, junto com você, se o produto faz sentido para o seu negócio.' },
+  { t: 'Propriedade intelectual', d: 'A marca Cenlo, as marcas dos produtos, os textos, o design e o software associados pertencem à Cenlo. Não é permitida a reprodução, cópia ou uso sem autorização por escrito.' },
   { t: 'Limitação de responsabilidade', d: 'O site é disponibilizado "tal como está". A Cenlo procura manter a informação atualizada e o serviço disponível, mas não garante ausência de erros ou interrupções, dentro dos limites permitidos por lei.' },
   { t: 'Alterações', d: 'A Cenlo pode atualizar estes termos a qualquer momento. A versão em vigor é sempre a publicada nesta página, com a data da última atualização.' },
-  { t: 'Lei aplicável', d: 'Estes termos regem-se pela lei portuguesa. Qualquer litígio será resolvido pelos tribunais competentes em Portugal.' },
+  { t: 'Lei aplicável', d: 'Estes termos seguem a lei portuguesa. Qualquer litígio será resolvido pelos tribunais competentes em Portugal.' },
 ]
 
 export const privacy = [
-  { t: 'Quem somos', d: 'A Cenlo desenvolve centrais inteligentes de atendimento e operação para quem atende clientes todos os dias. Esta política explica como tratamos os dados que nos confia.' },
-  { t: 'Que dados recolhemos', d: 'Apenas os dados que nos envia ao pedir uma demonstração ou ao falar connosco: nome, nome do negócio, cidade, segmento, telefone, email e a mensagem que escrever.' },
-  { t: 'Para que usamos os dados', d: 'Usamos os seus dados exclusivamente para responder ao seu pedido, preparar a demonstração e acompanhar o contacto. Não os usamos para mais nada sem o seu conhecimento.' },
-  { t: 'Partilha com terceiros', d: 'Não vendemos nem partilhamos os seus dados com terceiros para fins comerciais. Podem ser usadas ferramentas de apoio (por exemplo, email) apenas para o contacto consigo.' },
-  { t: 'Os seus direitos', d: 'Pode pedir, a qualquer momento, o acesso, a correção ou a eliminação dos seus dados. Basta escrever para ola@cenlo.pt e tratamos do pedido.' },
-  { t: 'Conservação', d: 'Guardamos os dados apenas durante o tempo necessário para o contacto e o eventual início de uma relação comercial. Depois disso, são eliminados a seu pedido.' },
+  { t: 'Quem somos', d: 'A Cenlo desenvolve centrais de atendimento e operação para negócios locais. Esta política explica como tratamos os dados que você nos envia por este site.' },
+  { t: 'Quais dados coletamos', d: 'Apenas o que você envia ao pedir contato ou demonstração: nome, nome do negócio, cidade, tipo de negócio, telefone, email e a mensagem que escrever.' },
+  { t: 'Para que usamos os dados', d: 'Usamos os seus dados só para responder ao seu pedido, preparar a demonstração e acompanhar o contato. Não usamos para mais nada sem o seu conhecimento.' },
+  { t: 'Compartilhamento com terceiros', d: 'Não vendemos nem compartilhamos os seus dados com terceiros para fins comerciais. Usamos ferramentas de apoio, como o envio de email, apenas para falar com você.' },
+  { t: 'Os seus direitos', d: 'Você pode pedir, a qualquer momento, acesso, correção ou eliminação dos seus dados. Basta escrever para ola@cenlo.pt.' },
+  { t: 'Conservação', d: 'Guardamos os dados apenas pelo tempo necessário para o contato e para o eventual início de uma relação comercial. Depois disso, eliminamos a seu pedido.' },
+  { t: 'Produtos Cenlo', d: 'Cenlo Food, Cenlo Beauty e Fornada Certa têm políticas de privacidade próprias para os dados tratados dentro de cada produto, publicadas nos respectivos sites.' },
 ]

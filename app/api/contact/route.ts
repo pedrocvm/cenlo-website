@@ -18,7 +18,7 @@ export async function POST(req: NextRequest) {
   const { error } = await resend.emails.send({
     from: 'Cenlo Website <ola@cenlo.pt>',
     to: 'website@cenlo.pt',
-    subject: `Pedido de demonstração — ${nome}`,
+    subject: `Contato pelo site — ${nome}`,
     text: [
       `Nome: ${nome}`,
       `Negócio: ${negocio || '—'}`,

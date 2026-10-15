@@ -1,97 +1,99 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { soon } from '@/lib/data'
+import { products } from '@/lib/data'
+import ProductVisual from '@/components/ProductVisual'
+import { Arrow } from '@/components/Icons'
+
+const title = 'Produtos · Cenlo Food, Cenlo Beauty e Fornada Certa'
+const description = 'Cenlo Food para restaurantes e delivery, Cenlo Beauty para studios de beleza e Fornada Certa para padarias. O que cada um faz, para quem é e como começar.'
 
 export const metadata: Metadata = {
-  title: 'Produtos Cenlo — soluções para negócios locais',
-  description: 'Centrais inteligentes para cada tipo de negócio. Cenlo Pizza disponível, Cenlo Food, Night e Services em breve.',
+  title,
+  description,
   alternates: { canonical: 'https://cenlo.pt/produtos' },
-  openGraph: {
-    title: 'Produtos Cenlo — soluções para negócios locais',
-    description: 'Centrais inteligentes para cada tipo de negócio. Cenlo Pizza disponível, Cenlo Food, Night e Services em breve.',
-    url: 'https://cenlo.pt/produtos',
-    type: 'website',
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'Produtos Cenlo — soluções para negócios locais',
-    description: 'Centrais inteligentes para cada tipo de negócio. Cenlo Pizza disponível, Cenlo Food, Night e Services em breve.',
-  },
+  openGraph: { title, description, url: 'https://cenlo.pt/produtos', type: 'website' },
+  twitter: { card: 'summary_large_image', title, description },
+}
+
+const dots = { food: 'var(--c-food)', beauty: 'var(--c-beauty2)', fornada: 'var(--c-fornada2)' }
+
+const schema = {
+  '@context': 'https://schema.org',
+  '@type': 'ItemList',
+  itemListElement: products.map((p, i) => ({
+    '@type': 'ListItem',
+    position: i + 1,
+    item: { '@type': 'SoftwareApplication', name: p.name, applicationCategory: 'BusinessApplication', description: p.lede, url: p.secondary.href },
+  })),
 }
 
 export default function ProdutosPage() {
   return (
     <>
-      <section style={{ position: 'relative', maxWidth: 1160, margin: '0 auto', padding: '64px 24px 40px' }}>
-        <div aria-hidden="true" style={{ position: 'absolute', top: -60, right: -80, width: 700, height: 320, background: 'radial-gradient(ellipse 700px 320px at center, rgba(255,106,44,.10) 0%, transparent 65%)', pointerEvents: 'none' }} />
-        <span style={{ fontSize: 13, fontWeight: 700, letterSpacing: '.08em', textTransform: 'uppercase', color: 'var(--terra)' }}>Produtos Cenlo</span>
-        <h1 className="hd" style={{ fontSize: 46, marginTop: 14, maxWidth: 760, fontFamily: 'var(--font-schibsted)' }}>Uma central para cada tipo de negócio local. A começar pela sua pizzaria.</h1>
-        <p style={{ fontSize: 18, color: 'var(--ink2)', marginTop: 16, maxWidth: 600 }}>Cada central construída a partir dos problemas reais de quem opera esse negócio todos os dias.</p>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }} />
+      <section className="page-hero">
+        <div className="hero-glow" aria-hidden="true" />
+        <div className="wrap" style={{ position: 'relative' }}>
+          <span className="eyebrow eyebrow-dot" data-reveal>Produtos</span>
+          <h1 className="display" style={{ marginTop: 22, maxWidth: 980 }} data-split="now">Três centrais. <span className="serif accent">Três balcões.</span></h1>
+          <p className="lede" data-reveal>Cada produto tem o seu site, o seu cardápio de funções e o seu jeito de começar. Em comum, as mesmas regras: preço que não vem da IA, equipe no comando e cliente que não instala nada.</p>
+          <nav className="toc" aria-label="Produtos" data-reveal>
+            {products.map(p => (
+              <a key={p.id} href={`#${p.anchor}`} className="pchip" style={{ ['--dot' as string]: dots[p.id] }}><i aria-hidden="true" />{p.name}</a>
+            ))}
+          </nav>
+        </div>
       </section>
 
-      {/* DISPONÍVEL: PIZZA */}
-      <section style={{ maxWidth: 1160, margin: '0 auto', padding: '12px 24px 8px' }}>
-        <div style={{ background: 'var(--surface)', border: '1px solid var(--line)', borderRadius: 18 }}>
-          <div style={{ padding: 36 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-              <span style={{ fontFamily: 'var(--font-schibsted)', fontWeight: 800, fontSize: 26, color: '#fff' }}>Cenlo Pizza</span>
-              <span style={{ fontSize: 11.5, fontWeight: 700, color: 'var(--olive)', background: 'var(--oliveBg)', padding: '4px 10px', borderRadius: 7 }}>Disponível</span>
+      <div className="wrap">
+        {products.map(p => (
+          <section key={p.id} id={p.anchor} className="pdetail" data-p={p.id} aria-labelledby={`t-${p.id}`}>
+            <div className="pdetail-side">
+              <span className="panel-tag" data-reveal><b>{p.name}</b> {p.segment}</span>
+              <h2 id={`t-${p.id}`} data-split>{p.hook}</h2>
+              <p className="lede" data-reveal>{p.lede}</p>
+              <div className="facts" data-reveal>
+                {p.facts.map(f => <div key={f.label}><strong>{f.value}</strong><span>{f.label}</span></div>)}
+              </div>
+              <div className="panel-ctas" data-reveal>
+                <a href={p.cta.href} className="btn btn-primary">{p.cta.label} <Arrow /></a>
+                <a href={p.secondary.href} className="btn btn-ghost">Ver o site</a>
+              </div>
             </div>
-            <p style={{ fontSize: 16.5, color: 'var(--ink2)', marginTop: 14 }}>Central inteligente para a sua pizzaria. Organiza o atendimento, estrutura os pedidos, envia para a cozinha, regista clientes e ajuda a reativar quem já comprou, transformando organização em mais faturação.</p>
-            <Link href="/pizza" className="cta-primary" style={{ display: 'inline-block', marginTop: 22, background: 'var(--terraBtn)', color: '#fff', border: 'none', padding: '13px 22px', borderRadius: 11, fontWeight: 600, fontSize: 15.5 }}>Ver Cenlo Pizza →</Link>
+            <div className="pdetail-main">
+              <div className="pdetail-media" data-reveal>
+                <ProductVisual id={p.id} />
+              </div>
+              <div data-reveal>
+                <span className="how-label">O que já está lá dentro</span>
+                <div className="areas" style={{ marginTop: 12 }}>
+                  {p.areas.map(a => <span key={a}>{a}</span>)}
+                </div>
+              </div>
+              <div className="notes">
+                {p.notes.map(n => (
+                  <div key={n.title} className="note" data-reveal>
+                    <b>{n.title}</b>
+                    <p>{n.desc}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+        ))}
+      </div>
+
+      <section className="sec">
+        <div className="wrap">
+          <div className="final" data-reveal>
+            <span className="eyebrow eyebrow-dot">Ainda em dúvida?</span>
+            <h2 className="h2" style={{ marginTop: 20 }} data-split>Conte como o seu negócio atende hoje. A gente indica o caminho.</h2>
+            <div className="hero-ctas">
+              <Link href="/contacto" className="btn btn-primary">Falar com a equipe <Arrow /></Link>
+              <a href="https://wa.me/351912333313?text=Ol%C3%A1!%20Vim%20pelo%20site%20da%20Cenlo%20e%20quero%20saber%20qual%20produto%20faz%20sentido%20para%20o%20meu%20neg%C3%B3cio." className="btn btn-ghost" target="_blank" rel="noopener noreferrer">Chamar no WhatsApp</a>
+            </div>
           </div>
         </div>
-      </section>
-
-      {/* EM BREVE */}
-      <section style={{ maxWidth: 1160, margin: '0 auto', padding: '44px 24px 20px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 22 }}>
-          <span style={{ fontFamily: 'var(--font-schibsted)', fontWeight: 700, fontSize: 22 }}>Em breve</span>
-          <span style={{ flex: 1, height: 1, background: 'var(--line)', display: 'block' }} />
-        </div>
-        <div className="grid-three" style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 16 }}>
-          {soon.map(v => (
-            <div key={v.name} className="card-hover" style={{ background: 'var(--surface)', border: '1px solid var(--line)', borderRadius: 15, padding: 24, display: 'flex', flexDirection: 'column', height: '100%' }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <span style={{ fontFamily: 'var(--font-schibsted)', fontWeight: 800, fontSize: 20, color: '#fff' }}>{v.name}</span>
-                <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--amber)', background: 'var(--amberBg)', padding: '3px 9px', borderRadius: 7 }}>Em breve</span>
-              </div>
-              <div style={{ fontSize: 13, color: 'var(--terra)', fontWeight: 600, marginTop: 12 }}>Para</div>
-              <p style={{ fontSize: 14, color: 'var(--ink2)', marginTop: 3 }}>{v.para}</p>
-              <div style={{ fontSize: 13, color: 'var(--terra)', fontWeight: 600, marginTop: 12 }}>O que resolve</div>
-              <p style={{ fontSize: 14, color: 'var(--ink2)', marginTop: 3 }}>{v.resolve}</p>
-              <Link href="/contacto" style={{ marginTop: 'auto', paddingTop: 18, background: 'none', border: 'none', textAlign: 'left', fontSize: 14, fontWeight: 600, color: 'var(--terra)', display: 'block' }}>{v.cta} →</Link>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* POSICIONAMENTO */}
-      <section style={{ background: 'var(--bg2)', borderTop: '1px solid var(--line)', borderBottom: '1px solid var(--line)', marginTop: 36 }}>
-        <div style={{ maxWidth: 1160, margin: '0 auto', padding: '60px 24px' }}>
-          <div style={{ maxWidth: 680 }}>
-            <h2 style={{ fontSize: 30, fontFamily: 'var(--font-schibsted)' }}>O atendimento do seu negócio finalmente sob controlo</h2>
-            <p style={{ fontSize: 16.5, color: 'var(--ink2)', marginTop: 14 }}>A Cenlo dá ordem ao atendimento que já acontece todos os dias, onde os clientes já falam consigo. Os apps de entrega podem continuar a existir; a ideia é deixar de depender só deles, reativar quem já é cliente e ter ordem no que é seu.</p>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginTop: 22 }}>
-              <div style={{ background: 'var(--surface)', border: '1px solid var(--line)', borderRadius: 12, padding: 16 }}>
-                <div style={{ fontWeight: 700, fontSize: 14.5, color: 'var(--olive)' }}>Canal próprio</div>
-                <p style={{ fontSize: 13.5, color: 'var(--ink2)', marginTop: 6 }}>Conversas, clientes e histórico ficam consigo, organizados.</p>
-              </div>
-              <div style={{ background: 'var(--surface)', border: '1px solid var(--line)', borderRadius: 12, padding: 16 }}>
-                <div style={{ fontWeight: 700, fontSize: 14.5, color: '#C0392B' }}>Apps de entrega</div>
-                <p style={{ fontSize: 13.5, color: 'var(--ink2)', marginTop: 6 }}>Bolt Food, Uber Eats, Glovo ou Wolt continuam úteis para alcance, sem serem o único canal.</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* CTA */}
-      <section style={{ position: 'relative', maxWidth: 1160, margin: '0 auto', padding: '60px 24px 84px', textAlign: 'center' }}>
-        <div aria-hidden="true" style={{ position: 'absolute', bottom: 0, left: '50%', transform: 'translateX(-50%)', width: 800, height: 300, background: 'radial-gradient(ellipse 800px 300px at center bottom, rgba(255,106,44,.10) 0%, transparent 65%)', pointerEvents: 'none' }} />
-        <h2 style={{ fontSize: 32, maxWidth: 560, margin: '0 auto', fontFamily: 'var(--font-schibsted)' }}>Precisa de uma solução à medida? Construímos para o seu negócio.</h2>
-        <p style={{ fontSize: 16.5, color: 'var(--ink2)', margin: '12px auto 0', maxWidth: 480 }}>Seja qual for o seu setor, diga-nos o que faz e desenhamos uma central à medida das necessidades da sua empresa.</p>
-        <Link href="/contacto" className="cta-primary" style={{ display: 'inline-block', marginTop: 24, background: 'var(--terraBtn)', color: '#fff', border: 'none', padding: '15px 26px', borderRadius: 11, fontWeight: 600, fontSize: 16 }}>Falar connosco</Link>
       </section>
     </>
   )

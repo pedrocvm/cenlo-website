@@ -2,6 +2,11 @@
   "installCommand": "npm install",
   "redirects": [
     {
+      "source": "/pizza",
+      "destination": "https://cenlofood.cenlo.pt/",
+      "permanent": true
+    },
+    {
       "source": "/pedro",
       "destination": "https://pedro.cenlo.pt",
       "permanent": false

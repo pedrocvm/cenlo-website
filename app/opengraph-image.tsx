@@ -1,59 +1,40 @@
 import { ImageResponse } from 'next/og'
 
-export const alt = 'Cenlo — central de pedidos por WhatsApp para negócios locais'
+export const alt = 'Cenlo: centrais para negócios locais. Cenlo Food, Cenlo Beauty e Fornada Certa.'
 export const size = { width: 1200, height: 630 }
 export const contentType = 'image/png'
 
+const products = [
+  { name: 'Cenlo Food', seg: 'Restaurantes e delivery', c: '#F26522' },
+  { name: 'Cenlo Beauty', seg: 'Studios de beleza', c: '#E3559C' },
+  { name: 'Fornada Certa', seg: 'Padarias', c: '#E07A4C' },
+]
+
 export default function Image() {
   return new ImageResponse(
-    <div
-      style={{
-        width: '100%',
-        height: '100%',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'flex-start',
-        justifyContent: 'center',
-        background: '#0B0B0F',
-        padding: '80px 96px',
-        fontFamily: 'system-ui, sans-serif',
-      }}
-    >
-      {/* Orange accent bar */}
-      <div style={{ width: 60, height: 6, background: '#FF6A2C', borderRadius: 3, marginBottom: 40, display: 'flex' }} />
-
-      {/* Brand name */}
-      <div style={{ fontSize: 72, fontWeight: 800, color: '#F4F3F7', letterSpacing: '-2px', lineHeight: 1, display: 'flex' }}>
-        Cenlo
+    <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', background: 'radial-gradient(circle at 85% 10%, rgba(242,101,34,.35), #0A0A0D 55%)', padding: '72px 80px', fontFamily: 'system-ui, sans-serif', color: '#F4F1EA' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 18 }}>
+        <svg width="64" height="64" viewBox="0 0 48 48">
+          <path d="M35.4 17.1 A13.2 13.2 0 1 0 35.4 30.9" fill="none" stroke="#F4F1EA" strokeWidth="5.1" strokeLinecap="round" />
+          <circle cx="26.6" cy="24" r="5.7" fill="#F26522" />
+        </svg>
+        <span style={{ fontSize: 48, fontWeight: 800, letterSpacing: '-2px' }}>Cenlo</span>
       </div>
-
-      {/* Tagline */}
-      <div style={{ fontSize: 28, color: '#A6A6B3', marginTop: 20, lineHeight: 1.4, maxWidth: 720, display: 'flex' }}>
-        Central de pedidos por WhatsApp para negócios locais.
+      <div style={{ display: 'flex', flexDirection: 'column' }}>
+        <div style={{ fontSize: 76, fontWeight: 800, letterSpacing: '-3px', lineHeight: 1, display: 'flex' }}>Da mensagem solta</div>
+        <div style={{ fontSize: 76, fontWeight: 800, letterSpacing: '-3px', lineHeight: 1.05, color: '#F26522', display: 'flex' }}>ao pedido pronto.</div>
       </div>
-
-      {/* Pill */}
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: 10,
-          marginTop: 48,
-          background: 'rgba(255,106,44,.18)',
-          border: '1px solid rgba(255,106,44,.4)',
-          borderRadius: 999,
-          padding: '10px 22px',
-        }}
-      >
-        <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#34D399', display: 'flex' }} />
-        <span style={{ fontSize: 20, color: '#FFB68F', fontWeight: 600, display: 'flex' }}>Cenlo Pizza — já em operação</span>
-      </div>
-
-      {/* Domain */}
-      <div style={{ position: 'absolute', bottom: 48, right: 96, fontSize: 18, color: '#4A4A5A', display: 'flex' }}>
-        cenlo.pt
+      <div style={{ display: 'flex', gap: 14 }}>
+        {products.map(p => (
+          <div key={p.name} style={{ display: 'flex', flexDirection: 'column', padding: '16px 22px', borderRadius: 18, border: '1px solid rgba(255,255,255,.14)', background: 'rgba(255,255,255,.04)' }}>
+            <span style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 26, fontWeight: 700 }}>
+              <span style={{ width: 12, height: 12, borderRadius: 6, background: p.c, display: 'flex' }} />{p.name}
+            </span>
+            <span style={{ fontSize: 18, color: '#B9B6BF', marginTop: 4 }}>{p.seg}</span>
+          </div>
+        ))}
       </div>
     </div>,
-    { ...size }
+    { ...size },
   )
 }
