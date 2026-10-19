@@ -36,8 +36,8 @@ export function storageGet(key, storage) { try { return JSON.parse((storage || g
 export function storageSet(key, value, storage) { try { (storage || globalThis.localStorage).setItem(key,JSON.stringify(value)); } catch {} }
 export const MARKETING = 'https://api-crm.cenlo.pt/public/acquisition/marketing';
 // Same table as the CRM: one Meta name and one eventID per fact, so Meta counts it once.
-const META_EVENTS={food_funnel_viewed:'PageView',bio_view_observed:'PageView',demo_entry_viewed:'ViewContent',contact_cta_clicked:'Contact',diagnostic_result_viewed:'DiagnosticCompleted'};
-const META_STANDARD=new Set(['PageView','ViewContent','Contact','Lead']);
+const META_EVENTS={food_funnel_viewed:'PageView',bio_view_observed:'PageView',demo_entry_viewed:'ViewContent',contact_cta_clicked:'Contact',diagnostic_result_viewed:'DiagnosticCompleted',food_whatsapp_opened:'Contact',food_demo_booked:'Schedule'};
+const META_STANDARD=new Set(['PageView','ViewContent','Contact','Lead','Schedule']);
 const FBP=/^fb\.\d\.\d{10,13}\.\d{1,20}$/, FBC=/^fb\.\d\.\d{10,13}\.[A-Za-z0-9_-]{1,500}$/;
 // Cookies can be blocked or absent; neither may break the page or the withdrawal.
 function readCookie(name){try{return globalThis.document?.cookie.split('; ').find(c=>c.startsWith(name+'='))?.slice(name.length+1)||'';}catch{return '';}}

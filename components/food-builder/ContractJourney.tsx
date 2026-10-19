@@ -14,7 +14,7 @@ const RANK: Record<PlanKey, number> = { essential: 0, pro: 1, ultra: 2 }
 const BASE_OF: Record<PlanKey, string | null> = { essential: null, pro: 'Tudo do Essential, mais:', ultra: 'Tudo do Pro, mais:' }
 const PLACEMENTS = ['header', 'hero', 'sticky', 'demo', 'solutions', 'plans', 'faq', 'closing']
 
-type Cap = { id: string; label: string; plan: PlanKey; condition?: string }
+type Cap = { id: string; label: string; plan: PlanKey; state?: string; condition?: string }
 type Policy = { monthlyStart: string; installmentDue: string[]; taxText: string; subscriptionTerms?: string[] }
 type Catalog = { capabilities: Cap[]; plans: Record<PlanKey, { setupCents: number; monthlyCents: number }>; policy: Policy }
 type Payment = { cash: { cents: number; savedCents: number } | null; split: { upfrontCents: number; restCents: number[] } | null }
@@ -37,6 +37,9 @@ function load(): Saved {
   return { sessionKey: crypto.randomUUID() }
 }
 function store(s: Saved) { try { sessionStorage.setItem(KEY, JSON.stringify(s)) } catch { /* see load */ } }
+
+/** The CRM names the campaign fields without the utm_ prefix, as the configurator sends them. */
+const campaign = () => Object.fromEntries(Object.entries(readAttribution()).filter(([, v]) => typeof v === 'string').map(([k, v]) => [k.replace(/^utm_/, ''), v as string]))
 
 async function call<T>(path: string, sessionKey: string, body?: unknown): Promise<T> {
   const res = await fetch(API + path, { method: body ? 'POST' : 'GET', headers: { 'content-type': 'application/json', 'x-food-session': sessionKey }, body: body ? JSON.stringify(body) : undefined })
@@ -83,14 +86,15 @@ export default function ContractJourney() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [saved, isTest])
 
-  const moduleIds = (p: PlanKey) => catalog ? catalog.capabilities.filter(c => RANK[c.plan] <= RANK[p]).map(c => c.id) : []
+  // Capabilities the CRM only sells after an evaluation (several units) would turn every plan into an evaluation; they go through the units question instead.
+  const moduleIds = (p: PlanKey) => catalog ? catalog.capabilities.filter(c => RANK[c.plan] <= RANK[p] && c.state !== 'evaluation').map(c => c.id) : []
   const composition = (p: PlanKey, n: number) => ({ moduleIds: moduleIds(p), preferences: [], units: n, integration: 'none', priority: 'sem_prioridade' })
   const journey = () => [`landing:${via}`, `plan:${initialPlan}`, ...(plan !== initialPlan ? [`plan:${plan}`] : []), 'contract:review']
 
   useEffect(() => {
     if (!catalog || !saved || moreUnits) return
     let live = true
-    call<{ state: string; offer?: Offer }>('/offers', saved.sessionKey, { sessionKey: saved.sessionKey, entry: 'landing', composition: composition(plan, 1), isTest, attribution: readAttribution(), journey: journey() })
+    call<{ state: string; offer?: Offer }>('/offers', saved.sessionKey, { sessionKey: saved.sessionKey, entry: 'landing', composition: composition(plan, 1), isTest, attribution: campaign(), journey: journey() })
       .then(r => { if (!live) return; if (r.offer) setOffer(r.offer); else setLoadError('Esse plano precisa de uma avaliação antes de mostrar o valor. Fale com a gente pelo WhatsApp.') })
       .catch(e => { if (live) setLoadError(e.message) })
     return () => { live = false }
@@ -115,7 +119,7 @@ export default function ContractJourney() {
     const person = { name: contact.name.trim(), business: contact.business.trim(), phone: contact.phone.trim(), email: contact.email.trim() }
     try {
       const r = moreUnits
-        ? await call<{ saved: boolean; reference: string; leadEventId?: string }>('/evaluations', saved.sessionKey, { submissionId: crypto.randomUUID(), sessionKey: saved.sessionKey, entry: 'landing', attribution: readAttribution(), isTest, composition: composition(plan, units), contact: person, consentToken: consentToken(), question: '', confirmation: true, website: trap, journey: journey() })
+        ? await call<{ saved: boolean; reference: string; leadEventId?: string }>('/evaluations', saved.sessionKey, { submissionId: crypto.randomUUID(), sessionKey: saved.sessionKey, entry: 'landing', attribution: campaign(), isTest, composition: composition(plan, units), contact: person, consentToken: consentToken(), question: '', confirmation: true, website: trap, journey: journey() })
         : await call<{ saved: boolean; reference: string; leadEventId?: string }>('/requests', saved.sessionKey, { submissionId: crypto.randomUUID(), offerId: current!.id, sessionKey: saved.sessionKey, kind: 'implementation', payment, contact: person, decision, consentToken: consentToken(), confirmation: true, website: trap })
       if (!r.saved) throw new Error('')
       const kind = moreUnits ? 'evaluation' : 'implementation'
