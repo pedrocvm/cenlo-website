@@ -4,7 +4,7 @@ import type { Submission } from './submission.ts'
 /**
  * Internal price suggestion for Pedro's e-mail. Never shown to the visitor.
  * Prices and setup terms come from the CRM (Diagnósticos › Preços e condições);
- * the fallback is what Pedro set on 2026-10-08. Money is integer cents.
+ * the fallback mirrors the CRM values (Essential setup €299 since 2026-10-19). Money is integer cents.
  */
 
 export type PlanKey = 'essential' | 'pro' | 'ultra'
@@ -16,7 +16,7 @@ export type FoodPricing = {
 
 export const FALLBACK_PRICING: FoodPricing = {
   plans: [
-    { key: 'essential', label: 'Essential', setupCents: 24900, monthlyCents: 4990 },
+    { key: 'essential', label: 'Essential', setupCents: 29900, monthlyCents: 4990 },
     { key: 'pro', label: 'Pro', setupCents: 39900, monthlyCents: 7990 },
     { key: 'ultra', label: 'Ultra', setupCents: 59900, monthlyCents: 11990 },
   ],
