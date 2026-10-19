@@ -1,62 +1,23 @@
-import { Resend } from 'resend'
 import { NextRequest, NextResponse } from 'next/server'
-import { buildSubmission, MAX_BODY_BYTES } from '@/lib/food-builder/submission'
-import { renderEmail } from '@/lib/food-builder/email'
-import { loadFoodPricing, suggestPrice } from '@/lib/food-builder/pricing'
-
-// ponytail: per-instance limiter, resets on cold start; loose limit because cenlofood.cenlo.pt proxies here and may share an IP. Move to a shared store if abuse shows up
-const hits = new Map<string, number[]>()
-function limited(ip: string, now: number) {
-  const recent = (hits.get(ip) ?? []).filter(t => now - t < 10 * 60 * 1000)
-  recent.push(now)
-  hits.set(ip, recent)
-  if (hits.size > 5000) hits.clear()
-  return recent.length > 20
-}
-
+import { legacySubmit } from './legacy'
+// Old clients cannot silently turn a configuration into a confirmed order.
+// Confirmed offers use the same persistent CRM service as the diagnostic.
 export async function POST(req: NextRequest) {
-  const now = Date.now()
-  const ip = req.headers.get('x-forwarded-for')?.split(',')[0].trim() || 'unknown'
-  if (limited(ip, now)) return NextResponse.json({ error: 'Demasiados envios. Aguarde alguns minutos e tente novamente.' }, { status: 429 })
-
-  const raw = await req.text()
-  if (raw.length > MAX_BODY_BYTES) return NextResponse.json({ error: 'Pedido demasiado grande.' }, { status: 413 })
-  let body: unknown
+  const origin = req.headers.get('origin')
+  if (origin && ![req.nextUrl.origin, 'https://cenlo.pt', 'https://cenlofood.cenlo.pt'].includes(origin)) return NextResponse.json({ error: 'Origem não permitida.' }, { status: 403 })
+  const raw = await req.clone().text()
+  if (Buffer.byteLength(raw) > 16384) return NextResponse.json({ error: 'O pedido é muito grande.' }, { status: 413 })
+  let body: Record<string, unknown>
+  try { body = JSON.parse(raw) } catch { return NextResponse.json({ error: 'Pedido inválido.' }, { status: 400 }) }
+  if (!body.offerId) {
+    try {
+      const status = await fetch(`${process.env.FOOD_OFFER_API_URL || 'https://api-crm.cenlo.pt/crm/public/diagnostics/food/autonomous'}/status`, { cache: 'no-store', signal: AbortSignal.timeout(5000) })
+      if (status.ok && (await status.json()).enabled === false) return legacySubmit(req)
+    } catch { return NextResponse.json({ error: 'Não foi possível conferir as condições.' }, { status: 503 }) }
+  }
+  if (!body.offerId || body.confirmation !== true) return NextResponse.json({ error: 'Confira a oferta e os valores antes de enviar seu pedido.', reviewUrl: '/configurar/rever' }, { status: 409 })
   try {
-    body = JSON.parse(raw)
-  } catch {
-    return NextResponse.json({ error: 'Pedido inválido.' }, { status: 400 })
-  }
-
-  const result = await buildSubmission(body, now)
-  if (!result.ok) return NextResponse.json({ error: result.errors[0].message, errors: result.errors }, { status: result.status })
-  const s = result.submission
-
-  if (!process.env.RESEND_API_KEY) {
-    console.error('RESEND_API_KEY não está configurada no ambiente')
-    return NextResponse.json({ error: 'O envio está temporariamente indisponível.' }, { status: 503 })
-  }
-
-  const { subject, text, html } = renderEmail(s, suggestPrice(s, await loadFoodPricing()))
-  const resend = new Resend(process.env.RESEND_API_KEY)
-  const { data, error } = await resend.emails.send(
-    {
-      from: 'Cenlo Food Builder <ola@cenlo.pt>',
-      to: process.env.FOOD_BUILDER_TO || 'ola@cenlo.pt',
-      replyTo: s.contact.email ?? undefined,
-      subject,
-      text,
-      html,
-      attachments: [{ filename: `${s.reference}.json`, content: Buffer.from(JSON.stringify(s, null, 2)).toString('base64'), contentType: 'application/json' }],
-      tags: [{ name: 'source', value: s.source }],
-    },
-    { idempotencyKey: `food-builder/${s.submissionId}` },
-  )
-
-  if (error || !data?.id) {
-    console.error('Resend error (food builder):', s.reference, error)
-    return NextResponse.json({ error: 'Não foi possível enviar a configuração. Tente novamente.' }, { status: 502 })
-  }
-
-  return NextResponse.json({ ok: true, reference: s.reference })
+    const res = await fetch(`${process.env.FOOD_OFFER_API_URL || 'https://api-crm.cenlo.pt/crm/public/diagnostics/food/autonomous'}/requests`, { method: 'POST', headers: { 'content-type': 'application/json', 'x-food-session': typeof body.sessionKey === 'string' ? body.sessionKey : '' }, body: raw, cache: 'no-store', signal: AbortSignal.timeout(15000) })
+    return NextResponse.json(await res.json(), { status: res.status })
+  } catch { return NextResponse.json({ error: 'Não consegui registrar seu pedido agora. Suas escolhas continuam aqui.' }, { status: 503 }) }
 }

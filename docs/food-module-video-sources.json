@@ -1,0 +1,263 @@
+{
+  "note": "Existing recordings reused; no new captures. Customer tracking shortened to the first 45 seconds without re-encoding. Other files copied unchanged. Demo-only sources documented in production READMEs.",
+  "clips": [
+    {
+      "module": "orders-core",
+      "source": "2026-09-30-guia-wiki/captures/raw/pt-BR/e02-filtros.mp4",
+      "file": "e02-filtros.mp4",
+      "seconds": 14
+    },
+    {
+      "module": "orders-core",
+      "source": "2026-09-30-guia-wiki/captures/raw/pt-BR/e02-novo.mp4",
+      "file": "e02-novo.mp4",
+      "seconds": 22
+    },
+    {
+      "module": "whatsapp-assistant",
+      "source": "2026-09-30-guia-wiki/captures/raw/pt-BR/e05-abrir.mp4",
+      "file": "e05-abrir.mp4",
+      "seconds": 7
+    },
+    {
+      "module": "whatsapp-assistant",
+      "source": "2026-09-30-guia-wiki/captures/raw/pt-BR/e05-responder.mp4",
+      "file": "e05-responder.mp4",
+      "seconds": 9
+    },
+    {
+      "module": "whatsapp-assistant",
+      "source": "2026-09-30-guia-wiki/captures/raw/pt-BR/e05-retomar.mp4",
+      "file": "e05-retomar.mp4",
+      "seconds": 5
+    },
+    {
+      "module": "kitchen-display",
+      "source": "2026-09-30-guia-wiki/captures/raw/pt-BR/e03-arrastar.mp4",
+      "file": "e03-arrastar.mp4",
+      "seconds": 5
+    },
+    {
+      "module": "kitchen-display",
+      "source": "2026-09-30-guia-wiki/captures/raw/pt-BR/e03-detalhe.mp4",
+      "file": "e03-detalhe.mp4",
+      "seconds": 8
+    },
+    {
+      "module": "auto-printing",
+      "source": "2026-09-30-guia-wiki/captures/raw/pt-BR/e20-associar.mp4",
+      "file": "e20-associar.mp4",
+      "seconds": 8
+    },
+    {
+      "module": "ordering-site",
+      "source": "2026-09-30-guia-wiki/captures/raw/pt-BR/e08-aparencia.mp4",
+      "file": "e08-aparencia.mp4",
+      "seconds": 10
+    },
+    {
+      "module": "ordering-site",
+      "source": "2026-09-30-guia-wiki/captures/raw/pt-BR/e08-publicar.mp4",
+      "file": "e08-publicar.mp4",
+      "seconds": 8
+    },
+    {
+      "module": "ordering-site",
+      "source": "2026-09-30-guia-wiki/captures/raw/pt-BR/e06-c-escolher.mp4",
+      "file": "e06-c-escolher.mp4",
+      "seconds": 9
+    },
+    {
+      "module": "counter-phone",
+      "source": "2026-09-30-guia-wiki/captures/raw/pt-BR/e02-novo.mp4",
+      "file": "e02-novo.mp4",
+      "seconds": 22
+    },
+    {
+      "module": "scheduled-orders",
+      "source": "2026-09-30-guia-wiki/captures/raw/pt-BR/e19-ligar.mp4",
+      "file": "e19-ligar.mp4",
+      "seconds": 7
+    },
+    {
+      "module": "scheduled-orders",
+      "source": "2026-09-30-guia-wiki/captures/raw/pt-BR/e19-data.mp4",
+      "file": "e19-data.mp4",
+      "seconds": 8
+    },
+    {
+      "module": "table-service",
+      "source": "2026-09-30-guia-wiki/captures/raw/pt-BR/e07-c-pedir.mp4",
+      "file": "e07-c-pedir.mp4",
+      "seconds": 20
+    },
+    {
+      "module": "table-service",
+      "source": "2026-09-30-guia-wiki/captures/raw/pt-BR/e07-c-enviar.mp4",
+      "file": "e07-c-enviar.mp4",
+      "seconds": 7
+    },
+    {
+      "module": "table-service",
+      "source": "2026-09-30-guia-wiki/captures/raw/pt-BR/e07-c-chamar.mp4",
+      "file": "e07-c-chamar.mp4",
+      "seconds": 10
+    },
+    {
+      "module": "delivery-zones",
+      "source": "2026-09-30-guia-wiki/captures/raw/pt-BR/e18-nova-zona.mp4",
+      "file": "e18-nova-zona.mp4",
+      "seconds": 9
+    },
+    {
+      "module": "cenlo-delivery",
+      "source": "2026-09-30-guia-wiki/captures/raw/pt-BR/e04-regras.mp4",
+      "file": "e04-regras.mp4",
+      "seconds": 12
+    },
+    {
+      "module": "cenlo-delivery",
+      "source": "2026-09-30-guia-wiki/captures/raw/pt-BR/e04-e-iniciar.mp4",
+      "file": "e04-e-iniciar.mp4",
+      "seconds": 8
+    },
+    {
+      "module": "cenlo-delivery",
+      "source": "2026-09-30-guia-wiki/captures/raw/pt-BR/e04-e-entregar.mp4",
+      "file": "e04-e-entregar.mp4",
+      "seconds": 8
+    },
+    {
+      "module": "customer-updates",
+      "source": "2026-09-26-tutorial-entregas/captures/raw/pt-BR/44-cliente-ao-vivo.mp4",
+      "file": "entregas-44-cliente-ao-vivo.mp4",
+      "seconds": 45,
+      "excerpt": "0:00–0:45 of existing recording"
+    },
+    {
+      "module": "promotions",
+      "source": "2026-09-30-guia-wiki/captures/raw/pt-BR/e11-beneficio.mp4",
+      "file": "e11-beneficio.mp4",
+      "seconds": 11
+    },
+    {
+      "module": "promotions",
+      "source": "2026-09-30-guia-wiki/captures/raw/pt-BR/e11-c-pedido.mp4",
+      "file": "e11-c-pedido.mp4",
+      "seconds": 12
+    },
+    {
+      "module": "promotions",
+      "source": "2026-09-30-guia-wiki/captures/raw/pt-BR/e11-pausar.mp4",
+      "file": "e11-pausar.mp4",
+      "seconds": 5
+    },
+    {
+      "module": "customer-crm",
+      "source": "2026-09-30-guia-wiki/captures/raw/pt-BR/e12-busca.mp4",
+      "file": "e12-busca.mp4",
+      "seconds": 8
+    },
+    {
+      "module": "customer-crm",
+      "source": "2026-09-30-guia-wiki/captures/raw/pt-BR/e12-ficha-rolar.mp4",
+      "file": "e12-ficha-rolar.mp4",
+      "seconds": 6
+    },
+    {
+      "module": "customer-reactivation",
+      "source": "2026-09-30-guia-wiki/captures/raw/pt-BR/e16-reativacao.mp4",
+      "file": "e16-reativacao.mp4",
+      "seconds": 8
+    },
+    {
+      "module": "customer-reactivation",
+      "source": "2026-09-30-guia-wiki/captures/raw/pt-BR/e12-reativar.mp4",
+      "file": "e12-reativar.mp4",
+      "seconds": 9
+    },
+    {
+      "module": "loyalty",
+      "source": "2026-10-05-tutorial-clube-de-fidelidade/captures/raw/pt-BR/m-meta-definir.mp4",
+      "file": "clube-m-meta-definir.mp4",
+      "seconds": 8
+    },
+    {
+      "module": "loyalty",
+      "source": "2026-10-05-tutorial-clube-de-fidelidade/captures/raw/pt-BR/c15-recebimento.mp4",
+      "file": "clube-c15-recebimento.mp4",
+      "seconds": 18
+    },
+    {
+      "module": "loyalty",
+      "source": "2026-10-05-tutorial-clube-de-fidelidade/captures/raw/pt-BR/m-reservar.mp4",
+      "file": "clube-m-reservar.mp4",
+      "seconds": 11
+    },
+    {
+      "module": "cenlo-intelligence",
+      "source": "2026-09-30-guia-wiki/captures/raw/pt-BR/e14-clientes.mp4",
+      "file": "e14-clientes.mp4",
+      "seconds": 6
+    },
+    {
+      "module": "cenlo-intelligence",
+      "source": "2026-09-30-guia-wiki/captures/raw/pt-BR/e14-qualidade.mp4",
+      "file": "e14-qualidade.mp4",
+      "seconds": 6
+    },
+    {
+      "module": "forecasting",
+      "source": "2026-09-30-guia-wiki/captures/raw/pt-BR/e14-previsoes.mp4",
+      "file": "e14-previsoes.mp4",
+      "seconds": 6
+    },
+    {
+      "module": "insights-recommendations",
+      "source": "2026-09-30-guia-wiki/captures/raw/pt-BR/e13-insights.mp4",
+      "file": "e13-insights.mp4",
+      "seconds": 6
+    },
+    {
+      "module": "reports",
+      "source": "2026-09-30-guia-wiki/captures/raw/pt-BR/e13-evolucao.mp4",
+      "file": "e13-evolucao.mp4",
+      "seconds": 6
+    },
+    {
+      "module": "reports",
+      "source": "2026-09-30-guia-wiki/captures/raw/pt-BR/e13-produtos.mp4",
+      "file": "e13-produtos.mp4",
+      "seconds": 7
+    },
+    {
+      "module": "closings-summaries",
+      "source": "2026-09-30-guia-wiki/captures/raw/pt-BR/e13-fechamentos.mp4",
+      "file": "e13-fechamentos.mp4",
+      "seconds": 7
+    },
+    {
+      "module": "closings-summaries",
+      "source": "2026-09-30-guia-wiki/captures/raw/pt-BR/e21-numero.mp4",
+      "file": "e21-numero.mp4",
+      "seconds": 8
+    },
+    {
+      "module": "team-permissions",
+      "source": "2026-09-30-guia-wiki/captures/raw/pt-BR/e22-convidar.mp4",
+      "file": "e22-convidar.mp4",
+      "seconds": 13
+    },
+    {
+      "module": "help-training",
+      "source": "2026-09-30-guia-wiki/captures/raw/pt-BR/e02-novo.mp4",
+      "file": "e02-novo.mp4",
+      "seconds": 22
+    }
+  ],
+  "noExactVideoLocated": [
+    "delivery-radius",
+    "multi-store",
+    "audit-trail"
+  ]
+}

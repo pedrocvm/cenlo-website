@@ -1,13 +1,14 @@
 import Link from 'next/link'
 import BuilderNav from '@/components/food-builder/BuilderNav'
 import Summary from '@/components/food-builder/Summary'
+import FoodAcquisition from '@/components/food-builder/FoodAcquisition'
 import CaptureAttribution from '@/components/food-builder/CaptureAttribution'
 import './builder.css'
 
 export default function FoodBuilderLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="fb">
-      <CaptureAttribution />
+      <CaptureAttribution /><FoodAcquisition />
       <header className="fb-header">
         <div className="fb-header-in">
           <Link href="/configurar" className="fb-brand" aria-label="Cenlo Food, configurador">

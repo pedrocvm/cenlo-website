@@ -2,9 +2,9 @@
 import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { BASE_MODULES, MODULES } from '@/lib/food-builder/catalog'
+import { MODULES } from '@/lib/food-builder/catalog'
 import { TierBadge } from './SelectToggle'
-import { clearSelection, removeModule, useSelection } from './selection'
+import { clearSelection, removeModule, useSelection, EXTRA_SELECTION_MODULES, BASE_SELECTION_MODULES } from './selection'
 
 function countLabel(n: number) {
   return n === 1 ? 'módulo selecionado' : 'módulos selecionados'
@@ -13,7 +13,7 @@ function countLabel(n: number) {
 function Panel({ onNavigate, headingId }: { onNavigate?: () => void; headingId: string }) {
   const selection = useSelection()
   const [confirming, setConfirming] = useState(false)
-  const selected = MODULES.filter(m => selection.includes(m.id))
+  const selected = [...MODULES, ...EXTRA_SELECTION_MODULES].filter(m => selection.includes(m.id))
 
   return (
     <section className="fb-summary" aria-labelledby={headingId}>
@@ -24,13 +24,13 @@ function Panel({ onNavigate, headingId }: { onNavigate?: () => void; headingId: 
       </div>
       <div className="fb-base">
         <span className="fb-badge fb-badge-ok" aria-hidden="true">Base</span>
-        <Link href="/configurar#modulos" onClick={onNavigate}><b>{BASE_MODULES.length} módulos</b> já incluídos</Link>
+        <Link href="/configurar#modulos" onClick={onNavigate}><b>{BASE_SELECTION_MODULES.length} módulos</b> já incluídos</Link>
       </div>
       {selected.length ? (
         <ul className="fb-sel-list">
           {selected.map(m => (
             <li key={m.id}>
-              <Link href={`/configurar/${m.slug}`} onClick={onNavigate}>{m.title}</Link>
+              <Link href={m.slug ? `/configurar/${m.slug}` : '/configurar/rever?editar=1'} onClick={onNavigate}>{m.title}</Link>
               {m.tier === 'premium' && <TierBadge tier="premium" />}
               <button type="button" className="fb-x" onClick={() => removeModule(m.id)} aria-label={`Remover ${m.title}`}>✕</button>
             </li>
@@ -53,7 +53,7 @@ function Panel({ onNavigate, headingId }: { onNavigate?: () => void; headingId: 
           )}
         </div>
       )}
-      <p className="fb-note">Sem compromisso. A seleção é uma preferência para analisarmos consigo, não ativa nada na sua conta.</p>
+      <p className="fb-note">Confira o escopo e os valores antes de enviar um pedido. Nada é cobrado ou ativado nesta etapa.</p>
     </section>
   )
 }
@@ -63,7 +63,7 @@ export default function Summary({ children }: { children: React.ReactNode }) {
   const selection = useSelection()
   const sheetRef = useRef<HTMLDialogElement>(null)
   const [sheetOpen, setSheetOpen] = useState(false)
-  const showSide = !pathname.startsWith('/configurar/rever') && !pathname.startsWith('/configurar/enviado')
+  const showSide = !pathname.startsWith('/configurar/avaliacao') && !pathname.startsWith('/configurar/oferta') && !pathname.startsWith('/configurar/rever') && !pathname.startsWith('/configurar/enviado')
 
   useEffect(() => {
     const d = sheetRef.current
@@ -72,6 +72,8 @@ export default function Summary({ children }: { children: React.ReactNode }) {
     if (!sheetOpen && d.open) d.close()
   }, [sheetOpen])
 
+  // Synchronize the mobile sheet with external navigation.
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => setSheetOpen(false), [pathname])
 
   const n = selection.length
