@@ -36,7 +36,7 @@ export function storageGet(key, storage) { try { return JSON.parse((storage || g
 export function storageSet(key, value, storage) { try { (storage || globalThis.localStorage).setItem(key,JSON.stringify(value)); } catch {} }
 export const MARKETING = 'https://api-crm.cenlo.pt/public/acquisition/marketing';
 // Same table as the CRM: one Meta name and one eventID per fact, so Meta counts it once.
-const META_EVENTS={food_funnel_viewed:'PageView',bio_view_observed:'PageView',demo_entry_viewed:'ViewContent',contact_cta_clicked:'Contact',diagnostic_result_viewed:'DiagnosticCompleted',food_whatsapp_opened:'Contact',food_demo_booked:'Schedule'};
+const META_EVENTS={bio_view_observed:'PageView',demo_entry_viewed:'ViewContent',contact_cta_clicked:'Contact',diagnostic_result_viewed:'DiagnosticCompleted',food_whatsapp_opened:'Contact',food_demo_booked:'Schedule'};
 const META_STANDARD=new Set(['PageView','ViewContent','Contact','Lead','Schedule']);
 const FBP=/^fb\.\d\.\d{10,13}\.\d{1,20}$/, FBC=/^fb\.\d\.\d{10,13}\.[A-Za-z0-9_-]{1,500}$/;
 // Cookies can be blocked or absent; neither may break the page or the withdrawal.
@@ -55,7 +55,6 @@ async function pixelFor(client,product){try{client.marketingConfig??=fetch(clien
 const initialised=new Set();
 function loadPixel(id){
   if(!globalThis.fbq){!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(globalThis,document,'script','https://connect.facebook.net/en_US/fbevents.js');}
-  // No automatic events: only the facts the visitor allowed, with our eventID.
   if(!initialised.has(id)){globalThis.fbq('set','autoConfig',false,id);globalThis.fbq('init',id);initialised.add(id);}
 }
 const PROOFS_KEY='cenlo-acquisition-revocations-v1', WITHDRAWALS_KEY='cenlo-acquisition-withdrawals-v1';
@@ -87,6 +86,14 @@ export class AcquisitionClient {
     if(!preview){this.persistProofs();this.persistWithdrawals();storageSet('cenlo-acquisition-withdrawal-v1',null);}
     if(this.pendingWithdrawal){this.receipt=null;void this.retryWithdrawal();}
     this.marketing=!!this.receipt&&!preview&&storageGet('cenlo-acquisition-marketing-v1')===true;
+    if(!preview)void this.activatePixel();
+  }
+  async activatePixel(){
+    const existed=typeof globalThis.fbq==='function';
+    const product=this.product;const id=this.pixels[product]??=await pixelFor(this,product);
+    if(!id)return;loadPixel(id);
+    if(existed)return;
+    try{globalThis.fbq('trackSingle',id,'PageView',{content_category:product});}catch{}
   }
   get pendingWithdrawal(){return this.withdrawalQueue.length?true:null;}
   get revocationReceipt(){return this.revocationProofs[0]??null;}
@@ -102,17 +109,17 @@ export class AcquisitionClient {
     if(this.disabled||this.pendingWithdrawal||this.revocationProofs.length>=MAX_PROOFS)return false;
     const generation=this.generation=(this.generation||0)+1;
     try{
-      const receipt=await this.request('/consent',{policyVersion:this.policyVersion,accepted:true,surface:this.surface,product:this.product,entryProduct:this.entryProduct,attribution:this.attribution,...(marketing?{marketing:true,meta:metaIdentifiers()}:{})});
+      const receipt=await this.request('/consent',{policyVersion:this.policyVersion,accepted:true,surface:this.surface,product:this.product,entryProduct:this.entryProduct,attribution:this.attribution,marketing:true,meta:metaIdentifiers()});
       if(generation!==this.generation){this.queueWithdrawal([receipt]);await this.retryWithdrawal();return false;}
       this.remember(this.receipt);this.remember(receipt);this.receipt=receipt;
-      storageSet('cenlo-acquisition-receipt-v1',receipt);storageSet('cenlo-acquisition-choice-v1','accepted');this.marketing=marketing;storageSet('cenlo-acquisition-marketing-v1',marketing);this.onChange();void this.prepare();return true;
+      storageSet('cenlo-acquisition-receipt-v1',receipt);storageSet('cenlo-acquisition-choice-v1','accepted');this.marketing=true;storageSet('cenlo-acquisition-marketing-v1',true);this.onChange();void this.prepare();return true;
     }catch{return false;}
   }
   async decline() {
     this.generation=(this.generation||0)+1;
     const proofs=mergeProofs(storedProofs(PROOFS_KEY),this.revocationProofs,[this.receipt]);
     this.revocationProofs=[];this.receipt=null;this.handoffs={};this.reference=null;
-    storageSet('cenlo-acquisition-receipt-v1',null);storageSet('cenlo-acquisition-choice-v1','essential');this.marketing=false;storageSet('cenlo-acquisition-marketing-v1',false);forgetMeta();
+    storageSet('cenlo-acquisition-receipt-v1',null);storageSet('cenlo-acquisition-choice-v1','essential');this.marketing=false;storageSet('cenlo-acquisition-marketing-v1',false);
     this.persistProofs();this.queueWithdrawal(proofs);this.onChange();await this.retryWithdrawal();return !this.pendingWithdrawal;
   }
   async retryWithdrawal() {
@@ -145,20 +152,18 @@ export class AcquisitionClient {
   }
   context() { return {sessionId:this.receipt.sessionId,product:this.product,entryProduct:this.entryProduct,environment:'production',trafficClass:'public',experience:this.surface,...(this.revision?{bioRevision:this.revision}:{}),attribution:this.attribution}; }
   event(name, properties={}) {
+    const eventId=crypto.randomUUID();
+    void this.mirror(name,eventId);
     if (!this.receipt || this.disabled || Date.parse(this.receipt.expiresAt)<=Date.now()) return false;
     const consentToken=this.receipt.consentToken;
-    const event={schemaVersion:1,eventId:crypto.randomUUID(),name,occurredAt:new Date().toISOString(),context:this.context(),properties};
-    // No pre-consent queue, no PII, no replay after withdrawal. Transport failure never blocks use.
-    void this.request('/events',{consentToken,events:[event]}).catch(()=>{});void this.mirror(name,event.eventId);return true;
+    const event={schemaVersion:1,eventId,name,occurredAt:new Date().toISOString(),context:this.context(),properties};
+    void this.request('/events',{consentToken,events:[event]}).catch(()=>{});return true;
   }
-  /** The Pixel sees the same fact with the same eventID, and only after the Meta choice. */
   async mirror(name,eventId){const metaName=META_EVENTS[name];if(metaName)await this.mirrorMeta(metaName,eventId);}
-  /** For facts the CRM confirms (a saved diagnostic is the Lead): the page passes the
-   * id the CRM uses, so the Pixel and the Conversions API describe one event. */
   async mirrorMeta(metaName,eventId,properties={}){
-    if(!this.marketing||this.disabled||this.preview||!this.receipt||Date.parse(this.receipt.expiresAt)<=Date.now())return;
+    if(this.preview)return;
     const product=this.product;const id=this.pixels[product]??=await pixelFor(this,product);
-    if(!id||!this.marketing)return;loadPixel(id);
+    if(!id)return;loadPixel(id);
     try{globalThis.fbq(META_STANDARD.has(metaName)?'trackSingle':'trackSingleCustom',id,metaName,{content_category:product,...properties},{eventID:eventId});}catch{}
   }
   async prepare() {
@@ -174,14 +179,13 @@ export class AcquisitionClient {
   }
 }
 export function consentControls(client, mount, { privacyUrl='https://pedro.cenlo.pt/privacidade.html', enabled=true, onExpandedChange=()=>{} }={}) {
-  const box=document.createElement('div');box.className='consent-controls';mount.append(box);const choice=storageGet('cenlo-acquisition-choice-v1');let expanded=enabled&&(!choice||(choice==='accepted'&&!client.receipt)),feedback='',metaChecked=false;
+  const box=document.createElement('div');box.className='consent-controls';mount.append(box);const choice=storageGet('cenlo-acquisition-choice-v1');let expanded=enabled&&(!choice||(choice==='accepted'&&!client.receipt)),feedback='';
   const draw=()=>{
     box.replaceChildren();const toggle=document.createElement('button');toggle.type='button';toggle.className='privacy-toggle';toggle.textContent='Privacidade';toggle.addEventListener('click',()=>{expanded=!expanded;draw();});toggle.setAttribute('aria-expanded',String(expanded));box.append(toggle);onExpandedChange(expanded);
     if (!expanded) return;
-    const p=document.createElement('p');p.textContent=feedback||(!enabled&&!client.receipt?'A medição está desativada nesta experiência. Pode usar a bio, o teste, o diagnóstico e o contacto normalmente.':'Pode usar tudo sem medição. Se permitir, o Cenlo acompanha cliques e etapas entre a bio, o teste e o diagnóstico por até 90 dias. Pode retirar aqui a qualquer momento.'+(client.receipt?(client.marketing?' Também autorizou a Meta a usar estes dados para anúncios.':' A Meta não recebe nada.'):''));box.append(p);
-    if(enabled&&!client.receipt){const label=document.createElement('label');label.className='consent-meta';const cb=document.createElement('input');cb.type='checkbox';cb.checked=metaChecked;cb.addEventListener('change',()=>{metaChecked=cb.checked;});label.append(cb,document.createTextNode(' Também deixar a Meta usar estes dados para mostrar anúncios do Cenlo no Instagram e no Facebook.'));box.append(label);}
+    const p=document.createElement('p');p.textContent=feedback||(!enabled&&!client.receipt?'A medição está desativada nesta experiência. Pode usar a bio, o teste, o diagnóstico e o contacto normalmente.':'Pode usar tudo sem medição. Se permitir, o Cenlo acompanha cliques e etapas entre a bio, o teste e o diagnóstico por até 90 dias. Pode retirar aqui a qualquer momento.');box.append(p);
     const choices=document.createElement('div');choices.className='consent-choices';box.append(choices);
-    for(const [label,action] of [[(client.receipt||client.revocationReceipt)?'Retirar permissão':'Continuar sem medição',()=>client.decline()],...(enabled&&!client.receipt?[['Permitir medição',()=>client.accept(metaChecked)]]:[])]){
+    for(const [label,action] of [[(client.receipt||client.revocationReceipt)?'Retirar permissão':'Continuar sem medição',()=>client.decline()],...(enabled&&!client.receipt?[['Permitir medição',()=>client.accept(false)]]:[])]){
       const b=document.createElement('button');b.type='button';b.textContent=label;b.addEventListener('click',async()=>{b.disabled=true;const ok=await action();expanded=ok===false;if(ok===false)feedback=client.pendingWithdrawal?'A medição parou neste navegador. A retirada dos dados será concluída quando a conexão voltar.':'A medição não está disponível agora. Pode continuar normalmente.';else feedback='';draw();});choices.append(b);
     }
     const a=document.createElement('a');a.href=privacyUrl;a.textContent='Como usamos os dados';a.target='_blank';a.rel='noopener noreferrer';box.append(a);
