@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { Resend } from 'resend'
 import { validateLead, type SitePizzariaLead } from '@/lib/site-pizzaria/lead'
 
 export const runtime = 'nodejs'
@@ -8,9 +7,8 @@ const WINDOW_MS = 10 * 60 * 1000
 const MAX_ATTEMPTS = 6
 // ponytail: per-instance memory. It blunts bursts and double submits on a warm instance; the CRM dedupes by submissionId for real.
 const attempts = new Map<string, { count: number; resetAt: number }>()
-const accepted = new Map<string, { reference: string; delivery: 'crm' | 'email'; leadEventId?: string; at: number }>()
-
-const isProduction = process.env.VERCEL_ENV === 'production'
+const accepted = new Map<string, { reference: string; leadEventId?: string; at: number }>()
+const UNAVAILABLE = 'Não foi possível registrar o pedido agora. Seus dados continuam preenchidos. Tente de novo em instantes.'
 
 function requesterIp(request: NextRequest) {
   return request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || request.headers.get('x-real-ip') || 'unknown'
@@ -27,17 +25,15 @@ function isRateLimited(ip: string) {
   return current.count > MAX_ATTEMPTS
 }
 
-async function forwardToCrm(lead: SitePizzariaLead & { device: string | null }, consentToken: string | undefined) {
+/** The CRM saves the lead and tells Pedro on WhatsApp. There is no other place a request can land. */
+async function saveInCrm(lead: SitePizzariaLead & { device: string | null }, consentToken: string | undefined) {
   const endpoint = process.env.CENLO_SITE_PIZZARIA_CRM_ENDPOINT
-  if (!endpoint) return null
+  const token = process.env.CENLO_SITE_PIZZARIA_CRM_TOKEN
+  if (!endpoint || !token) throw new Error('CRM não configurado')
 
   const response = await fetch(endpoint, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Idempotency-Key': lead.submissionId,
-      ...(process.env.CENLO_SITE_PIZZARIA_CRM_TOKEN ? { Authorization: `Bearer ${process.env.CENLO_SITE_PIZZARIA_CRM_TOKEN}` } : {}),
-    },
+    headers: { 'Content-Type': 'application/json', 'Idempotency-Key': lead.submissionId, Authorization: `Bearer ${token}` },
     body: JSON.stringify({ ...lead, ...(consentToken ? { consentToken } : {}) }),
     cache: 'no-store',
     signal: AbortSignal.timeout(8_000),
@@ -45,34 +41,6 @@ async function forwardToCrm(lead: SitePizzariaLead & { device: string | null }, 
   if (!response.ok) throw new Error(`CRM respondeu ${response.status}`)
   const receipt = await response.json().catch(() => ({})) as { leadEventId?: unknown }
   return { leadEventId: typeof receipt.leadEventId === 'string' ? receipt.leadEventId : undefined }
-}
-
-async function sendNotification(lead: SitePizzariaLead & { device: string | null }, delivery: 'crm' | 'email') {
-  if (!process.env.RESEND_API_KEY) return false
-
-  const { error } = await new Resend(process.env.RESEND_API_KEY).emails.send({
-    from: 'Cenlo Website <ola@cenlo.pt>',
-    to: process.env.CENLO_SITE_PIZZARIA_NOTIFICATION_EMAIL || 'website@cenlo.pt',
-    subject: `${delivery === 'email' ? '[sem CRM] ' : ''}Pedido de site para pizzaria · ${lead.business}`,
-    text: [
-      'Oferta: site para pizzaria por €149,90',
-      `Referência: ${lead.reference}`,
-      `Gravado no CRM: ${delivery === 'crm' ? 'sim' : 'NÃO (só este e-mail)'}`,
-      `Nome: ${lead.firstName}`,
-      `Pizzaria: ${lead.business}`,
-      `WhatsApp: ${lead.phone}`,
-      `Instagram ou cardápio: ${lead.currentLink || '—'}`,
-      `Consentimento: ${lead.consentText}`,
-      `Página: ${lead.pageUrl || '—'}`,
-      `Origem: ${lead.referrer || '—'}`,
-      `Campanha: ${Object.keys(lead.attribution).length ? JSON.stringify(lead.attribution) : '—'}`,
-      `Fuso horário: ${lead.timezone || '—'}`,
-      `Dispositivo: ${lead.device || '—'}`,
-      `Recebido em: ${lead.createdAt}`,
-    ].join('\n'),
-  })
-  if (error) throw new Error(error.message)
-  return true
 }
 
 export async function POST(request: NextRequest) {
@@ -89,7 +57,7 @@ export async function POST(request: NextRequest) {
 
   // Honeypot filled: answer like a success so the bot learns nothing.
   if (typeof body.website === 'string' && body.website.trim()) {
-    return NextResponse.json({ ok: true, reference: 'SPZ-RECEBIDO', delivery: 'email' }, { status: 201 })
+    return NextResponse.json({ ok: true, reference: 'SPZ-RECEBIDO' }, { status: 201 })
   }
 
   const result = validateLead(body, new Date())
@@ -97,43 +65,18 @@ export async function POST(request: NextRequest) {
   const lead = { ...result.lead, device: request.headers.get('user-agent')?.slice(0, 500) || null }
 
   const previous = accepted.get(lead.submissionId)
-  if (previous) return NextResponse.json({ ok: true, reference: previous.reference, delivery: previous.delivery, replay: true }, { status: 200 })
+  if (previous) return NextResponse.json({ ok: true, reference: previous.reference, replay: true }, { status: 200 })
   const consentToken = typeof body.consentToken === 'string' && body.consentToken.length <= 4000 ? body.consentToken : undefined
 
-  // Production promises a CRM lead. Without its endpoint the page refuses honestly instead of parking leads in an inbox.
-  if (isProduction && !(process.env.CENLO_SITE_PIZZARIA_CRM_ENDPOINT && process.env.CENLO_SITE_PIZZARIA_CRM_TOKEN)) {
-    console.error('site-pizzaria: endpoint ou token do CRM ausente em produção', { reference: lead.reference })
-    return NextResponse.json({ ok: false, error: 'Não foi possível registrar o pedido agora. Seus dados continuam preenchidos. Tente de novo em instantes.' }, { status: 503 })
-  }
-
-  const failures: string[] = []
-  let delivery: 'crm' | 'email' | null = null
   let leadEventId: string | undefined
   try {
-    const crm = await forwardToCrm(lead, consentToken)
-    if (crm) { delivery = 'crm'; leadEventId = crm.leadEventId }
+    ;({ leadEventId } = await saveInCrm(lead, consentToken))
   } catch (error) {
-    failures.push(`CRM: ${error instanceof Error ? error.message : 'falha'}`)
-  }
-
-  if (!delivery && isProduction) {
-    console.error('site-pizzaria: CRM recusou o lead', { reference: lead.reference, failures })
-    return NextResponse.json({ ok: false, error: 'Não foi possível registrar o pedido agora. Seus dados continuam preenchidos. Tente de novo em instantes.' }, { status: 503 })
-  }
-
-  try {
-    if (await sendNotification(lead, delivery ?? 'email')) delivery ??= 'email'
-  } catch (error) {
-    failures.push(`E-mail: ${error instanceof Error ? error.message : 'falha'}`)
-  }
-
-  if (!delivery) {
-    console.error('site-pizzaria: lead não registrado', { reference: lead.reference, failures })
-    return NextResponse.json({ ok: false, error: 'Não foi possível registrar o pedido agora. Seus dados continuam preenchidos. Tente de novo em instantes.' }, { status: 503 })
+    console.error('site-pizzaria: lead não registrado no CRM', { reference: lead.reference, error: error instanceof Error ? error.message : 'falha' })
+    return NextResponse.json({ ok: false, error: UNAVAILABLE }, { status: 503 })
   }
 
   for (const [key, value] of accepted) if (Date.now() - value.at > 60 * 60 * 1000) accepted.delete(key)
-  accepted.set(lead.submissionId, { reference: lead.reference, delivery, leadEventId, at: Date.now() })
-  console.info('site-pizzaria: lead registrado', { reference: lead.reference, delivery, failures })
-  return NextResponse.json({ ok: true, reference: lead.reference, delivery, ...(leadEventId ? { leadEventId } : {}) }, { status: 201 })
+  accepted.set(lead.submissionId, { reference: lead.reference, leadEventId, at: Date.now() })
+  return NextResponse.json({ ok: true, reference: lead.reference, ...(leadEventId ? { leadEventId } : {}) }, { status: 201 })
 }
