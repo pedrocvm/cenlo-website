@@ -5,6 +5,7 @@ import { PrivacyProvider } from '@/components/PrivacyContext'
 import PrivacyModal from '@/components/PrivacyModal'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
+import MainShell from '@/components/MainShell'
 import Motion from '@/components/motion/Motion'
 
 const hanken = Hanken_Grotesk({ subsets: ['latin'], weight: ['400', '500', '600', '700'], variable: '--font-hanken', display: 'swap' })
@@ -40,7 +41,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <PrivacyProvider>
           <a href="#main" className="skip">Pular para o conteúdo</a>
           <Header />
-          <main id="main">{children}</main>
+          <MainShell>{children}</MainShell>
           <Footer />
           <PrivacyModal />
           <Motion />
