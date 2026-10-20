@@ -1,206 +1,135 @@
-import { randomUUID } from 'node:crypto'
 import { NextRequest, NextResponse } from 'next/server'
 import { Resend } from 'resend'
+import { validateLead, type SitePizzariaLead } from '@/lib/site-pizzaria/lead'
 
 export const runtime = 'nodejs'
 
 const WINDOW_MS = 10 * 60 * 1000
 const MAX_ATTEMPTS = 6
+// ponytail: per-instance memory. It blunts bursts and double submits on a warm instance; the CRM dedupes by submissionId for real.
 const attempts = new Map<string, { count: number; resetAt: number }>()
+const accepted = new Map<string, { reference: string; delivery: 'crm' | 'email'; at: number }>()
 
-function clean(value: unknown, max = 160) {
-  return typeof value === 'string' ? value.trim().slice(0, max) : ''
-}
+const isProduction = process.env.VERCEL_ENV === 'production'
 
 function requesterIp(request: NextRequest) {
-  return (
-    request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
-    request.headers.get('x-real-ip') ||
-    'unknown'
-  )
+  return request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || request.headers.get('x-real-ip') || 'unknown'
 }
 
 function isRateLimited(ip: string) {
   const now = Date.now()
   const current = attempts.get(ip)
-
   if (!current || current.resetAt <= now) {
     attempts.set(ip, { count: 1, resetAt: now + WINDOW_MS })
     return false
   }
-
-  if (current.count >= MAX_ATTEMPTS) return true
-
   current.count += 1
-  attempts.set(ip, current)
-  return false
+  return current.count > MAX_ATTEMPTS
 }
 
-function normalizeAttribution(value: unknown) {
-  if (!value || typeof value !== 'object' || Array.isArray(value)) return {}
-
-  const allowed = new Set([
-    'utm_source',
-    'utm_medium',
-    'utm_campaign',
-    'utm_content',
-    'utm_term',
-    'utm_id',
-    'fbclid',
-    'gclid',
-  ])
-
-  return Object.fromEntries(
-    Object.entries(value)
-      .filter(([key, item]) => allowed.has(key) && typeof item === 'string')
-      .map(([key, item]) => [key, clean(item, 180)]),
-  )
-}
-
-async function forwardToCrm(payload: Record<string, unknown>) {
+async function forwardToCrm(lead: SitePizzariaLead & { device: string | null }) {
   const endpoint = process.env.CENLO_SITE_PIZZARIA_CRM_ENDPOINT
-  if (!endpoint) return { attempted: false, ok: false }
+  if (!endpoint) return false
 
   const response = await fetch(endpoint, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      ...(process.env.CENLO_SITE_PIZZARIA_CRM_TOKEN
-        ? { Authorization: `Bearer ${process.env.CENLO_SITE_PIZZARIA_CRM_TOKEN}` }
-        : {}),
+      'Idempotency-Key': lead.submissionId,
+      ...(process.env.CENLO_SITE_PIZZARIA_CRM_TOKEN ? { Authorization: `Bearer ${process.env.CENLO_SITE_PIZZARIA_CRM_TOKEN}` } : {}),
     },
-    body: JSON.stringify(payload),
+    body: JSON.stringify(lead),
     cache: 'no-store',
     signal: AbortSignal.timeout(8_000),
   })
-
   if (!response.ok) throw new Error(`CRM respondeu ${response.status}`)
-  return { attempted: true, ok: true }
+  return true
 }
 
-async function sendNotification(payload: Record<string, unknown>) {
-  if (!process.env.RESEND_API_KEY) return { attempted: false, ok: false }
+async function sendNotification(lead: SitePizzariaLead & { device: string | null }, delivery: 'crm' | 'email') {
+  if (!process.env.RESEND_API_KEY) return false
 
-  const resend = new Resend(process.env.RESEND_API_KEY)
-  const attribution = payload.attribution as Record<string, string>
-  const { error } = await resend.emails.send({
+  const { error } = await new Resend(process.env.RESEND_API_KEY).emails.send({
     from: 'Cenlo Website <ola@cenlo.pt>',
     to: process.env.CENLO_SITE_PIZZARIA_NOTIFICATION_EMAIL || 'website@cenlo.pt',
-    subject: `Novo pedido de site para pizzaria — ${payload.business}`,
+    subject: `${delivery === 'email' ? '[sem CRM] ' : ''}Pedido de site para pizzaria · ${lead.business}`,
     text: [
-      'Oferta: Site para pizzaria por €149,90',
-      `Referência: ${payload.reference}`,
-      `Nome: ${payload.firstName}`,
-      `Pizzaria: ${payload.business}`,
-      `WhatsApp: ${payload.phone}`,
-      `Instagram ou cardápio: ${payload.currentLink || '—'}`,
-      `Consentimento: ${payload.consent ? 'sim' : 'não'}`,
-      `Página: ${payload.pageUrl || '—'}`,
-      `Origem: ${payload.referrer || '—'}`,
-      `Fuso horário: ${payload.timezone || '—'}`,
-      `Dispositivo: ${payload.device || '—'}`,
-      `Campanha: ${Object.keys(attribution).length ? JSON.stringify(attribution) : '—'}`,
-      `Recebido em: ${payload.createdAt}`,
+      'Oferta: site para pizzaria por €149,90',
+      `Referência: ${lead.reference}`,
+      `Gravado no CRM: ${delivery === 'crm' ? 'sim' : 'NÃO (só este e-mail)'}`,
+      `Nome: ${lead.firstName}`,
+      `Pizzaria: ${lead.business}`,
+      `WhatsApp: ${lead.phone}`,
+      `Instagram ou cardápio: ${lead.currentLink || '—'}`,
+      `Consentimento: ${lead.consentText}`,
+      `Página: ${lead.pageUrl || '—'}`,
+      `Origem: ${lead.referrer || '—'}`,
+      `Campanha: ${Object.keys(lead.attribution).length ? JSON.stringify(lead.attribution) : '—'}`,
+      `Fuso horário: ${lead.timezone || '—'}`,
+      `Dispositivo: ${lead.device || '—'}`,
+      `Recebido em: ${lead.createdAt}`,
     ].join('\n'),
   })
-
   if (error) throw new Error(error.message)
-  return { attempted: true, ok: true }
+  return true
 }
 
 export async function POST(request: NextRequest) {
-  const ip = requesterIp(request)
-  if (isRateLimited(ip)) {
-    return NextResponse.json(
-      { ok: false, error: 'Muitas tentativas seguidas. Aguarde alguns minutos e tente novamente.' },
-      { status: 429 },
-    )
+  if (isRateLimited(requesterIp(request))) {
+    return NextResponse.json({ ok: false, error: 'Muitas tentativas seguidas. Aguarde alguns minutos e tente de novo.' }, { status: 429 })
   }
 
   let body: Record<string, unknown>
   try {
     body = await request.json()
   } catch {
-    return NextResponse.json({ ok: false, error: 'Pedido inválido.' }, { status: 400 })
+    return NextResponse.json({ ok: false, error: 'Não conseguimos ler o pedido. Tente de novo.' }, { status: 400 })
   }
 
-  // Honeypot preenchido. Responde como sucesso para não ensinar o robô a contornar a proteção.
-  if (clean(body.website, 80)) {
-    return NextResponse.json({ ok: true, reference: `SPZ-${Date.now().toString(36).toUpperCase()}` })
+  // Honeypot filled: answer like a success so the bot learns nothing.
+  if (typeof body.website === 'string' && body.website.trim()) {
+    return NextResponse.json({ ok: true, reference: 'SPZ-RECEBIDO', delivery: 'email' }, { status: 201 })
   }
 
-  const firstName = clean(body.firstName, 60)
-  const business = clean(body.business, 120)
-  const phone = clean(body.phone, 24)
-  const currentLink = clean(body.currentLink, 220)
-  const consent = body.consent === true
-  const digits = phone.replace(/\D/g, '')
+  const result = validateLead(body, new Date())
+  if ('error' in result) return NextResponse.json({ ok: false, ...result.error, error: result.error.message }, { status: 422 })
+  const lead = { ...result.lead, device: request.headers.get('user-agent')?.slice(0, 500) || null }
 
-  if (firstName.length < 2) {
-    return NextResponse.json({ ok: false, field: 'firstName', error: 'Informe o seu primeiro nome.' }, { status: 422 })
-  }
-  if (business.length < 2) {
-    return NextResponse.json({ ok: false, field: 'business', error: 'Informe o nome da pizzaria.' }, { status: 422 })
-  }
-  if (digits.length < 6 || digits.length > 18) {
-    return NextResponse.json({ ok: false, field: 'phone', error: 'Informe um número de WhatsApp válido.' }, { status: 422 })
-  }
-  if (!consent) {
-    return NextResponse.json({ ok: false, field: 'consent', error: 'Confirme a autorização para receber a resposta no WhatsApp.' }, { status: 422 })
+  const previous = accepted.get(lead.submissionId)
+  if (previous) return NextResponse.json({ ok: true, reference: previous.reference, delivery: previous.delivery, replay: true }, { status: 200 })
+
+  // Production promises a CRM lead. Without its endpoint the page refuses honestly instead of parking leads in an inbox.
+  if (isProduction && !process.env.CENLO_SITE_PIZZARIA_CRM_ENDPOINT) {
+    console.error('site-pizzaria: CENLO_SITE_PIZZARIA_CRM_ENDPOINT ausente em produção', { reference: lead.reference })
+    return NextResponse.json({ ok: false, error: 'Não foi possível registrar o pedido agora. Seus dados continuam preenchidos. Tente de novo em instantes.' }, { status: 503 })
   }
 
-  const reference = `SPZ-${randomUUID().split('-')[0].toUpperCase()}`
-  const payload = {
-    reference,
-    offer: 'site-pizzaria-14990',
-    landingVersion: '1.0.0',
-    firstName,
-    business,
-    phone,
-    currentLink: currentLink || null,
-    consent,
-    pageUrl: clean(body.pageUrl, 500) || null,
-    referrer: clean(body.referrer, 500) || null,
-    timezone: clean(body.timezone, 80) || null,
-    device: clean(request.headers.get('user-agent'), 500) || null,
-    attribution: normalizeAttribution(body.attribution),
-    createdAt: new Date().toISOString(),
-  }
-
-  let crm = { attempted: false, ok: false }
-  let email = { attempted: false, ok: false }
   const failures: string[] = []
+  let delivery: 'crm' | 'email' | null = null
+  try {
+    if (await forwardToCrm(lead)) delivery = 'crm'
+  } catch (error) {
+    failures.push(`CRM: ${error instanceof Error ? error.message : 'falha'}`)
+  }
+
+  if (!delivery && isProduction) {
+    console.error('site-pizzaria: CRM recusou o lead', { reference: lead.reference, failures })
+    return NextResponse.json({ ok: false, error: 'Não foi possível registrar o pedido agora. Seus dados continuam preenchidos. Tente de novo em instantes.' }, { status: 503 })
+  }
 
   try {
-    crm = await forwardToCrm(payload)
+    if (await sendNotification(lead, delivery ?? 'email')) delivery ??= 'email'
   } catch (error) {
-    failures.push(`CRM: ${error instanceof Error ? error.message : 'falha desconhecida'}`)
+    failures.push(`E-mail: ${error instanceof Error ? error.message : 'falha'}`)
   }
 
-  try {
-    email = await sendNotification(payload)
-  } catch (error) {
-    failures.push(`Email: ${error instanceof Error ? error.message : 'falha desconhecida'}`)
+  if (!delivery) {
+    console.error('site-pizzaria: lead não registrado', { reference: lead.reference, failures })
+    return NextResponse.json({ ok: false, error: 'Não foi possível registrar o pedido agora. Seus dados continuam preenchidos. Tente de novo em instantes.' }, { status: 503 })
   }
 
-  if (!crm.ok && !email.ok) {
-    console.error('Não foi possível registrar o pedido de site para pizzaria', {
-      reference,
-      attempted: { crm: crm.attempted, email: email.attempted },
-      failures,
-    })
-    return NextResponse.json(
-      { ok: false, error: 'Não foi possível registrar o pedido agora. Seus dados continuam preenchidos. Tente novamente.' },
-      { status: 503 },
-    )
-  }
-
-  return NextResponse.json(
-    {
-      ok: true,
-      reference,
-      delivery: crm.ok ? 'crm' : 'email',
-    },
-    { status: 201 },
-  )
+  for (const [key, value] of accepted) if (Date.now() - value.at > 60 * 60 * 1000) accepted.delete(key)
+  accepted.set(lead.submissionId, { reference: lead.reference, delivery, at: Date.now() })
+  console.info('site-pizzaria: lead registrado', { reference: lead.reference, delivery, failures })
+  return NextResponse.json({ ok: true, reference: lead.reference, delivery }, { status: 201 })
 }
