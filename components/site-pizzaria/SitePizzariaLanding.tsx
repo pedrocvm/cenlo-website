@@ -80,6 +80,19 @@ function check(values: Values): Partial<Record<Field, string>> {
   return errors
 }
 
+/** 912345678 → "912 345 678"; an international number keeps what the visitor typed. */
+function formatPhone(raw: string) {
+  if (raw.trim().startsWith('+')) return raw.replace(/[^\d+\s]/g, '').slice(0, 20)
+  return raw.replace(/\D/g, '').slice(0, 9).replace(/(\d{3})(?=\d)/g, '$1 ')
+}
+
+/** "instagram.com/forno_do_ze/" or "forno_do_ze" → "@forno_do_ze"; links stay links. */
+function handleOf(raw: string) {
+  const v = raw.trim()
+  const m = /^(?:https?:\/\/)?(?:www\.)?instagram\.com\/([A-Za-z0-9._]+)/i.exec(v) || /^@?([A-Za-z0-9._]{2,30})$/.exec(v)
+  return m ? '@' + m[1] : ''
+}
+
 function Arrow() {
   return <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14m0 0-5.5-5.5M19 12l-5.5 5.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
 }
@@ -253,6 +266,7 @@ export default function SitePizzariaLanding() {
   const [errors, setErrors] = useState<Partial<Record<Field, string>>>({})
   const [submit, setSubmit] = useState<Submit>({ state: 'idle' })
   const [sticky, setSticky] = useState(false)
+  const [touched, setTouched] = useState<Partial<Record<Field, boolean>>>({})
 
   useEffect(() => { track('landing_viewed', { offer: 'site-pizzaria-14990' }) }, [])
 
@@ -275,7 +289,7 @@ export default function SitePizzariaLanding() {
   const set = (field: keyof Values) => (value: string | boolean) => {
     if (!started.current) { started.current = true; track('form_started') }
     if (field === 'business') nameEdited.current = true
-    setValues(v => ({ ...v, [field]: value }))
+    setValues(v => ({ ...v, [field]: field === 'phone' && typeof value === 'string' ? formatPhone(value) : value }))
     if (errors[field as Field]) setErrors(e => ({ ...e, [field]: undefined }))
   }
 
@@ -320,7 +334,7 @@ export default function SitePizzariaLanding() {
       const result = await response.json().catch(() => ({}))
       if (response.ok && result.ok) {
         setSubmit({ state: 'success', reference: result.reference })
-        track('lead_saved', { reference: result.reference, delivery: result.delivery })
+        track('lead_saved', { reference: result.reference })
         // The CRM sends the Lead to Meta; the browser mirrors it with the same event id, so it counts once.
         if (typeof result.leadEventId === 'string') acquisition()?.contactReceived?.(result.leadEventId, 'site_offer')
         return
@@ -341,7 +355,11 @@ export default function SitePizzariaLanding() {
 
   const whatsappHref = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent('Olá! Vi a oferta do site para pizzaria por €149,90 e tenho uma dúvida.')}`
   const onWhatsapp = (placement: string) => () => track('whatsapp_opened', { placement }, ['food_whatsapp_opened'])
-  const describedBy = (f: Field, extra?: string) => [errors[f] ? `spz-err-${f}` : '', extra || ''].filter(Boolean).join(' ') || undefined
+  const describedBy = (f: Field, extra?: string) => [shown(f) ? `spz-err-${f}` : '', extra || ''].filter(Boolean).join(' ') || undefined
+  const live = check(values)
+  const shown = (f: Field) => errors[f] || (touched[f] ? live[f] : undefined)
+  const done = (['firstName', 'business', 'phone', 'consent'] as Field[]).filter(f => !live[f]).length
+  const handle = handleOf(values.currentLink)
   const shownName = preview.trim() || 'Sua Pizzaria'
   const initials = shownName.split(/\s+/).filter(Boolean).slice(0, 2).map(w => w[0]?.toUpperCase()).join('')
 
@@ -454,52 +472,70 @@ export default function SitePizzariaLanding() {
               <div className="spzPrep"><b>Para adiantar, separe:</b><span>logo, cardápio com preços, fotos das pizzas, endereço e horário.</span></div>
             </div>
 
-            <div className="spzFormCard">
+            <div className={`spzFormCard${submit.state === 'success' ? ' isDone' : ''}`}>
+              <div className="spzTicketHead" aria-hidden="true">
+                <span className="spzTicketLabel">Pedido</span>
+                <b className="spzTicketName" key={values.business.trim() || 'empty'}>Site para {values.business.trim() || 'a sua pizzaria'}</b>
+                <span className="spzTicketPrice">€149,90 · pagamento único</span>
+                <span className="spzProgress"><i style={{ transform: `scaleX(${submit.state === 'success' ? 1 : done / 4})` }} /></span>
+              </div>
               {submit.state === 'success' ? (
                 <div className="spzSuccess" role="status">
-                  <span className="spzSuccessMark"><Check /></span>
+                  <svg className="spzDraw" width="56" height="56" viewBox="0 0 56 56" aria-hidden="true"><circle cx="28" cy="28" r="26" /><path d="m17 29 7.5 7.5L40 21" /></svg>
                   <h3 ref={successRef} tabIndex={-1}>Pedido recebido, {values.firstName.trim().split(' ')[0]}.</h3>
-                  <p>A gente fala com você no WhatsApp <b>{values.phone}</b> para confirmar as condições e pedir o cardápio e as fotos da <b>{values.business}</b>.</p>
-                  <p className="spzRef">Referência <code>{submit.reference}</code></p>
-                  <a className="spzTextLink" href={EXAMPLE_URL} target="_blank" rel="noopener noreferrer" onClick={openExample('closing')}>Enquanto isso, abra o site de exemplo <Arrow /></a>
+                  <ol className="spzTimeline">
+                    <li className="isDone"><b>Pedido recebido</b><span>Referência <code>{submit.reference}</code></span></li>
+                    <li><b>A gente chama você no WhatsApp</b><span>No número <b>{values.phone}</b>, para pedir o cardápio, as fotos e o logo.</span></li>
+                    <li><b>A Cenlo monta o site</b><span>Você confere e pede até 3 ajustes antes de ir ao ar.</span></li>
+                  </ol>
+                  <a className="spzTextLink" href={EXAMPLE_URL} target="_blank" rel="noopener noreferrer" onClick={openExample('closing')}>Abrir o site de demonstração <Arrow /></a>
                 </div>
               ) : (
                 <form onSubmit={onSubmit} noValidate aria-describedby={submit.state === 'error' ? 'spz-form-error' : undefined}>
                   <input className="spzHoneypot" name="website" type="text" tabIndex={-1} autoComplete="off" aria-hidden="true" />
                   {([
-                    ['firstName', 'Primeiro nome', { autoComplete: 'given-name', enterKeyHint: 'next' }],
-                    ['business', 'Nome da pizzaria', { autoComplete: 'organization', enterKeyHint: 'next' }],
-                    ['phone', 'WhatsApp', { type: 'tel', autoComplete: 'tel', inputMode: 'tel', placeholder: '912 345 678', enterKeyHint: 'next' }],
+                    ['firstName', 'Primeiro nome', { autoComplete: 'given-name', enterKeyHint: 'next', maxLength: 60 }],
+                    ['business', 'Nome da pizzaria', { autoComplete: 'organization', enterKeyHint: 'next', maxLength: 120 }],
+                    ['phone', 'WhatsApp', { type: 'tel', autoComplete: 'tel', inputMode: 'tel', enterKeyHint: 'next', maxLength: 20 }],
                   ] as const).map(([f, label, attrs]) => (
-                    <div className="spzField" key={f}>
-                      <label htmlFor={`spz-${f}`}>{label}</label>
+                    <div className={`spzFloat${f === 'phone' ? ' hasPrefix' : ''}${!live[f] ? ' isValid' : ''}${shown(f) ? ' isInvalid' : ''}`} key={f}>
+                      {f === 'phone' && !values.phone.trim().startsWith('+') && <span className="spzPrefix" aria-hidden="true">+351</span>}
                       <input
                         id={`spz-${f}`}
                         ref={el => { fieldRefs.current[f] = el }}
                         value={values[f]}
+                        placeholder=" "
                         onChange={e => set(f)(e.target.value)}
-                        aria-invalid={Boolean(errors[f])}
-                        aria-describedby={describedBy(f)}
+                        onBlur={() => values[f] && setTouched(t => ({ ...t, [f]: true }))}
+                        aria-invalid={Boolean(shown(f))}
+                        aria-describedby={describedBy(f, f === 'phone' ? 'spz-phone-help' : undefined)}
                         required
                         {...attrs}
                       />
-                      {errors[f] && <p className="spzFieldError" id={`spz-err-${f}`}>{errors[f]}</p>}
+                      <label htmlFor={`spz-${f}`}>{label}</label>
+                      <span className="spzOk" aria-hidden="true"><Check /></span>
+                      {f === 'phone' && <small id="spz-phone-help" className="spzHint">Número de Portugal ou com o código do país, ex.: +55.</small>}
+                      {shown(f) && <p className="spzFieldError" id={`spz-err-${f}`}>{shown(f)}</p>}
                     </div>
                   ))}
-                  <div className="spzField">
+                  <div className={`spzFloat${handle ? ' isValid' : ''}`}>
+                    <input id="spz-currentLink" value={values.currentLink} placeholder=" " onChange={e => set('currentLink')(e.target.value)} inputMode="url" autoComplete="url" maxLength={220} enterKeyHint="done" aria-describedby="spz-link-help" />
                     <label htmlFor="spz-currentLink">Instagram ou cardápio atual <small>opcional</small></label>
-                    <input id="spz-currentLink" value={values.currentLink} onChange={e => set('currentLink')(e.target.value)} inputMode="url" autoComplete="url" placeholder="@suapizzaria ou um link" maxLength={220} enterKeyHint="done" />
+                    <span className="spzOk" aria-hidden="true"><Check /></span>
+                    <small id="spz-link-help" className="spzHint">{handle ? <>Vamos olhar <b>{handle}</b> para adiantar o cardápio.</> : 'O @ do Instagram ou o link do cardápio que você usa hoje.'}</small>
                   </div>
-                  <div className="spzConsent">
-                    <input id="spz-consent" type="checkbox" ref={el => { fieldRefs.current.consent = el }} checked={values.consent} onChange={e => set('consent')(e.target.checked)} aria-invalid={Boolean(errors.consent)} aria-describedby={describedBy('consent', 'spz-privacy')} />
-                    <label htmlFor="spz-consent">Autorizo a Cenlo a falar comigo pelo WhatsApp sobre este pedido.</label>
-                  </div>
-                  {errors.consent && <p className="spzFieldError" id="spz-err-consent">{errors.consent}</p>}
-                  <p className="spzHelp" id="spz-privacy">Usamos estes dados só para responder a este pedido.</p>
+                  <label className={`spzSwitch${shown('consent') ? ' isInvalid' : ''}`} htmlFor="spz-consent">
+                    <input id="spz-consent" type="checkbox" role="switch" ref={el => { fieldRefs.current.consent = el }} checked={values.consent} onChange={e => set('consent')(e.target.checked)} aria-invalid={Boolean(shown('consent'))} aria-describedby={describedBy('consent', 'spz-privacy')} />
+                    <span className="spzTrack" aria-hidden="true"><i /></span>
+                    <span>Autorizo a Cenlo a falar comigo pelo WhatsApp sobre este pedido.</span>
+                  </label>
+                  {shown('consent') && <p className="spzFieldError" id="spz-err-consent">{shown('consent')}</p>}
+                  <p className="spzHelp" id="spz-privacy">Usamos estes dados só para responder a este pedido. Nada é cobrado aqui.</p>
                   {submit.state === 'error' && <p className="spzFormError" id="spz-form-error" role="alert">{submit.message}</p>}
                   <button className="spzBtn spzBtnPrimary spzSubmit" type="submit" disabled={submit.state === 'sending'} aria-busy={submit.state === 'sending'}>
                     {submit.state === 'sending' ? <><span className="spzSpinner" aria-hidden="true" /> Enviando…</> : submit.state === 'error' ? 'Tentar de novo' : <>Pedir o meu site <Arrow /></>}
                   </button>
+                  <p className="spzLeft" aria-live="polite">{done === 4 ? 'Tudo certo. É só enviar.' : 4 - done === 1 ? 'Falta 1 item.' : `Faltam ${4 - done} itens.`}</p>
                   <a className="spzWaAlt" href={whatsappHref} target="_blank" rel="noopener noreferrer" onClick={onWhatsapp('form')}>Tem uma dúvida antes? Fale com a gente no WhatsApp.</a>
                 </form>
               )}
