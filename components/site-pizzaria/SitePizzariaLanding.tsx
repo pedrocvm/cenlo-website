@@ -335,8 +335,8 @@ export default function SitePizzariaLanding() {
       if (response.ok && result.ok) {
         setSubmit({ state: 'success', reference: result.reference })
         track('lead_saved', { reference: result.reference })
-        // The CRM sends the Lead to Meta; the browser mirrors it with the same event id, so it counts once.
-        if (typeof result.leadEventId === 'string') acquisition()?.contactReceived?.(result.leadEventId, 'site_offer')
+        const leadEventId = typeof result.leadEventId === 'string' ? result.leadEventId : `food-contact:${submissionId.current}`
+        acquisition()?.contactReceived?.(leadEventId, 'site_offer')
         return
       }
       if (response.status === 422 && result.field && result.field in EMPTY) {
