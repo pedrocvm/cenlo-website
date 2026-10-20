@@ -3,8 +3,9 @@
 import { FormEvent, KeyboardEvent, useCallback, useEffect, useRef, useState } from 'react'
 import gsap from 'gsap'
 import { usePrivacy } from '@/components/PrivacyContext'
-import { EXAMPLE_URL, FAQS, WHATSAPP_NUMBER } from '@/lib/site-pizzaria/content'
+import { EXAMPLE_URL, FAQS, OFFER_TERMS, WHATSAPP_NUMBER } from '@/lib/site-pizzaria/content'
 
+type Placement = 'header' | 'hero' | 'sticky' | 'closing'
 type Field = 'firstName' | 'business' | 'phone' | 'consent'
 type Values = { firstName: string; business: string; phone: string; currentLink: string; consent: boolean }
 type Submit = { state: 'idle' } | { state: 'sending' } | { state: 'error'; message: string } | { state: 'success'; reference: string }
@@ -52,11 +53,18 @@ function uuid() {
   return `${h.slice(0, 8)}-${h.slice(8, 12)}-${h.slice(12, 16)}-${h.slice(16, 20)}-${h.slice(20)}`
 }
 
-function track(name: string, data: Record<string, unknown> = {}, meta?: { event: 'Lead' | 'Contact'; id: string }) {
+type Acquisition = {
+  event?: (name: string, props?: Record<string, unknown>) => unknown
+  contactReceived?: (eventId: string, intent: string) => void
+  consentToken?: () => string | undefined
+}
+const acquisition = () => (window as typeof window & { CenloAcquisition?: Acquisition }).CenloAcquisition
+
+/** Local signal for QA, and the Food acquisition contract (consent, CRM, Meta) when it maps. */
+function track(name: string, data: Record<string, unknown> = {}, crm?: [string, Record<string, unknown>?]) {
   try {
-    const fbq = (window as typeof window & { fbq?: (...args: unknown[]) => void }).fbq
-    if (meta) fbq?.('track', meta.event, { content_name: 'site_pizzaria_14990', ...data }, { eventID: meta.id })
     window.dispatchEvent(new CustomEvent('cenlo:site_pizzaria', { detail: { name, ...data } }))
+    if (crm) acquisition()?.event?.(crm[0], crm[1] ?? {})
   } catch {
     // Measurement never blocks the visitor.
   }
@@ -230,7 +238,7 @@ function PhoneDemo() {
   )
 }
 
-export default function SitePizzariaLanding({ qaPending }: { qaPending: string[] }) {
+export default function SitePizzariaLanding() {
   const { openModal } = usePrivacy()
   const heroCta = useRef<HTMLAnchorElement>(null)
   const formSection = useRef<HTMLElement>(null)
@@ -261,8 +269,8 @@ export default function SitePizzariaLanding({ qaPending }: { qaPending: string[]
 
   useEffect(() => { if (submit.state === 'success') successRef.current?.focus() }, [submit.state])
 
-  const toForm = (placement: string) => () => track('cta_clicked', { placement })
-  const openExample = (placement: string) => () => track('demo_opened', { placement })
+  const toForm = (placement: Placement) => () => track('cta_clicked', { placement }, ['food_start_clicked', { placement }])
+  const openExample = (placement: Placement) => () => track('demo_opened', { placement }, ['food_public_demo_opened', { placement }])
 
   const set = (field: keyof Values) => (value: string | boolean) => {
     if (!started.current) { started.current = true; track('form_started') }
@@ -304,6 +312,7 @@ export default function SitePizzariaLanding({ qaPending }: { qaPending: string[]
           submissionId: submissionId.current,
           pageUrl: window.location.href,
           referrer: document.referrer || null,
+          consentToken: acquisition()?.consentToken?.(),
           timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || null,
           attribution: Object.fromEntries(['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term', 'utm_id', 'fbclid', 'gclid'].map(k => [k, params.get(k) || ''])),
         }),
@@ -311,8 +320,9 @@ export default function SitePizzariaLanding({ qaPending }: { qaPending: string[]
       const result = await response.json().catch(() => ({}))
       if (response.ok && result.ok) {
         setSubmit({ state: 'success', reference: result.reference })
-        // Lead only when the CRM holds it; an e-mail-only preview is not a lead.
-        track('lead_saved', { reference: result.reference, delivery: result.delivery }, result.delivery === 'crm' ? { event: 'Lead', id: `site-pizzaria:${submissionId.current}` } : undefined)
+        track('lead_saved', { reference: result.reference, delivery: result.delivery })
+        // The CRM sends the Lead to Meta; the browser mirrors it with the same event id, so it counts once.
+        if (typeof result.leadEventId === 'string') acquisition()?.contactReceived?.(result.leadEventId, 'site_offer')
         return
       }
       if (response.status === 422 && result.field && result.field in EMPTY) {
@@ -330,20 +340,13 @@ export default function SitePizzariaLanding({ qaPending }: { qaPending: string[]
   }
 
   const whatsappHref = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent('Olá! Vi a oferta do site para pizzaria por €149,90 e tenho uma dúvida.')}`
-  const onWhatsapp = (placement: string) => () => track('whatsapp_opened', { placement }, { event: 'Contact', id: `site-pizzaria-wa:${uuid()}` })
+  const onWhatsapp = (placement: string) => () => track('whatsapp_opened', { placement }, ['food_whatsapp_opened'])
   const describedBy = (f: Field, extra?: string) => [errors[f] ? `spz-err-${f}` : '', extra || ''].filter(Boolean).join(' ') || undefined
   const shownName = preview.trim() || 'Sua Pizzaria'
   const initials = shownName.split(/\s+/).filter(Boolean).slice(0, 2).map(w => w[0]?.toUpperCase()).join('')
 
   return (
     <div className="spzRoot">
-      {qaPending.length > 0 && (
-        <details className="spzQa">
-          <summary>QA (só no preview) · {qaPending.length} pendências antes de publicar</summary>
-          <p>Só no preview. Produção responde 404 até estas condições serem aprovadas.</p>
-          <ul>{qaPending.map(item => <li key={item}>{item}</li>)}</ul>
-        </details>
-      )}
       <header className="spzHeader">
         <div className="spzWrap spzHeaderInner">
           <a className="spzBrand" href="https://cenlofood.cenlo.pt/" aria-label="Cenlo Food, página inicial"><Mark /><span>Cenlo <b>Food</b></span></a>
@@ -365,12 +368,13 @@ export default function SitePizzariaLanding({ qaPending }: { qaPending: string[]
               </div>
               <ul className="spzHeroFacts">
                 <li><Check /> Sem aplicativo e sem cadastro para o cliente</li>
-                <li><Check /> Você manda o cardápio, a Cenlo monta o site</li>
+                <li><Check /> Pagamento único, com até 3 ajustes</li>
+                <li><Check /> Você manda o cardápio e as fotos, a Cenlo monta o site</li>
               </ul>
             </div>
             <div className="spzHeroDemo">
               <PhoneDemo />
-              <p className="spzNote">Telas reais do site de exemplo da Bella Napoli, feito com a Cenlo.</p>
+              <p className="spzNote">Telas reais do site de demonstração da Bella Napoli, feito com a Cenlo. Dados fictícios.</p>
             </div>
           </div>
         </section>
@@ -389,7 +393,7 @@ export default function SitePizzariaLanding({ qaPending }: { qaPending: string[]
             </div>
             <figure className="spzMiniPhone">
               <div className="spzPhone spzPhoneSmall"><div className="spzPhoneScreen"><img src="/site-pizzaria/localizacao.webp" alt="Seção de localização do site da Bella Napoli com endereço, horário, telefone e o mapa do Google" width={600} height={1298} loading="lazy" decoding="async" /></div></div>
-              <figcaption>Endereço, horário, telefone e o mapa do Google no site de exemplo.</figcaption>
+              <figcaption>Endereço, horário, telefone e o mapa do Google no site de demonstração.</figcaption>
             </figure>
           </div>
         </section>
@@ -416,7 +420,7 @@ export default function SitePizzariaLanding({ qaPending }: { qaPending: string[]
                   </div>
                 </div>
               </div>
-              <figcaption>Prévia ilustrativa sobre a tela do exemplo.</figcaption>
+              <figcaption>Prévia ilustrativa sobre a tela da demonstração.</figcaption>
             </figure>
           </div>
         </section>
@@ -427,14 +431,15 @@ export default function SitePizzariaLanding({ qaPending }: { qaPending: string[]
               <p className="spzKicker">A oferta</p>
               <h2 id="spz-oferta">Site para pizzaria</h2>
               <p className="spzPriceValue"><span>€</span>149<small>,90</small></p>
-              <a className="spzBtn spzBtnPrimary" href="#pedido" onClick={toForm('offer')}>Quero meu site por €149,90 <Arrow /></a>
+              <ul className="spzTerms">{OFFER_TERMS.map(t => <li key={t}><Check /> {t}</li>)}</ul>
+              <a className="spzBtn spzBtnPrimary" href="#pedido" onClick={toForm('closing')}>Quero meu site por €149,90 <Arrow /></a>
             </div>
             <div>
               <h3 className="spzStepsTitle">Como começa</h3>
               <ol className="spzSteps">
                 <li><b>Você pede aqui</b><span>Nome, pizzaria e WhatsApp. Leva menos de um minuto.</span></li>
-                <li><b>A gente chama você no WhatsApp</b><span>Confirmamos as condições e pedimos cardápio, preços, fotos, logo, endereço e horário.</span></li>
-                <li><b>A Cenlo monta o site</b><span>Com o seu cardápio e a sua marca. Você confere antes de o site ir ao ar.</span></li>
+                <li><b>A gente chama você no WhatsApp</b><span>Pedimos o cardápio com preços, as fotos, o logo, o endereço e o horário.</span></li>
+                <li><b>A Cenlo monta o site</b><span>Com o seu cardápio, as suas fotos e a sua marca. Você confere e pede até 3 ajustes antes de o site ir ao ar.</span></li>
               </ol>
             </div>
           </div>
@@ -456,7 +461,7 @@ export default function SitePizzariaLanding({ qaPending }: { qaPending: string[]
                   <h3 ref={successRef} tabIndex={-1}>Pedido recebido, {values.firstName.trim().split(' ')[0]}.</h3>
                   <p>A gente fala com você no WhatsApp <b>{values.phone}</b> para confirmar as condições e pedir o cardápio e as fotos da <b>{values.business}</b>.</p>
                   <p className="spzRef">Referência <code>{submit.reference}</code></p>
-                  <a className="spzTextLink" href={EXAMPLE_URL} target="_blank" rel="noopener noreferrer" onClick={openExample('success')}>Enquanto isso, abra o site de exemplo <Arrow /></a>
+                  <a className="spzTextLink" href={EXAMPLE_URL} target="_blank" rel="noopener noreferrer" onClick={openExample('closing')}>Enquanto isso, abra o site de exemplo <Arrow /></a>
                 </div>
               ) : (
                 <form onSubmit={onSubmit} noValidate aria-describedby={submit.state === 'error' ? 'spz-form-error' : undefined}>
@@ -526,7 +531,7 @@ export default function SitePizzariaLanding({ qaPending }: { qaPending: string[]
           <nav aria-label="Rodapé">
             <a href="mailto:ola@cenlo.pt">ola@cenlo.pt</a>
             <a href="/termos">Termos</a>
-            <button type="button" onClick={openModal}>Preferências de privacidade</button>
+            <button type="button" onClick={openModal}>Privacidade</button>
           </nav>
           <span>© 2026 Cenlo · Feito em Portugal</span>
         </div>

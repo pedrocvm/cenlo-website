@@ -152,6 +152,9 @@
 .spzOffer .spzPriceValue { display: flex; align-items: flex-start; margin: 10px 0 22px !important; font-family: var(--f-display); font-weight: 800; font-size: 84px; line-height: .9; letter-spacing: -.05em; color: #fff; }
 .spzPriceValue span { margin: 8px 4px 0 0; font-size: 34px; letter-spacing: 0; }
 .spzPriceValue small { margin-top: 6px; font-size: 34px; letter-spacing: -.02em; }
+.spzTerms { display: grid; gap: 8px; margin: 0 0 24px !important; color: var(--spz-deep-mute); font-size: 15.5px; }
+.spzTerms li { display: flex; align-items: flex-start; gap: 8px; }
+.spzTerms svg { color: var(--spz-deep-acc); flex: none; margin-top: 4px; }
 .spzStepsTitle { font-size: 20px; font-weight: 800; }
 .spzSteps { display: grid; gap: 0; margin-top: 14px !important; counter-reset: spz; }
 .spzSteps li { position: relative; display: grid; gap: 4px; padding: 16px 0 16px 48px; border-top: 1px solid rgba(255, 255, 255, .16); counter-increment: spz; }
@@ -215,12 +218,6 @@
 .spzSticky span { display: grid; line-height: 1.15; }
 .spzSticky small { color: #d9cfc6; font-size: 12.5px; }
 .spzSticky b { font-size: 18px; }
-
-/* QA (preview only) */
-.spzQa { padding: 6px var(--spz-gut); background: #1f2937; color: #f9fafb; font-size: 12.5px; }
-.spzQa summary { cursor: pointer; font-weight: 700; min-height: 28px; display: flex; align-items: center; }
-.spzQa p { margin: 6px 0 !important; color: #d1d5db; }
-.spzQa ul { display: grid; gap: 4px; padding-left: 16px; list-style: disc; }
 
 @media (min-width: 560px) {
   .spzHeroActions { flex-direction: row; align-items: center; gap: 18px; }

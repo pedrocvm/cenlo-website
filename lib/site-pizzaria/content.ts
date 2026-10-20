@@ -2,25 +2,19 @@
 export const EXAMPLE_URL = 'https://bellanapoli.cenlo.pt/'
 export const WHATSAPP_NUMBER = '351912333313'
 
-/**
- * Commercial terms Pedro still has to approve. While any is open, production
- * serves a 404 (see page.tsx) and preview shows them in the QA panel only.
- */
-export const PENDING_TERMS = [
-  'O que os €149,90 cobrem: pagamento único ou recorrente',
-  'Domínio: incluído, de quem fica e quem renova',
-  'Hospedagem: incluída e por quanto tempo',
-  'Prazo de entrega depois de receber os materiais',
-  'Quantidade de ajustes antes da publicação',
-  'Alterações futuras do cardápio e dos preços',
-  'Forma de pagamento e desistência',
-  'Endpoint definitivo do CRM (CENLO_SITE_PIZZARIA_CRM_ENDPOINT)',
+/** Pedro, 20/10/2026: only the site, one-off payment, up to 3 adjustments; domain, hosting and images are the client's. */
+export const OFFER_TERMS = [
+  'Pagamento único de €149,90',
+  'Inclui até 3 ajustes',
+  'Domínio, hospedagem e fotos por conta da pizzaria',
 ] as const
-
-export const COMMERCIAL_TERMS_CONFIRMED = false
 
 /** Visible FAQ and FAQPage JSON-LD share this list, so they cannot drift apart. */
 export const FAQS: { q: string; a: string }[] = [
+  {
+    q: 'O que os €149,90 cobrem?',
+    a: 'A criação do site, em pagamento único, com até 3 ajustes depois de você ver o site pronto. Domínio, hospedagem e fotos ficam por conta da pizzaria.',
+  },
   {
     q: 'O cliente precisa instalar um aplicativo ou criar conta?',
     a: 'Não. O site abre no navegador do celular. O cliente consulta o cardápio e monta o pedido sem cadastro.',
