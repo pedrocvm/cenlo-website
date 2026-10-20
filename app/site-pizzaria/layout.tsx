@@ -2,37 +2,21 @@ import type { Metadata, Viewport } from 'next'
 import './site-pizzaria.css'
 
 const title = 'Site para pizzaria por €149,90 | Cenlo Food'
-const description = 'Tenha um site para sua pizzaria com cardápio, fotos, preços, endereço, horário, mapa e pedido preparado para o WhatsApp. Veja o exemplo e peça o seu.'
+const description = 'Site para a sua pizzaria com cardápio, fotos, preços, endereço, horário e mapa. O cliente monta o pedido e o WhatsApp abre com tudo escrito. Teste o exemplo e peça o seu.'
+const url = 'https://cenlofood.cenlo.pt/site-pizzaria'
+const image = { url: 'https://cenlofood.cenlo.pt/site-pizzaria/og.jpg', width: 1200, height: 630, alt: 'Site de pizzaria no celular, com cardápio e pedido pelo WhatsApp, por €149,90' }
 
 export const metadata: Metadata = {
   title,
   description,
-  alternates: { canonical: 'https://cenlofood.cenlo.pt/site-pizzaria' },
-  openGraph: {
-    type: 'website',
-    locale: 'pt_BR',
-    siteName: 'Cenlo Food',
-    url: 'https://cenlofood.cenlo.pt/site-pizzaria',
-    title,
-    description,
-    images: [{
-      url: 'https://cenlofood.cenlo.pt/food/assets/video-site-pedido-poster.jpg',
-      width: 1600,
-      height: 1000,
-      alt: 'Site de demonstração de uma pizzaria no celular',
-    }],
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title,
-    description,
-    images: ['https://cenlofood.cenlo.pt/food/assets/video-site-pedido-poster.jpg'],
-  },
+  alternates: { canonical: url },
+  openGraph: { type: 'website', locale: 'pt_BR', siteName: 'Cenlo Food', url, title, description, images: [image] },
+  twitter: { card: 'summary_large_image', title, description, images: [image.url] },
   robots: { index: true, follow: true },
 }
 
 export const viewport: Viewport = {
-  themeColor: '#FBF8F3',
+  themeColor: '#FFFCF8',
   colorScheme: 'light',
 }
 

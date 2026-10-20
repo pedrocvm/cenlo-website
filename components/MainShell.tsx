@@ -6,7 +6,7 @@ export default function MainShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
 
   if (pathname.startsWith('/site-pizzaria')) {
-    return <div id="main">{children}</div>
+    return <>{children}</>
   }
 
   return <main id="main">{children}</main>

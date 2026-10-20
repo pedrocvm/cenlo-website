@@ -1,710 +1,528 @@
 'use client'
 
-import { FormEvent, useEffect, useMemo, useRef, useState } from 'react'
+import { FormEvent, KeyboardEvent, useCallback, useEffect, useRef, useState } from 'react'
 import gsap from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { usePrivacy } from '@/components/PrivacyContext'
+import { EXAMPLE_URL, FAQS, WHATSAPP_NUMBER } from '@/lib/site-pizzaria/content'
 
-gsap.registerPlugin(ScrollTrigger)
+type Field = 'firstName' | 'business' | 'phone' | 'consent'
+type Values = { firstName: string; business: string; phone: string; currentLink: string; consent: boolean }
+type Submit = { state: 'idle' } | { state: 'sending' } | { state: 'error'; message: string } | { state: 'success'; reference: string }
 
-const ASSET = 'https://cenlofood.cenlo.pt/food/assets'
-const DEMO_URL = 'https://food.cenlo.pt/demo/food'
-const WHATSAPP_NUMBER = '351912333313'
-const COMMERCIAL_DETAILS_CONFIRMED = false
+const STEPS = [
+  { key: 'inicio', chip: 'Início', src: '/site-pizzaria/inicio.webp', alt: 'Página inicial do site da Bella Napoli com os botões Pedir agora e Ver menu', hot: { x: 60.8, y: 67.8, label: 'Ver menu' }, caption: 'O cliente abre o site e toca em Ver menu.' },
+  { key: 'cardapio', chip: 'Cardápio', src: '/site-pizzaria/cardapio.webp', alt: 'Cardápio com fotos e preços: Margherita a €8,50 e Pepperoni a €9,50', hot: { x: 50, y: 84, label: 'Adicionar' }, caption: 'Vê as fotos, as descrições e os preços, e escolhe a pizza.' },
+  { key: 'pizza', chip: 'Pizza', src: '/site-pizzaria/pizza.webp', alt: 'Tela Montar pizza com quantidade, tamanho Grande escolhido e o botão Adicionar ao pedido', hot: { x: 50, y: 95.1, label: 'Adicionar ao pedido' }, caption: 'Escolhe o tamanho, os sabores e os extras.' },
+  { key: 'carrinho', chip: 'Carrinho', src: '/site-pizzaria/carrinho.webp', alt: 'Carrinho com uma pizza grande de pepperoni, total estimado de €12,35 e o botão Enviar pedido pelo WhatsApp', hot: { x: 50, y: 89.8, label: 'Enviar pedido pelo WhatsApp' }, caption: 'Confere o pedido, escolhe entrega ou retirada e como vai pagar.' },
+  { key: 'whatsapp', chip: 'WhatsApp', src: '', alt: '', hot: { x: 90.5, y: 95.5, label: 'Enviar' }, caption: 'O WhatsApp abre com o pedido escrito. Ele só chega à pizzaria quando o cliente toca em enviar.' },
+] as const
 
-type DemoKey = 'inicio' | 'cardapio' | 'carrinho' | 'localizacao'
-type SubmitState = 'idle' | 'sending' | 'success' | 'error'
-
-const demoFrames: Record<DemoKey, { label: string; src: string; alt: string }> = {
-  inicio: {
-    label: 'Início',
-    src: `${ASSET}/video-site-pedido-poster.jpg`,
-    alt: 'Página inicial do site de demonstração da Bella Napoli',
-  },
-  cardapio: {
-    label: 'Cardápio',
-    src: `${ASSET}/bn-pedir-1-menu.webp`,
-    alt: 'Cardápio da Bella Napoli organizado por categorias',
-  },
-  carrinho: {
-    label: 'Carrinho',
-    src: `${ASSET}/bn-pedir-3-carrinho.webp`,
-    alt: 'Carrinho com pedido pronto para abrir no WhatsApp',
-  },
-  localizacao: {
-    label: 'Localização',
-    src: `${ASSET}/video-site-pedido-poster.jpg`,
-    alt: 'Site da Bella Napoli com endereço, horário e mapa',
-  },
-}
-
-const faqs = [
-  {
-    q: 'Os €149,90 são pelo quê?',
-    a: 'O valor apresentado nesta campanha é pela criação e configuração inicial do site mostrado na página. Antes da publicação da oferta, domínio, hospedagem, prazo, revisões e alterações futuras precisam estar formalmente definidos na condição comercial.',
-    pending: true,
-  },
-  {
-    q: 'O cliente precisa instalar um aplicativo?',
-    a: 'Não. O site abre no navegador do celular. O cliente consulta o cardápio, monta o pedido e abre o WhatsApp com os itens preenchidos.',
-  },
-  {
-    q: 'O cliente precisa criar uma conta?',
-    a: 'Não. A navegação, o carrinho e a preparação da mensagem funcionam sem cadastro do cliente.',
-  },
-  {
-    q: 'Como o pedido chega ao WhatsApp?',
-    a: 'O cliente escolhe os itens, confere o carrinho e toca no botão. O WhatsApp abre com o pedido preenchido. A mensagem chega à pizzaria depois que ele toca em enviar.',
-  },
-  {
-    q: 'Posso usar o número que minha pizzaria já tem?',
-    a: 'Sim. O botão pode ser ligado ao número de WhatsApp que a pizzaria já usa no atendimento.',
-  },
-  {
-    q: 'O site recebe pagamento online?',
-    a: 'Esta oferta apresenta o cardápio e prepara o pedido para o WhatsApp. Pagamento online não deve ser considerado incluído sem uma condição específica aprovada.',
-  },
-  {
-    q: 'O site aparece automaticamente no Google?',
-    a: 'O endereço pode ser ligado ao perfil da pizzaria no Google e aos seus outros canais. A posição nas buscas também depende da configuração e da presença do negócio no Google.',
-  },
-  {
-    q: 'O atendimento automático do Cenlo Food está incluído?',
-    a: 'Não nesta oferta específica. Aqui, o cliente monta o pedido no site e envia pelo WhatsApp. O atendimento automático, a central de pedidos e a cozinha fazem parte da plataforma Cenlo Food completa.',
-  },
+const MESSAGE: [string, string?][] = [
+  ['PEDIDO VIA SITE'],
+  [''],
+  ['Olá! Fiz este pedido no site e queria confirmar para levantamento no balcão.'],
+  [''],
+  ['Cliente:', ' Ana'],
+  ['Tipo:', ' Levantamento'],
+  ['Pagamento:', ' Dinheiro'],
+  [''],
+  ['Pedido:', ''],
+  ['• 1x Pizza Grande de Pepperoni'],
+  [''],
+  ['Podem confirmar, por favor?'],
 ]
 
-function ArrowIcon() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <path d="M5 12h14m0 0-5.5-5.5M19 12l-5.5 5.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  )
+const INCLUDED = [
+  ['Cardápio com fotos e preços', 'Pizzas, bebidas e sobremesas em categorias, com tamanhos, meio a meio e extras.'],
+  ['Pedido montado pelo cliente', 'Ele escolhe, ajusta e vê o total estimado antes de enviar.'],
+  ['WhatsApp com o pedido escrito', 'A mensagem chega ao número da pizzaria quando o cliente toca em enviar.'],
+  ['Endereço, horário e mapa', 'Tudo numa página, com o mapa do Google para o cliente encontrar a pizzaria.'],
+  ['A sua marca', 'Nome, logo e fotos da sua pizzaria no lugar dos da Bella Napoli.'],
+  ['Um link para divulgar', 'Na bio do Instagram, no perfil do Google, no WhatsApp ou num QR na mesa.'],
+] as const
+
+const EMPTY: Values = { firstName: '', business: '', phone: '', currentLink: '', consent: false }
+
+function uuid() {
+  if (typeof crypto.randomUUID === 'function') return crypto.randomUUID()
+  const b = crypto.getRandomValues(new Uint8Array(16))
+  b[6] = (b[6] & 0x0f) | 0x40
+  b[8] = (b[8] & 0x3f) | 0x80
+  const h = [...b].map(x => x.toString(16).padStart(2, '0')).join('')
+  return `${h.slice(0, 8)}-${h.slice(8, 12)}-${h.slice(12, 16)}-${h.slice(16, 20)}-${h.slice(20)}`
 }
 
-function CheckIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <path d="m5 12.5 4.3 4.3L19 7.5" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  )
-}
-
-function CenloMark({ dark = false }: { dark?: boolean }) {
-  return (
-    <svg width="29" height="29" viewBox="0 0 48 48" aria-hidden="true">
-      <path d="M35.4 17.1 A13.2 13.2 0 1 0 35.4 30.9" fill="none" stroke={dark ? '#221C16' : '#F7F3EC'} strokeWidth="5.1" strokeLinecap="round" />
-      <circle cx="26.6" cy="24" r="5.7" fill="#C0532E" />
-    </svg>
-  )
-}
-
-function track(name: string, data: Record<string, unknown> = {}) {
+function track(name: string, data: Record<string, unknown> = {}, meta?: { event: 'Lead' | 'Contact'; id: string }) {
   try {
     const fbq = (window as typeof window & { fbq?: (...args: unknown[]) => void }).fbq
-    if (name === 'lead_saved') fbq?.('track', 'Lead', data)
-    if (name === 'whatsapp_opened') fbq?.('track', 'Contact', data)
-    window.dispatchEvent(new CustomEvent(`cenlo:${name}`, { detail: data }))
+    if (meta) fbq?.('track', meta.event, { content_name: 'site_pizzaria_14990', ...data }, { eventID: meta.id })
+    window.dispatchEvent(new CustomEvent('cenlo:site_pizzaria', { detail: { name, ...data } }))
   } catch {
-    // Measurement must never block the commercial action.
+    // Measurement never blocks the visitor.
   }
 }
 
-export default function SitePizzariaLanding() {
-  const { openModal } = usePrivacy()
-  const rootRef = useRef<HTMLDivElement>(null)
-  const heroRef = useRef<HTMLElement>(null)
-  const formRef = useRef<HTMLElement>(null)
-  const phoneRef = useRef<HTMLDivElement>(null)
-  const [activeDemo, setActiveDemo] = useState<DemoKey>('inicio')
-  const [storyStep, setStoryStep] = useState(0)
-  const [restaurantName, setRestaurantName] = useState('Sua Pizzaria')
-  const [reducedMotion, setReducedMotion] = useState(false)
-  const [stickyVisible, setStickyVisible] = useState(false)
-  const [submitState, setSubmitState] = useState<SubmitState>('idle')
-  const [submitMessage, setSubmitMessage] = useState('')
-  const [reference, setReference] = useState('')
+function check(values: Values): Partial<Record<Field, string>> {
+  const errors: Partial<Record<Field, string>> = {}
+  if (values.firstName.trim().length < 2) errors.firstName = 'Escreva o seu primeiro nome.'
+  if (values.business.trim().length < 2) errors.business = 'Escreva o nome da pizzaria.'
+  const digits = values.phone.replace(/\D/g, '')
+  if (digits.length < 9 || digits.length > 15 || /[^\d\s()+.-]/.test(values.phone)) errors.phone = 'Confira o número de WhatsApp. Ex.: 912 345 678 ou +351 912 345 678.'
+  if (!values.consent) errors.consent = 'Marque a autorização para a gente responder no WhatsApp.'
+  return errors
+}
 
-  const storyVisuals = useMemo(() => [
-    { kind: 'search', label: 'Busca no celular' },
-    { kind: 'image', label: 'Site da pizzaria', src: `${ASSET}/video-site-pedido-poster.jpg` },
-    { kind: 'image', label: 'Cardápio organizado', src: `${ASSET}/bn-pedir-1-menu.webp` },
-    { kind: 'image', label: 'Pedido no WhatsApp', src: `${ASSET}/bn-pedir-3-carrinho.webp` },
-  ], [])
+function Arrow() {
+  return <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14m0 0-5.5-5.5M19 12l-5.5 5.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
+}
 
-  useEffect(() => {
-    const media = window.matchMedia('(prefers-reduced-motion: reduce)')
-    const update = () => setReducedMotion(media.matches)
-    update()
-    media.addEventListener('change', update)
-    return () => media.removeEventListener('change', update)
+function Check() {
+  return <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m5 12.5 4.3 4.3L19 7.5" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" /></svg>
+}
+
+function Mark({ light = false }: { light?: boolean }) {
+  return (
+    <svg width="30" height="30" viewBox="0 0 48 48" aria-hidden="true">
+      <path d="M35.4 17.1 A13.2 13.2 0 1 0 35.4 30.9" fill="none" stroke={light ? '#F4F1EA' : '#29221E'} strokeWidth="5.1" strokeLinecap="round" />
+      <circle cx="26.6" cy="24" r="5.7" fill="#F26522" />
+    </svg>
+  )
+}
+
+function Message() {
+  return <>{MESSAGE.map(([bold, rest], i) => <span key={i} className="spzWaLine">{rest !== undefined ? <><b>{bold}</b>{rest}</> : bold || ' '}</span>)}</>
+}
+
+function PhoneDemo() {
+  const [step, setStep] = useState(0)
+  const [sent, setSent] = useState(false)
+  const stage = useRef<HTMLDivElement>(null)
+  const touched = useRef(false)
+  const visible = useRef(false)
+  const first = useRef(true)
+
+  const go = useCallback((next: number, opts: { user?: boolean; send?: boolean } = {}) => {
+    if (opts.user && !touched.current) {
+      touched.current = true
+      track('mockup_used', { step: STEPS[next]?.key ?? 'enviado' })
+    }
+    if (opts.send) setSent(true)
+    else { setSent(false); setStep(next) }
   }, [])
 
+  const advance = useCallback((user = false) => {
+    if (step < STEPS.length - 1) go(step + 1, { user })
+    else if (!sent) go(step, { user, send: true })
+    else go(0, { user })
+  }, [go, step, sent])
+
   useEffect(() => {
-    if (!rootRef.current) return
-    const scope = gsap.context(() => {
-      const mm = gsap.matchMedia()
+    const root = stage.current
+    // The first screen is the LCP: it paints from the HTML, never from a tween.
+    if (first.current) { first.current = false; return }
+    if (!root || matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    const screen = root.querySelector<HTMLElement>(`[data-screen="${STEPS[step].key}"]`)
+    const lines = STEPS[step].key === 'whatsapp' && !sent ? [...root.querySelectorAll<HTMLElement>('.spzWaDraft .spzWaLine')] : []
+    const bubble = sent ? root.querySelector<HTMLElement>('.spzWaBubble') : null
+    const targets = [screen, bubble, ...lines].filter((el): el is HTMLElement => Boolean(el))
+    // Tweens end where the CSS already is, so clearing inline styles never leaves a stale screen visible.
+    const clear = () => gsap.set(targets, { clearProps: 'opacity,visibility,transform' })
+    const tl = gsap.timeline({ onComplete: clear })
+    if (screen && !sent) tl.fromTo(screen, { xPercent: 14, autoAlpha: 0 }, { xPercent: 0, autoAlpha: 1, duration: 0.42, ease: 'power3.out' })
+    if (lines.length) tl.fromTo(lines, { autoAlpha: 0, y: 6 }, { autoAlpha: 1, y: 0, duration: 0.24, stagger: 0.05, ease: 'power2.out' }, '-=0.1')
+    if (bubble) tl.fromTo(bubble, { autoAlpha: 0, y: 40, scale: 0.92 }, { autoAlpha: 1, y: 0, scale: 1, duration: 0.45, ease: 'power3.out' })
+    return () => { tl.kill(); clear() }
+  }, [step, sent])
 
-      mm.add('(prefers-reduced-motion: no-preference)', () => {
-        gsap.fromTo('.spzHeroCopy > *',
-          { autoAlpha: 0, y: 26 },
-          { autoAlpha: 1, y: 0, duration: 0.85, ease: 'expo.out', stagger: 0.07, delay: 0.08 },
-        )
-        gsap.fromTo('.spzHeroPhone',
-          { autoAlpha: 0, x: 54, rotateY: -16, rotateX: 5, scale: 0.94 },
-          { autoAlpha: 1, x: 0, rotateY: -5, rotateX: 2, scale: 1, duration: 1.35, ease: 'expo.out', delay: 0.2 },
-        )
-        gsap.fromTo('.spzPriceSeal',
-          { autoAlpha: 0, scale: 0.65, rotate: -12 },
-          { autoAlpha: 1, scale: 1, rotate: -5, duration: 0.8, ease: 'back.out(1.8)', delay: 0.75 },
-        )
-
-        const steps = gsap.utils.toArray<HTMLElement>('[data-story-step]')
-        steps.forEach((step, index) => {
-          ScrollTrigger.create({
-            trigger: step,
-            start: 'top 58%',
-            end: 'bottom 42%',
-            onToggle: self => { if (self.isActive) setStoryStep(index) },
-          })
-        })
-
-        gsap.utils.toArray<HTMLElement>('[data-spz-reveal]').forEach(el => {
-          gsap.fromTo(el,
-            { autoAlpha: 0, y: 30 },
-            {
-              autoAlpha: 1,
-              y: 0,
-              duration: 0.9,
-              ease: 'expo.out',
-              scrollTrigger: { trigger: el, start: 'top 88%', once: true },
-            },
-          )
-        })
-      })
-
-      return () => mm.revert()
-    }, rootRef)
-
-    return () => scope.revert()
+  useEffect(() => {
+    const root = stage.current
+    if (!root) return
+    const io = new IntersectionObserver(([entry]) => { visible.current = entry.isIntersecting }, { threshold: 0.45 })
+    io.observe(root)
+    return () => io.disconnect()
   }, [])
 
+  // Until the visitor takes over, the phone walks through the order by itself, slowly enough to read.
   useEffect(() => {
-    const hero = heroRef.current
-    const form = formRef.current
-    if (!hero || !form) return
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    const id = window.setTimeout(() => {
+      if (!touched.current && visible.current && !document.hidden) advance()
+    }, sent ? 3800 : step === 0 ? 4200 : 3200)
+    return () => window.clearTimeout(id)
+  }, [advance, step, sent])
 
-    const update = () => {
-      const heroPassed = hero.getBoundingClientRect().bottom < 12
-      const formNear = form.getBoundingClientRect().top < window.innerHeight * 0.86
-      setStickyVisible(heroPassed && !formNear)
-    }
-    update()
-    window.addEventListener('scroll', update, { passive: true })
-    window.addEventListener('resize', update)
-    return () => {
-      window.removeEventListener('scroll', update)
-      window.removeEventListener('resize', update)
-    }
-  }, [])
-
-  useEffect(() => {
-    const phone = phoneRef.current
-    if (!phone || reducedMotion || !window.matchMedia('(pointer:fine)').matches) return
-
-    let frame = 0
-    const move = (event: PointerEvent) => {
-      const rect = phone.getBoundingClientRect()
-      const x = (event.clientX - rect.left) / rect.width - 0.5
-      const y = (event.clientY - rect.top) / rect.height - 0.5
-      cancelAnimationFrame(frame)
-      frame = requestAnimationFrame(() => {
-        phone.style.setProperty('--tilt-x', `${-y * 7}deg`)
-        phone.style.setProperty('--tilt-y', `${x * 10 - 5}deg`)
-      })
-    }
-    const reset = () => {
-      phone.style.setProperty('--tilt-x', '2deg')
-      phone.style.setProperty('--tilt-y', '-5deg')
-    }
-    phone.addEventListener('pointermove', move)
-    phone.addEventListener('pointerleave', reset)
-    return () => {
-      cancelAnimationFrame(frame)
-      phone.removeEventListener('pointermove', move)
-      phone.removeEventListener('pointerleave', reset)
-    }
-  }, [reducedMotion])
-
-  const scrollToForm = () => {
-    track('site_offer_cta_clicked', { placement: 'landing' })
-    formRef.current?.scrollIntoView({ behavior: reducedMotion ? 'auto' : 'smooth', block: 'start' })
-  }
-
-  const openDemo = () => {
-    track('site_demo_opened', { offer: 'site-pizzaria-14990' })
-    window.open(DEMO_URL, '_blank', 'noopener,noreferrer')
-  }
-
-  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+  const onTabKey = (event: KeyboardEvent<HTMLButtonElement>, index: number) => {
+    const delta = event.key === 'ArrowRight' ? 1 : event.key === 'ArrowLeft' ? -1 : 0
+    if (!delta) return
     event.preventDefault()
-    if (submitState === 'sending') return
+    const next = (index + delta + STEPS.length) % STEPS.length
+    go(next, { user: true })
+    event.currentTarget.parentElement?.querySelectorAll<HTMLButtonElement>('[role="tab"]')[next]?.focus()
+  }
 
-    const form = event.currentTarget
-    const data = new FormData(form)
-    const params = new URLSearchParams(window.location.search)
-    const payload = {
-      firstName: String(data.get('firstName') || '').trim(),
-      business: String(data.get('business') || '').trim(),
-      phone: String(data.get('phone') || '').trim(),
-      currentLink: String(data.get('currentLink') || '').trim(),
-      website: String(data.get('website') || '').trim(),
-      consent: data.get('consent') === 'on',
-      pageUrl: window.location.href,
-      referrer: document.referrer || null,
-      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || null,
-      attribution: Object.fromEntries(
-        ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term', 'utm_id', 'fbclid', 'gclid']
-          .map(key => [key, params.get(key)])
-          .filter((entry): entry is [string, string] => Boolean(entry[1])),
-      ),
+  const current = STEPS[step]
+  const caption = sent ? 'Pronto: o pedido chegou à pizzaria pelo WhatsApp, enviado pelo próprio cliente.' : current.caption
+
+  return (
+    <div className="spzDemo">
+      <div className="spzPhone" ref={stage}>
+        <div className="spzPhoneScreen" role="tabpanel" id="spz-demo-panel" aria-labelledby={`spz-tab-${current.key}`}>
+          {STEPS.slice(0, 4).map((s, i) => (
+            <img
+              key={s.key}
+              data-screen={s.key}
+              src={s.src}
+              alt={i === step ? s.alt : ''}
+              aria-hidden={i !== step}
+              width={600}
+              height={1298}
+              loading={i === 0 ? 'eager' : 'lazy'}
+              fetchPriority={i === 0 ? 'high' : 'auto'}
+              decoding="async"
+              className={i === step ? 'isOn' : ''}
+            />
+          ))}
+          <div data-screen="whatsapp" className={`spzWa${current.key === 'whatsapp' ? ' isOn' : ''}`} aria-hidden={current.key !== 'whatsapp'}>
+            <div className="spzWaTop"><span aria-hidden="true">BN</span><div><b>Bella Napoli</b><small>conta comercial</small></div></div>
+            <div className="spzWaChat">
+              {sent && <div className="spzWaBubble"><Message /><small>agora ✓✓</small></div>}
+            </div>
+            <div className="spzWaComposer">
+              <div className="spzWaDraft">{sent ? <span className="spzWaLine spzWaPlaceholder">Mensagem</span> : <Message />}</div>
+              <span className="spzWaSend" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24"><path d="M3 20.5 21 12 3 3.5l.02 6.6L15 12 3.02 13.9z" fill="currentColor" /></svg></span>
+            </div>
+            <span className="spzIllus">Ilustração da conversa no WhatsApp</span>
+          </div>
+          {!sent && (
+            <button
+              type="button"
+              className="spzHot"
+              style={{ left: `${current.hot.x}%`, top: `${current.hot.y}%` }}
+              onClick={() => advance(true)}
+              aria-label={`Simular toque em ${current.hot.label}`}
+            ><span aria-hidden="true" /></button>
+          )}
+        </div>
+      </div>
+
+      <div className="spzDemoSide">
+        <p className="spzDemoCaption" aria-live="polite"><b>{sent ? '✓' : step + 1}</b><span>{caption}</span></p>
+        <div className="spzChips" role="tablist" aria-label="Etapas do pedido no site de exemplo">
+          {STEPS.map((s, i) => (
+            <button
+              key={s.key}
+              id={`spz-tab-${s.key}`}
+              type="button"
+              role="tab"
+              aria-selected={i === step}
+              aria-controls="spz-demo-panel"
+              tabIndex={i === step ? 0 : -1}
+              onClick={() => go(i, { user: true })}
+              onKeyDown={event => onTabKey(event, i)}
+            >{s.chip}</button>
+          ))}
+        </div>
+        <p className="spzDemoHint">{sent
+          ? <button type="button" className="spzLinkBtn" onClick={() => go(0, { user: true })}>Ver de novo</button>
+          : 'Toque no botão destacado no celular ou escolha uma etapa.'}</p>
+      </div>
+    </div>
+  )
+}
+
+export default function SitePizzariaLanding({ qaPending }: { qaPending: string[] }) {
+  const { openModal } = usePrivacy()
+  const heroCta = useRef<HTMLAnchorElement>(null)
+  const formSection = useRef<HTMLElement>(null)
+  const footer = useRef<HTMLElement>(null)
+  const submissionId = useRef('')
+  const started = useRef(false)
+  const nameEdited = useRef(false)
+  const fieldRefs = useRef<Partial<Record<Field, HTMLInputElement | null>>>({})
+  const successRef = useRef<HTMLHeadingElement>(null)
+  const [preview, setPreview] = useState('')
+  const [values, setValues] = useState<Values>(EMPTY)
+  const [errors, setErrors] = useState<Partial<Record<Field, string>>>({})
+  const [submit, setSubmit] = useState<Submit>({ state: 'idle' })
+  const [sticky, setSticky] = useState(false)
+
+  useEffect(() => { track('landing_viewed', { offer: 'site-pizzaria-14990' }) }, [])
+
+  useEffect(() => {
+    const seen = new Map<Element, boolean>()
+    const io = new IntersectionObserver(entries => {
+      entries.forEach(e => seen.set(e.target, e.isIntersecting))
+      const [cta, form, foot] = [heroCta.current, formSection.current, footer.current].map(el => (el ? seen.get(el) ?? false : false))
+      setSticky(!cta && !form && !foot && (heroCta.current?.getBoundingClientRect().top ?? 1) < 0)
+    }, { rootMargin: '0px 0px -10% 0px' })
+    ;[heroCta.current, formSection.current, footer.current].forEach(el => el && io.observe(el))
+    return () => io.disconnect()
+  }, [])
+
+  useEffect(() => { if (submit.state === 'success') successRef.current?.focus() }, [submit.state])
+
+  const toForm = (placement: string) => () => track('cta_clicked', { placement })
+  const openExample = (placement: string) => () => track('demo_opened', { placement })
+
+  const set = (field: keyof Values) => (value: string | boolean) => {
+    if (!started.current) { started.current = true; track('form_started') }
+    if (field === 'business') nameEdited.current = true
+    setValues(v => ({ ...v, [field]: value }))
+    if (errors[field as Field]) setErrors(e => ({ ...e, [field]: undefined }))
+  }
+
+  const onPreview = (value: string) => {
+    setPreview(value)
+    if (!nameEdited.current) setValues(v => ({ ...v, business: value }))
+  }
+
+  const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    if (submit.state === 'sending') return
+
+    const found = check(values)
+    setErrors(found)
+    const first = (['firstName', 'business', 'phone', 'consent'] as Field[]).find(f => found[f])
+    if (first) {
+      fieldRefs.current[first]?.focus()
+      track('form_failed', { reason: 'invalid', field: first })
+      return
     }
 
-    setSubmitState('sending')
-    setSubmitMessage('')
+    submissionId.current ||= uuid()
+    const params = new URLSearchParams(window.location.search)
+    const honeypot = (event.currentTarget.elements.namedItem('website') as HTMLInputElement | null)?.value || ''
+    setSubmit({ state: 'sending' })
 
     try {
       const response = await fetch('/api/site-pizzaria', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
+        body: JSON.stringify({
+          ...values,
+          website: honeypot,
+          submissionId: submissionId.current,
+          pageUrl: window.location.href,
+          referrer: document.referrer || null,
+          timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || null,
+          attribution: Object.fromEntries(['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term', 'utm_id', 'fbclid', 'gclid'].map(k => [k, params.get(k) || ''])),
+        }),
       })
       const result = await response.json().catch(() => ({}))
-      if (!response.ok || !result.ok) throw new Error(result.error || 'Não foi possível enviar agora.')
-
-      setReference(result.reference || '')
-      setSubmitState('success')
-      setSubmitMessage('Vamos entrar em contato pelo WhatsApp para confirmar o cardápio, os materiais e os próximos passos.')
-      track('lead_saved', { content_name: 'site_pizzaria_14990', reference: result.reference })
-    } catch (error) {
-      setSubmitState('error')
-      setSubmitMessage(error instanceof Error ? error.message : 'Não foi possível enviar agora. Tente novamente.')
+      if (response.ok && result.ok) {
+        setSubmit({ state: 'success', reference: result.reference })
+        // Lead only when the CRM holds it; an e-mail-only preview is not a lead.
+        track('lead_saved', { reference: result.reference, delivery: result.delivery }, result.delivery === 'crm' ? { event: 'Lead', id: `site-pizzaria:${submissionId.current}` } : undefined)
+        return
+      }
+      if (response.status === 422 && result.field && result.field in EMPTY) {
+        setErrors({ [result.field]: result.error })
+        fieldRefs.current[result.field as Field]?.focus()
+        setSubmit({ state: 'idle' })
+      } else {
+        setSubmit({ state: 'error', message: result.error || 'Não foi possível enviar agora. Seus dados continuam preenchidos. Tente de novo.' })
+      }
+      track('form_failed', { reason: `http_${response.status}`, field: result.field })
+    } catch {
+      setSubmit({ state: 'error', message: 'Sem ligação com o servidor. Confira a internet e toque em enviar de novo. Seus dados continuam preenchidos.' })
+      track('form_failed', { reason: 'network' })
     }
   }
 
   const whatsappHref = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent('Olá! Vi a oferta do site para pizzaria por €149,90 e tenho uma dúvida.')}`
+  const onWhatsapp = (placement: string) => () => track('whatsapp_opened', { placement }, { event: 'Contact', id: `site-pizzaria-wa:${uuid()}` })
+  const describedBy = (f: Field, extra?: string) => [errors[f] ? `spz-err-${f}` : '', extra || ''].filter(Boolean).join(' ') || undefined
+  const shownName = preview.trim() || 'Sua Pizzaria'
+  const initials = shownName.split(/\s+/).filter(Boolean).slice(0, 2).map(w => w[0]?.toUpperCase()).join('')
 
   return (
-    <div className="spzRoot" ref={rootRef}>
+    <div className="spzRoot">
+      {qaPending.length > 0 && (
+        <details className="spzQa">
+          <summary>QA (só no preview) · {qaPending.length} pendências antes de publicar</summary>
+          <p>Só no preview. Produção responde 404 até estas condições serem aprovadas.</p>
+          <ul>{qaPending.map(item => <li key={item}>{item}</li>)}</ul>
+        </details>
+      )}
       <header className="spzHeader">
         <div className="spzWrap spzHeaderInner">
-          <a className="spzBrand" href="https://cenlofood.cenlo.pt/" aria-label="Cenlo Food, página inicial">
-            <CenloMark dark />
-            <span>Cenlo <b>Food</b></span>
-          </a>
-          <nav aria-label="Página da oferta">
-            <button type="button" className="spzHeaderLink" onClick={openDemo}>Ver exemplo</button>
-            <button type="button" className="spzBtn spzBtnPrimary spzBtnSmall" onClick={scrollToForm}>Quero meu site</button>
-          </nav>
+          <a className="spzBrand" href="https://cenlofood.cenlo.pt/" aria-label="Cenlo Food, página inicial"><Mark /><span>Cenlo <b>Food</b></span></a>
+          <a className="spzHeaderLink" href={EXAMPLE_URL} target="_blank" rel="noopener noreferrer" onClick={openExample('header')}>Ver o site de exemplo</a>
+          <a className="spzBtn spzBtnPrimary spzBtnSmall spzHeaderCta" href="#pedido" onClick={toForm('header')}>Quero meu site</a>
         </div>
       </header>
 
-      <main>
-        <section className="spzHero" ref={heroRef}>
-          <div className="spzDiagonal" aria-hidden="true" />
+      <main id="main" tabIndex={-1}>
+        <section className="spzHero" aria-labelledby="spz-title">
           <div className="spzWrap spzHeroGrid">
             <div className="spzHeroCopy">
-              <span className="spzKicker">Site pronto para pizzarias</span>
-              <h1>O site da sua pizzaria pronto por <em>€149,90.</em></h1>
-              <p className="spzLead">Cardápio com fotos e preços, endereço, horário, mapa e um pedido que o cliente monta e envia direto para o seu WhatsApp. Sem aplicativo e sem cadastro para o cliente.</p>
+              <p className="spzKicker">Site para pizzaria · a oferta do anúncio</p>
+              <h1 id="spz-title">O site da sua pizzaria por <em>€149,90</em></h1>
+              <p className="spzLead">Cardápio com fotos e preços, endereço, horário e mapa. O cliente monta o pedido no celular e o WhatsApp abre com tudo escrito para ele enviar.</p>
               <div className="spzHeroActions">
-                <button type="button" className="spzBtn spzBtnPrimary" onClick={scrollToForm}>Quero meu site por €149,90 <ArrowIcon /></button>
-                <button type="button" className="spzBtn spzBtnSecondary" onClick={openDemo}>Ver um exemplo funcionando</button>
+                <a ref={heroCta} className="spzBtn spzBtnPrimary" href="#pedido" onClick={toForm('hero')}>Quero meu site por €149,90 <Arrow /></a>
+                <a className="spzTextLink" href={EXAMPLE_URL} target="_blank" rel="noopener noreferrer" onClick={openExample('hero')}>Abrir o site de exemplo <Arrow /></a>
               </div>
-              <p className="spzMicro">Você envia o cardápio e os dados da pizzaria. A Cenlo prepara o site para você.</p>
-              <div className="spzHeroProof" aria-label="Resumo da oferta">
-                <span><CheckIcon /> Cardápio no celular</span>
-                <span><CheckIcon /> Pedido no WhatsApp</span>
-                <span><CheckIcon /> Sua marca e informações</span>
-              </div>
+              <ul className="spzHeroFacts">
+                <li><Check /> Sem aplicativo e sem cadastro para o cliente</li>
+                <li><Check /> Você manda o cardápio, a Cenlo monta o site</li>
+              </ul>
             </div>
+            <div className="spzHeroDemo">
+              <PhoneDemo />
+              <p className="spzNote">Telas reais do site de exemplo da Bella Napoli, feito com a Cenlo.</p>
+            </div>
+          </div>
+        </section>
 
-            <div className="spzHeroVisual" aria-label="Demonstração do site da Bella Napoli">
-              <div className="spzSearchBubble"><span aria-hidden="true">⌕</span><b>pizzaria perto de mim</b><i /></div>
-              <div className="spzPhone spzHeroPhone" ref={phoneRef}>
-                <div className="spzPhoneBar"><span /><i /></div>
+        <section className="spzSection spzIncluded" id="inclui" aria-labelledby="spz-inclui">
+          <div className="spzWrap spzIncludedGrid">
+            <div>
+              <p className="spzKicker">O que vem no site</p>
+              <h2 id="spz-inclui">Tudo o que o cliente procura antes de pedir, numa página.</h2>
+              <ol className="spzList">
+                {INCLUDED.map(([title, text], i) => (
+                  <li key={title}><span aria-hidden="true">{String(i + 1).padStart(2, '0')}</span><div><h3>{title}</h3><p>{text}</p></div></li>
+                ))}
+              </ol>
+              <p className="spzNote">O site não cobra online: o pagamento é combinado entre o cliente e a pizzaria.</p>
+            </div>
+            <figure className="spzMiniPhone">
+              <div className="spzPhone spzPhoneSmall"><div className="spzPhoneScreen"><img src="/site-pizzaria/localizacao.webp" alt="Seção de localização do site da Bella Napoli com endereço, horário, telefone e o mapa do Google" width={600} height={1298} loading="lazy" decoding="async" /></div></div>
+              <figcaption>Endereço, horário, telefone e o mapa do Google no site de exemplo.</figcaption>
+            </figure>
+          </div>
+        </section>
+
+        <section className="spzSection spzBrandSec" id="sua-marca" aria-labelledby="spz-marca">
+          <div className="spzWrap spzBrandGrid">
+            <div>
+              <p className="spzKicker">Com a sua marca</p>
+              <h2 id="spz-marca">Veja com o nome da sua pizzaria.</h2>
+              <p>A Bella Napoli é só o exemplo. O seu site leva o seu nome, o seu logo, as suas fotos e o seu cardápio.</p>
+              <label className="spzPreviewField" htmlFor="spz-preview">
+                <span>Nome da sua pizzaria</span>
+                <input id="spz-preview" type="text" maxLength={32} autoComplete="organization" placeholder="Ex.: Pizzaria do Bairro" value={preview} onChange={e => onPreview(e.target.value)} aria-describedby="spz-preview-help" />
+              </label>
+              <small id="spz-preview-help" className="spzHelp">Serve só para esta prévia. Se você pedir o site, o nome já vai preenchido no formulário.</small>
+            </div>
+            <figure className="spzBrandPreview">
+              <div className="spzPhone spzPhoneSmall">
                 <div className="spzPhoneScreen">
-                  <video
-                    muted
-                    loop
-                    playsInline
-                    autoPlay={!reducedMotion}
-                    preload="metadata"
-                    poster={`${ASSET}/video-site-pedido-poster.jpg`}
-                    aria-label="Navegação pelo site de pedidos da Bella Napoli"
-                  >
-                    <source src={`${ASSET}/video-site-pedido.mp4`} type="video/mp4" />
-                  </video>
-                </div>
-              </div>
-              <div className="spzPriceSeal"><small>criação</small><strong>149,90 €</strong></div>
-              <span className="spzFloatTag spzTagMenu">cardápio</span>
-              <span className="spzFloatTag spzTagWhatsapp">pedido no WhatsApp</span>
-              <span className="spzDemoLabel">dados de demonstração</span>
-            </div>
-          </div>
-        </section>
-
-        <section className="spzQuickProof" aria-label="O que o site oferece">
-          <div className="spzWrap spzQuickGrid">
-            {[
-              ['01', 'Cardápio com fotos e preços'],
-              ['02', 'Pedido preparado para o WhatsApp'],
-              ['03', 'Sem aplicativo'],
-              ['04', 'Sem cadastro para o cliente'],
-            ].map(([n, text]) => <div key={n}><small>{n}</small><span>{text}</span></div>)}
-          </div>
-        </section>
-
-        <section className="spzStory" id="como-funciona">
-          <div className="spzWrap">
-            <div className="spzSectionHead" data-spz-reveal>
-              <span className="spzKicker">Do Google ao WhatsApp</span>
-              <h2>Quando alguém encontra sua pizzaria, o cardápio precisa estar fácil de achar.</h2>
-            </div>
-            <div className="spzStoryGrid">
-              <div className="spzStoryVisual" aria-live="polite">
-                <div className="spzStoryPhone">
-                  <div className="spzPhoneBar"><span /><i /></div>
-                  <div className="spzStoryScreen">
-                    {storyVisuals[storyStep].kind === 'search' ? (
-                      <div className="spzSearchScene">
-                        <span>⌕</span>
-                        <p>pizzaria perto de mim</p>
-                        <div><b>Bella Napoli</b><small>Cardápio, horário e pedido</small></div>
-                      </div>
-                    ) : (
-                      <img
-                        key={storyVisuals[storyStep].src}
-                        src={storyVisuals[storyStep].src}
-                        alt={storyVisuals[storyStep].label}
-                        width="780"
-                        height="1688"
-                      />
-                    )}
+                  <img src="/site-pizzaria/inicio.webp" alt="" width={600} height={1298} loading="lazy" decoding="async" />
+                  <div className="spzBrandBar" aria-live="polite">
+                    <span className="spzMono" aria-hidden="true">{initials || 'SP'}</span>
+                    <b key={shownName}>{shownName}</b>
                   </div>
                 </div>
-                <div className="spzStoryCounter"><b>0{storyStep + 1}</b><span>de 04</span></div>
               </div>
+              <figcaption>Prévia ilustrativa sobre a tela do exemplo.</figcaption>
+            </figure>
+          </div>
+        </section>
 
-              <div className="spzStorySteps">
-                {[
-                  ['Alguém procura pela sua pizzaria.', 'O link do site pode aparecer no perfil do Google, no Instagram, no WhatsApp, num código QR ou numa campanha.'],
-                  ['Encontra tudo numa página só.', 'Cardápio, preços, endereço, horário, telefone e mapa deixam de ficar espalhados em publicações e mensagens.'],
-                  ['Escolhe as pizzas com calma.', 'Fotos, descrições, tamanhos e preços ficam organizados para o cliente montar o pedido no celular.'],
-                  ['O WhatsApp abre com tudo preenchido.', 'O cliente confere a mensagem e toca em enviar. O pedido só chega depois desse envio.'],
-                ].map(([title, text], index) => (
-                  <article key={title} data-story-step className={storyStep === index ? 'isActive' : ''}>
-                    <span>0{index + 1}</span>
-                    <h3>{title}</h3>
-                    <p>{text}</p>
-                  </article>
-                ))}
-              </div>
+        <section className="spzSection spzOffer" id="oferta" aria-labelledby="spz-oferta">
+          <div className="spzWrap spzOfferGrid">
+            <div className="spzPrice">
+              <p className="spzKicker">A oferta</p>
+              <h2 id="spz-oferta">Site para pizzaria</h2>
+              <p className="spzPriceValue"><span>€</span>149<small>,90</small></p>
+              <a className="spzBtn spzBtnPrimary" href="#pedido" onClick={toForm('offer')}>Quero meu site por €149,90 <Arrow /></a>
+            </div>
+            <div>
+              <h3 className="spzStepsTitle">Como começa</h3>
+              <ol className="spzSteps">
+                <li><b>Você pede aqui</b><span>Nome, pizzaria e WhatsApp. Leva menos de um minuto.</span></li>
+                <li><b>A gente chama você no WhatsApp</b><span>Confirmamos as condições e pedimos cardápio, preços, fotos, logo, endereço e horário.</span></li>
+                <li><b>A Cenlo monta o site</b><span>Com o seu cardápio e a sua marca. Você confere antes de o site ir ao ar.</span></li>
+              </ol>
             </div>
           </div>
         </section>
 
-        <section className="spzDemo" id="exemplo">
-          <div className="spzWrap spzDemoGrid">
-            <div className="spzDemoCopy" data-spz-reveal>
-              <span className="spzKicker">Demonstração real</span>
-              <h2>Veja o site funcionando antes de decidir.</h2>
-              <p>Este é o site da Bella Napoli, uma pizzaria de demonstração. Você pode abrir o cardápio, montar um pedido e ver como ele é preparado para o WhatsApp.</p>
-              <button type="button" className="spzBtn spzBtnDark" onClick={openDemo}>Abrir o site de demonstração <ArrowIcon /></button>
-              <small>O exemplo usa dados fictícios para mostrar o funcionamento.</small>
-            </div>
-
-            <div className="spzDemoStage" data-spz-reveal>
-              <div className="spzDemoTabs" role="tablist" aria-label="Áreas do site">
-                {(Object.keys(demoFrames) as DemoKey[]).map(key => (
-                  <button
-                    key={key}
-                    type="button"
-                    role="tab"
-                    aria-selected={activeDemo === key}
-                    onClick={() => setActiveDemo(key)}
-                  >{demoFrames[key].label}</button>
-                ))}
-              </div>
-              <div className="spzDemoPhone">
-                <div className="spzPhoneBar"><span /><i /></div>
-                <img
-                  key={activeDemo}
-                  src={demoFrames[activeDemo].src}
-                  alt={demoFrames[activeDemo].alt}
-                  width="780"
-                  height="1688"
-                />
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section className="spzJourney">
-          <div className="spzWrap">
-            <div className="spzSectionHead" data-spz-reveal>
-              <span className="spzKicker">Três passos</span>
-              <h2>O cliente encontra, escolhe e pede sem instalar nada.</h2>
-            </div>
-            <div className="spzJourneyGrid">
-              {[
-                ['Abre o site da pizzaria', 'Chega pelo Instagram, Google, WhatsApp, anúncio ou código QR.', 'link'],
-                ['Escolhe e monta o pedido', 'Consulta fotos, descrições, tamanhos, preços e opções disponíveis.', 'pizza'],
-                ['Envia pelo WhatsApp', 'Confere a mensagem preenchida e toca em enviar para a pizzaria.', 'chat'],
-              ].map(([title, text, icon], index) => (
-                <article key={title} data-spz-reveal>
-                  <span className={`spzJourneyIcon is-${icon}`} aria-hidden="true">{index + 1}</span>
-                  <small>Passo 0{index + 1}</small>
-                  <h3>{title}</h3>
-                  <p>{text}</p>
-                </article>
-              ))}
-              <svg className="spzJourneyLine" viewBox="0 0 1000 120" preserveAspectRatio="none" aria-hidden="true">
-                <path d="M70 74 C250 5 330 112 500 58 S760 8 930 72" pathLength="1" />
-              </svg>
-            </div>
-          </div>
-        </section>
-
-        <section className="spzIncluded">
-          <div className="spzWrap">
-            <div className="spzSectionHead" data-spz-reveal>
-              <span className="spzKicker">O que vem pronto</span>
-              <h2>O site já chega com o que sua pizzaria precisa mostrar.</h2>
-            </div>
-            <div className="spzIncludedGrid">
-              {[
-                ['Sua marca', 'Nome, logo, cores e apresentação da pizzaria.', `${ASSET}/video-site-pedido-poster.jpg`],
-                ['Seu cardápio', 'Categorias, pizzas, tamanhos, preços, descrições e fotos fornecidas.', `${ASSET}/bn-pedir-1-menu.webp`],
-                ['Pedido pelo WhatsApp', 'Carrinho com os itens escolhidos e botão para abrir a mensagem.', `${ASSET}/bn-pedir-3-carrinho.webp`],
-                ['Informações da loja', 'Endereço, telefone, horário e redes sociais numa página só.', `${ASSET}/video-site-pedido-poster.jpg`],
-                ['Localização', 'Mapa para o cliente encontrar a pizzaria.', `${ASSET}/video-site-pedido-poster.jpg`],
-                ['Experiência no celular', 'Página adaptada ao dispositivo onde a maior parte dos clientes acessa.', `${ASSET}/bn-pedir-2-item.webp`],
-              ].map(([title, text, src], index) => (
-                <article key={title} data-spz-reveal>
-                  <div className="spzIncludedMedia"><img src={src} alt="" loading="lazy" /></div>
-                  <span>0{index + 1}</span>
-                  <h3>{title}</h3>
-                  <p>{text}</p>
-                </article>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        <section className="spzPersonalize">
-          <div className="spzWrap spzPersonalizeGrid">
-            <div className="spzPersonalizeCopy" data-spz-reveal>
-              <span className="spzKicker">Feito para a sua marca</span>
-              <h2>Seu nome, suas pizzas, seus preços.</h2>
-              <p>A Bella Napoli é apenas o exemplo. A versão entregue usa a identidade e as informações da sua pizzaria.</p>
-              <label htmlFor="restaurant-preview">Digite o nome da sua pizzaria</label>
-              <input
-                id="restaurant-preview"
-                type="text"
-                maxLength={34}
-                value={restaurantName}
-                onChange={event => setRestaurantName(event.target.value || 'Sua Pizzaria')}
-                aria-describedby="restaurant-preview-help"
-              />
-              <small id="restaurant-preview-help">Este campo serve apenas para a visualização e não armazena o texto.</small>
-            </div>
-            <div className="spzBrandPreview" data-spz-reveal>
-              <div className="spzBrandPhone">
-                <div className="spzBrandTop"><span className="spzMiniMark">C</span><b>{restaurantName}</b></div>
-                <div className="spzBrandHero">
-                  <small>Pedido direto pelo WhatsApp</small>
-                  <h3>A pizza que está a fazer falta, a caminho.</h3>
-                  <button type="button" tabIndex={-1}>Pedir agora</button>
-                </div>
-                <div className="spzBrandPills"><span>Cardápio</span><span>Horário</span><span>Mapa</span></div>
-              </div>
-              <span className="spzBrandCaption">Prévia ilustrativa com o nome digitado</span>
-            </div>
-          </div>
-        </section>
-
-        <section className="spzChannels">
-          <div className="spzWrap">
-            <div className="spzSectionHead" data-spz-reveal>
-              <span className="spzKicker">Um endereço para divulgar</span>
-              <h2>Coloque o site onde seus clientes já procuram.</h2>
-              <p>O endereço pode ser ligado aos canais da pizzaria. Criar o site, por si só, não garante posição nas buscas do Google.</p>
-            </div>
-            <div className="spzChannelsGrid">
-              {['Perfil da pizzaria no Google', 'Bio do Instagram', 'WhatsApp', 'Código QR', 'Campanhas e anúncios'].map((item, index) => (
-                <div key={item} data-spz-reveal><span>0{index + 1}</span><b>{item}</b></div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        <section className="spzOffer" id="oferta">
-          <div className="spzWrap spzOfferCard" data-spz-reveal>
-            <div className="spzOfferCopy">
-              <span className="spzKicker">A oferta do anúncio</span>
-              <h2>Seu site pronto por <em>€149,90.</em></h2>
-              <p>Você envia os dados e o cardápio. A Cenlo organiza as informações, aplica a identidade da sua pizzaria e prepara o site para revisão.</p>
-              <ul>
-                {[
-                  'Configuração visual da pizzaria',
-                  'Cadastro inicial do cardápio enviado',
-                  'Carrinho com pedido para o WhatsApp',
-                  'Endereço, horário, telefone e mapa',
-                  'Adaptação para celular',
-                  'Publicação depois da sua aprovação',
-                ].map(item => <li key={item}><CheckIcon /> {item}</li>)}
-              </ul>
-              {!COMMERCIAL_DETAILS_CONFIRMED && (
-                <aside className="spzReviewNotice">
-                  <b>Bloqueio de publicação</b>
-                  <span>Antes de colocar esta oferta no ar, ainda é preciso confirmar domínio, hospedagem, prazo, revisões, alterações futuras e regra de desistência.</span>
-                </aside>
-              )}
-            </div>
-            <div className="spzOfferPrice">
-              <span>Criação e configuração inicial</span>
-              <strong><small>€</small>149<sup>,90</sup></strong>
-              <p>O valor exato e o que está incluído aparecem antes do envio do pedido.</p>
-              <button type="button" className="spzBtn spzBtnPrimary" onClick={scrollToForm}>Quero começar <ArrowIcon /></button>
-            </div>
-          </div>
-        </section>
-
-        <section className="spzDelivery">
-          <div className="spzWrap">
-            <div className="spzSectionHead" data-spz-reveal>
-              <span className="spzKicker">Como fica pronto</span>
-              <h2>Você não precisa montar nada.</h2>
-            </div>
-            <ol className="spzDeliverySteps">
-              {[
-                ['Você envia', 'Nome, logo, cardápio, preços, fotos, endereço, horário e WhatsApp.'],
-                ['A Cenlo prepara', 'Organizamos as informações e aplicamos a identidade da pizzaria.'],
-                ['Você revisa', 'Confere a página e envia os ajustes incluídos na oferta.'],
-                ['O site é publicado', 'Depois da aprovação, o endereço fica pronto para divulgação.'],
-              ].map(([title, text], index) => (
-                <li key={title} data-spz-reveal><span>0{index + 1}</span><div><h3>{title}</h3><p>{text}</p></div></li>
-              ))}
-            </ol>
-          </div>
-        </section>
-
-        <section className="spzFormSection" id="quero-meu-site" ref={formRef}>
+        <section className="spzSection spzFormSec" id="pedido" ref={formSection} aria-labelledby="spz-pedido">
           <div className="spzWrap spzFormGrid">
-            <div className="spzFormIntro" data-spz-reveal>
-              <span className="spzKicker">Próximo passo</span>
-              <h2>Vamos preparar o site da sua pizzaria.</h2>
-              <p>Deixe os dados abaixo. A gente entra em contato pelo WhatsApp para confirmar os materiais, as condições e os próximos passos.</p>
-              <div className="spzFormAside">
-                <b>Separe quando puder</b>
-                <span>Logo, cardápio, preços, fotos, endereço, horário e o número do WhatsApp.</span>
-              </div>
+            <div className="spzFormIntro">
+              <p className="spzKicker">Pedir o site</p>
+              <h2 id="spz-pedido">Peça o site da sua pizzaria.</h2>
+              <p>Depois do envio, a gente responde no WhatsApp que você deixar aqui. Nada é cobrado neste formulário.</p>
+              <div className="spzPrep"><b>Para adiantar, separe:</b><span>logo, cardápio com preços, fotos das pizzas, endereço e horário.</span></div>
             </div>
 
-            <div className="spzFormCard" data-spz-reveal>
-              {submitState === 'success' ? (
-                <div className="spzSuccess" role="status" tabIndex={-1}>
-                  <span className="spzSuccessMark"><CheckIcon /></span>
-                  <small>Pedido recebido</small>
-                  <h3>Agora a gente confirma os materiais com você.</h3>
-                  <p>{submitMessage}</p>
-                  {reference && <code>Referência {reference}</code>}
-                  <button type="button" className="spzBtn spzBtnSecondary" onClick={openDemo}>Voltar ao exemplo do site</button>
+            <div className="spzFormCard">
+              {submit.state === 'success' ? (
+                <div className="spzSuccess" role="status">
+                  <span className="spzSuccessMark"><Check /></span>
+                  <h3 ref={successRef} tabIndex={-1}>Pedido recebido, {values.firstName.trim().split(' ')[0]}.</h3>
+                  <p>A gente fala com você no WhatsApp <b>{values.phone}</b> para confirmar as condições e pedir o cardápio e as fotos da <b>{values.business}</b>.</p>
+                  <p className="spzRef">Referência <code>{submit.reference}</code></p>
+                  <a className="spzTextLink" href={EXAMPLE_URL} target="_blank" rel="noopener noreferrer" onClick={openExample('success')}>Enquanto isso, abra o site de exemplo <Arrow /></a>
                 </div>
               ) : (
-                <form onSubmit={handleSubmit} noValidate>
+                <form onSubmit={onSubmit} noValidate aria-describedby={submit.state === 'error' ? 'spz-form-error' : undefined}>
                   <input className="spzHoneypot" name="website" type="text" tabIndex={-1} autoComplete="off" aria-hidden="true" />
-                  <label>
-                    <span>Primeiro nome</span>
-                    <input name="firstName" required autoComplete="given-name" placeholder="Pedro" minLength={2} maxLength={60} />
-                  </label>
-                  <label>
-                    <span>Nome da pizzaria</span>
-                    <input name="business" required autoComplete="organization" placeholder="Bella Napoli" minLength={2} maxLength={120} />
-                  </label>
-                  <label>
-                    <span>WhatsApp</span>
-                    <input name="phone" type="tel" required autoComplete="tel" inputMode="tel" placeholder="912 345 678" minLength={6} maxLength={24} />
-                  </label>
-                  <label>
-                    <span>Instagram ou cardápio atual <small>opcional</small></span>
-                    <input name="currentLink" type="text" inputMode="url" placeholder="@minhapizzaria ou um link" maxLength={220} />
-                  </label>
-                  <label className="spzConsent">
-                    <input name="consent" type="checkbox" required />
-                    <span>Autorizo a Cenlo a entrar em contato pelo WhatsApp sobre este pedido.</span>
-                  </label>
-                  <p className="spzPrivacyText">Os dados serão usados para responder a este pedido. Eles não entram em campanhas sem uma autorização específica.</p>
-                  {submitState === 'error' && <div className="spzFormError" role="alert">{submitMessage}</div>}
-                  <button className="spzBtn spzBtnPrimary spzSubmit" type="submit" disabled={submitState === 'sending'}>
-                    {submitState === 'sending' ? 'Enviando…' : <>Quero começar <ArrowIcon /></>}
+                  {([
+                    ['firstName', 'Primeiro nome', { autoComplete: 'given-name', enterKeyHint: 'next' }],
+                    ['business', 'Nome da pizzaria', { autoComplete: 'organization', enterKeyHint: 'next' }],
+                    ['phone', 'WhatsApp', { type: 'tel', autoComplete: 'tel', inputMode: 'tel', placeholder: '912 345 678', enterKeyHint: 'next' }],
+                  ] as const).map(([f, label, attrs]) => (
+                    <div className="spzField" key={f}>
+                      <label htmlFor={`spz-${f}`}>{label}</label>
+                      <input
+                        id={`spz-${f}`}
+                        ref={el => { fieldRefs.current[f] = el }}
+                        value={values[f]}
+                        onChange={e => set(f)(e.target.value)}
+                        aria-invalid={Boolean(errors[f])}
+                        aria-describedby={describedBy(f)}
+                        required
+                        {...attrs}
+                      />
+                      {errors[f] && <p className="spzFieldError" id={`spz-err-${f}`}>{errors[f]}</p>}
+                    </div>
+                  ))}
+                  <div className="spzField">
+                    <label htmlFor="spz-currentLink">Instagram ou cardápio atual <small>opcional</small></label>
+                    <input id="spz-currentLink" value={values.currentLink} onChange={e => set('currentLink')(e.target.value)} inputMode="url" autoComplete="url" placeholder="@suapizzaria ou um link" maxLength={220} enterKeyHint="done" />
+                  </div>
+                  <div className="spzConsent">
+                    <input id="spz-consent" type="checkbox" ref={el => { fieldRefs.current.consent = el }} checked={values.consent} onChange={e => set('consent')(e.target.checked)} aria-invalid={Boolean(errors.consent)} aria-describedby={describedBy('consent', 'spz-privacy')} />
+                    <label htmlFor="spz-consent">Autorizo a Cenlo a falar comigo pelo WhatsApp sobre este pedido.</label>
+                  </div>
+                  {errors.consent && <p className="spzFieldError" id="spz-err-consent">{errors.consent}</p>}
+                  <p className="spzHelp" id="spz-privacy">Usamos estes dados só para responder a este pedido.</p>
+                  {submit.state === 'error' && <p className="spzFormError" id="spz-form-error" role="alert">{submit.message}</p>}
+                  <button className="spzBtn spzBtnPrimary spzSubmit" type="submit" disabled={submit.state === 'sending'} aria-busy={submit.state === 'sending'}>
+                    {submit.state === 'sending' ? <><span className="spzSpinner" aria-hidden="true" /> Enviando…</> : submit.state === 'error' ? 'Tentar de novo' : <>Pedir o meu site <Arrow /></>}
                   </button>
-                  <a
-                    className="spzWhatsappAlternative"
-                    href={whatsappHref}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onClick={() => track('whatsapp_opened', { content_name: 'site_pizzaria_14990' })}
-                  >Prefere tirar uma dúvida primeiro? Fale no WhatsApp.</a>
+                  <a className="spzWaAlt" href={whatsappHref} target="_blank" rel="noopener noreferrer" onClick={onWhatsapp('form')}>Tem uma dúvida antes? Fale com a gente no WhatsApp.</a>
                 </form>
               )}
             </div>
           </div>
         </section>
 
-        <section className="spzFaq" id="perguntas">
+        <section className="spzSection spzFaq" id="duvidas" aria-labelledby="spz-duvidas">
           <div className="spzWrap spzFaqGrid">
-            <div className="spzSectionHead" data-spz-reveal>
-              <span className="spzKicker">Antes de começar</span>
-              <h2>As perguntas que precisam estar respondidas.</h2>
-              <p>Os pontos comerciais ainda pendentes ficam visíveis nesta revisão e bloqueiam a publicação.</p>
+            <div>
+              <p className="spzKicker">Dúvidas</p>
+              <h2 id="spz-duvidas">Antes de pedir</h2>
             </div>
             <div className="spzFaqList">
-              {faqs.map((item, index) => (
-                <details key={item.q} data-spz-reveal>
-                  <summary><span>0{index + 1}</span>{item.q}<i aria-hidden="true" /></summary>
-                  <div><p>{item.a}</p>{item.pending && <small>Condição pendente de aprovação comercial.</small>}</div>
+              {FAQS.map(item => (
+                <details key={item.q}>
+                  <summary>{item.q}<i aria-hidden="true" /></summary>
+                  <p>{item.a}</p>
                 </details>
               ))}
             </div>
           </div>
         </section>
-
-        <section className="spzFinal">
-          <div className="spzWrap spzFinalInner" data-spz-reveal>
-            <span className="spzKicker">O site da sua pizzaria</span>
-            <h2>Cardápio que ninguém acha não vende.</h2>
-            <p>Dê à sua pizzaria uma página própria para mostrar o cardápio, preparar pedidos para o WhatsApp e reunir as informações que o cliente procura.</p>
-            <div className="spzFinalPrice"><span>por</span><strong>€149,90</strong></div>
-            <div className="spzFinalActions">
-              <button type="button" className="spzBtn spzBtnPrimary" onClick={scrollToForm}>Quero meu site <ArrowIcon /></button>
-              <button type="button" className="spzBtn spzBtnSecondary" onClick={openDemo}>Ver exemplo funcionando</button>
-            </div>
-          </div>
-        </section>
       </main>
 
-      <footer className="spzFooter">
+      <footer className="spzFooter" ref={footer}>
         <div className="spzWrap spzFooterGrid">
-          <div>
-            <a className="spzBrand isFooter" href="https://cenlofood.cenlo.pt/">
-              <CenloMark />
-              <span>Cenlo <b>Food</b></span>
-            </a>
-            <p>Sites e sistemas para negócios locais de alimentação.</p>
-          </div>
+          <a className="spzBrand" href="https://cenlofood.cenlo.pt/"><Mark light /><span>Cenlo <b>Food</b></span></a>
           <nav aria-label="Rodapé">
             <a href="mailto:ola@cenlo.pt">ola@cenlo.pt</a>
             <a href="/termos">Termos</a>
@@ -714,10 +532,11 @@ export default function SitePizzariaLanding() {
         </div>
       </footer>
 
-      <div className="spzSticky" data-visible={stickyVisible} aria-hidden={!stickyVisible}>
+      <div className="spzSticky" data-visible={sticky} aria-hidden={!sticky}>
         <span><small>Site para pizzaria</small><b>€149,90</b></span>
-        <button type="button" className="spzBtn spzBtnPrimary spzBtnSmall" onClick={scrollToForm}>Quero meu site</button>
+        <a className="spzBtn spzBtnPrimary spzBtnSmall" href="#pedido" tabIndex={sticky ? 0 : -1} onClick={toForm('sticky')}>Quero meu site</a>
       </div>
+
     </div>
   )
 }
