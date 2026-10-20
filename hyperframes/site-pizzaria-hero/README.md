@@ -1,63 +1,39 @@
 # HyperFrames · Site para pizzaria
 
-Composições determinísticas para gerar os filmes de campanha e os posters da landing `/site-pizzaria`.
+Filme de campanha da oferta de site para pizzaria por €149,90. Conta o mesmo pedido que o mockup interativo da landing `/site-pizzaria` mostra: o cliente abre o site, escolhe a pizza, monta, confere o carrinho e o WhatsApp abre com o pedido escrito.
 
-A landing não carrega o runtime do HyperFrames. Os ficheiros renderizados são assets estáticos de produção. As composições usam HTML, CSS, JavaScript e uma timeline GSAP finita, conforme o contrato do HyperFrames.
+A landing não carrega o runtime do HyperFrames nem usa vídeo: o mockup da página é interativo. Este projeto produz os criativos do anúncio e a imagem social (`public/site-pizzaria/og.jpg`).
 
-## Composições
+## Estrutura
 
-- `desktop/` · 1600 × 1000 · 10 segundos
-- `mobile/` · 1080 × 1920 · 10 segundos
+- `index.html` · desktop 1600 × 1000 · 13 s
+- `compositions/mobile.html` · mobile 1080 × 1920 · 13 s
+- `assets/screens/` · telas reais de https://bellanapoli.cenlo.pt/ capturadas a 390 × 844 (as mesmas de `public/site-pizzaria/`)
+- `assets/styles.css`, `assets/timeline.js` · visual e timeline partilhados; cada composição regista a sua timeline
+- `assets/fonts/` · Schibsted Grotesk e Hanken Grotesk locais
 
-As imagens usadas na composição são telas reais do tenant de demonstração Bella Napoli, servidas atualmente por `cenlofood.cenlo.pt`.
+A conversa do WhatsApp é uma ilustração identificada no próprio quadro. O texto é o que o template do site monta (`buildWhatsAppMessage`), sem a linha `Ref.`.
 
-## Preparação
-
-Na raiz do repositório
-
-```bash
-npx hyperframes doctor
-npx hyperframes lint hyperframes/site-pizzaria-hero/desktop
-npx hyperframes lint hyperframes/site-pizzaria-hero/mobile
-```
-
-## Preview
+## Validação
 
 ```bash
-npx hyperframes preview hyperframes/site-pizzaria-hero/desktop
-npx hyperframes preview hyperframes/site-pizzaria-hero/mobile --port 3003
+cd hyperframes/site-pizzaria-hero
+npx --yes hyperframes@0.8.179 check .
+npx --yes hyperframes@0.8.179 snapshot . --at 1.2,3.4,5.5,7.4,9.6,11.2,12.6
 ```
 
-## Snapshots de revisão
+## Render (só depois de aprovada a direção)
 
 ```bash
-npx hyperframes snapshot hyperframes/site-pizzaria-hero/desktop --at 0.5,2.6,4.8,7.3,9.5
-npx hyperframes snapshot hyperframes/site-pizzaria-hero/mobile --at 0.5,2.6,4.8,7.3,9.5
+cd hyperframes/site-pizzaria-hero
+npx --yes hyperframes@0.8.179 render . --video-frame-format png --output renders/site-pizzaria-desktop.mp4
+npx --yes hyperframes@0.8.179 render . --format webm --output renders/site-pizzaria-desktop.webm
+npx --yes hyperframes@0.8.179 render . -c compositions/mobile.html --output renders/site-pizzaria-mobile.mp4
+npx --yes hyperframes@0.8.179 render . -c compositions/mobile.html --format webm --output renders/site-pizzaria-mobile.webm
 ```
 
-## Render final
+Posters: `snapshot --at 3.6` (desktop) e o mesmo instante na composição mobile.
 
-Execute cada comando dentro da pasta correspondente, porque o CLI usa o `index.html` da pasta atual.
+## Imagem social
 
-```bash
-cd hyperframes/site-pizzaria-hero/desktop
-npx hyperframes render --docker --fps 30 --quality high --output ../../../public/site-pizzaria/hero-desktop.mp4
-npx hyperframes render --docker --format webm --fps 30 --quality high --output ../../../public/site-pizzaria/hero-desktop.webm
-
-cd ../mobile
-npx hyperframes render --docker --fps 30 --quality high --output ../../../public/site-pizzaria/hero-mobile.mp4
-npx hyperframes render --docker --format webm --fps 30 --quality high --output ../../../public/site-pizzaria/hero-mobile.webm
-```
-
-A renderização final ainda precisa ser executada num ambiente com Chrome, FFmpeg e Docker disponíveis. Até lá, a landing usa o vídeo real de demonstração que já existe no Cenlo Food.
-
-## Sequência
-
-1. Busca por `pizzaria perto de mim`
-2. Informações dispersas
-3. Entrada do site no telemóvel
-4. Cardápio
-5. Carrinho e WhatsApp
-6. Oferta de €149,90
-
-O vídeo é silencioso e termina numa composição visual próxima do primeiro frame, reduzindo a percepção do corte quando usado em loop.
+`public/site-pizzaria/og.jpg` sai do quadro 3,6 s do desktop, recortado em 1600 × 840 e reduzido para 1200 × 630.
