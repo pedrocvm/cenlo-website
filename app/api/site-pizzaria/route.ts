@@ -8,7 +8,7 @@ const WINDOW_MS = 10 * 60 * 1000
 const MAX_ATTEMPTS = 6
 // ponytail: per-instance memory. It blunts bursts and double submits on a warm instance; the CRM dedupes by submissionId for real.
 const attempts = new Map<string, { count: number; resetAt: number }>()
-const accepted = new Map<string, { reference: string; delivery: 'crm' | 'email'; at: number }>()
+const accepted = new Map<string, { reference: string; delivery: 'crm' | 'email'; leadEventId?: string; at: number }>()
 
 const isProduction = process.env.VERCEL_ENV === 'production'
 
@@ -27,9 +27,9 @@ function isRateLimited(ip: string) {
   return current.count > MAX_ATTEMPTS
 }
 
-async function forwardToCrm(lead: SitePizzariaLead & { device: string | null }) {
+async function forwardToCrm(lead: SitePizzariaLead & { device: string | null }, consentToken: string | undefined) {
   const endpoint = process.env.CENLO_SITE_PIZZARIA_CRM_ENDPOINT
-  if (!endpoint) return false
+  if (!endpoint) return null
 
   const response = await fetch(endpoint, {
     method: 'POST',
@@ -38,12 +38,13 @@ async function forwardToCrm(lead: SitePizzariaLead & { device: string | null }) 
       'Idempotency-Key': lead.submissionId,
       ...(process.env.CENLO_SITE_PIZZARIA_CRM_TOKEN ? { Authorization: `Bearer ${process.env.CENLO_SITE_PIZZARIA_CRM_TOKEN}` } : {}),
     },
-    body: JSON.stringify(lead),
+    body: JSON.stringify({ ...lead, ...(consentToken ? { consentToken } : {}) }),
     cache: 'no-store',
     signal: AbortSignal.timeout(8_000),
   })
   if (!response.ok) throw new Error(`CRM respondeu ${response.status}`)
-  return true
+  const receipt = await response.json().catch(() => ({})) as { leadEventId?: unknown }
+  return { leadEventId: typeof receipt.leadEventId === 'string' ? receipt.leadEventId : undefined }
 }
 
 async function sendNotification(lead: SitePizzariaLead & { device: string | null }, delivery: 'crm' | 'email') {
@@ -97,17 +98,20 @@ export async function POST(request: NextRequest) {
 
   const previous = accepted.get(lead.submissionId)
   if (previous) return NextResponse.json({ ok: true, reference: previous.reference, delivery: previous.delivery, replay: true }, { status: 200 })
+  const consentToken = typeof body.consentToken === 'string' && body.consentToken.length <= 4000 ? body.consentToken : undefined
 
   // Production promises a CRM lead. Without its endpoint the page refuses honestly instead of parking leads in an inbox.
-  if (isProduction && !process.env.CENLO_SITE_PIZZARIA_CRM_ENDPOINT) {
-    console.error('site-pizzaria: CENLO_SITE_PIZZARIA_CRM_ENDPOINT ausente em produção', { reference: lead.reference })
+  if (isProduction && !(process.env.CENLO_SITE_PIZZARIA_CRM_ENDPOINT && process.env.CENLO_SITE_PIZZARIA_CRM_TOKEN)) {
+    console.error('site-pizzaria: endpoint ou token do CRM ausente em produção', { reference: lead.reference })
     return NextResponse.json({ ok: false, error: 'Não foi possível registrar o pedido agora. Seus dados continuam preenchidos. Tente de novo em instantes.' }, { status: 503 })
   }
 
   const failures: string[] = []
   let delivery: 'crm' | 'email' | null = null
+  let leadEventId: string | undefined
   try {
-    if (await forwardToCrm(lead)) delivery = 'crm'
+    const crm = await forwardToCrm(lead, consentToken)
+    if (crm) { delivery = 'crm'; leadEventId = crm.leadEventId }
   } catch (error) {
     failures.push(`CRM: ${error instanceof Error ? error.message : 'falha'}`)
   }
@@ -129,7 +133,7 @@ export async function POST(request: NextRequest) {
   }
 
   for (const [key, value] of accepted) if (Date.now() - value.at > 60 * 60 * 1000) accepted.delete(key)
-  accepted.set(lead.submissionId, { reference: lead.reference, delivery, at: Date.now() })
+  accepted.set(lead.submissionId, { reference: lead.reference, delivery, leadEventId, at: Date.now() })
   console.info('site-pizzaria: lead registrado', { reference: lead.reference, delivery, failures })
-  return NextResponse.json({ ok: true, reference: lead.reference, delivery }, { status: 201 })
+  return NextResponse.json({ ok: true, reference: lead.reference, delivery, ...(leadEventId ? { leadEventId } : {}) }, { status: 201 })
 }

@@ -14,11 +14,12 @@ const campaign=Object.fromEntries(Object.entries({...stored.attribution,...attri
 const client=new AcquisitionClient({surface:'diagnostic',product,entryProduct:params.get('produto')===product?product:null,attribution:campaign,api:runtime.api||API,policyVersion:config?.analytics.policyVersion,disabled:preview||!config?.analytics.enabled,preview,onChange:()=>window.dispatchEvent(new Event('cenlo-acquisition-change'))});
 if(location.pathname.startsWith('/configurar')||location.pathname.startsWith('/contratar')){const context=client.context.bind(client);client.context=()=>({...context(),experience:'food_offer'});}
 else if(/^\/(food\/?)?$/.test(location.pathname)){const context=client.context.bind(client);client.context=()=>({...context(),experience:'food_landing'});}
+else if(location.pathname.startsWith('/site-pizzaria')){const context=client.context.bind(client);client.context=()=>({...context(),experience:'site_offer'});}
 let observed=false;const observe=()=>{if(!observed&&!preview)observed=client.event('food_funnel_viewed');};window.addEventListener('cenlo-acquisition-change',observe);
 if(code&&!preview)await client.exchange(code);void client.prepare();observe();
 window.CenloAcquisition={
- // Same rule as the CRM (Pedro, 2026-10-19): only a contract request is a Lead.
- contactReceived:(eventId,intent)=>{try{if(/^food-contact:[a-f0-9-]{36}$/.test(eventId))void client.mirrorMeta(intent==='implementation'||intent==='evaluation'?'Lead':'Contact',eventId).catch(()=>{});}catch{}},
+ // Same rule as the CRM: a contract request (2026-10-19) or a pizzeria site request (2026-10-20) is a Lead.
+ contactReceived:(eventId,intent)=>{try{if(/^food-contact:[a-f0-9-]{36}$/.test(eventId))void client.mirrorMeta(intent==='implementation'||intent==='evaluation'||intent==='site_offer'?'Lead':'Contact',eventId).catch(()=>{});}catch{}},
  event:(name,props={})=>client.event(name,props),
  consentToken:()=>!client.disabled&&client.receipt&&Date.parse(client.receipt.expiresAt)>Date.now()?client.receipt.consentToken:undefined,
  diagnosticEndpoint:runtime.diagnosticEndpoint||'https://api-crm.cenlo.pt/crm/public/diagnostics',
