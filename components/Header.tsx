@@ -43,7 +43,7 @@ export default function Header() {
     return () => { document.body.style.overflow = ''; document.removeEventListener('keydown', onKey) }
   }, [open])
 
-  if (pathname.startsWith('/configurar')) return null
+  if (pathname.startsWith('/configurar') || pathname.startsWith('/contratar')) return null
 
   return (
     <>
