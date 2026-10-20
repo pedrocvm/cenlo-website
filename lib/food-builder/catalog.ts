@@ -1,4 +1,4 @@
-export const CATALOG_VERSION = '2026-10-08.3'
+export const CATALOG_VERSION = '2026-10-08.4'
 
 export const GROUPS = [
   { id: 'operations', title: 'Atendimento e operação', intro: 'Do primeiro contacto ao pedido pronto: tudo entra no mesmo sítio e chega à cozinha sem ser copiado à mão.' },
@@ -138,7 +138,7 @@ const modules = [
     group: 'operations',
     title: 'Impressão Automática',
     icon: 'printer',
-    tier: 'optional',
+    tier: 'base',
     promise: 'A comanda sai na impressora da cozinha assim que o pedido é confirmado.',
     summary: 'O Cenlo Print Agent liga o Cenlo à impressora térmica da loja, com fila, monitorização e recuperação de falhas.',
     problem: [
@@ -228,7 +228,7 @@ const modules = [
     group: 'channels',
     title: 'Pedidos Agendados',
     icon: 'calendar',
-    tier: 'optional',
+    tier: 'base',
     promise: 'Aceite encomendas para mais tarde sem as misturar com a produção do momento.',
     summary: 'Pedidos para uma data e hora futuras ficam à parte e só entram na cozinha quando chega a altura.',
     problem: [
@@ -313,7 +313,7 @@ const modules = [
     group: 'delivery',
     title: 'Entregas por Raio',
     icon: 'radius',
-    tier: 'optional',
+    tier: 'base',
     promise: 'A cobertura e a taxa definidas pela distância real até à morada do cliente.',
     summary: 'Faixas de distância a partir da morada da loja, com uma taxa por faixa e um raio máximo de entrega.',
     problem: [
@@ -397,7 +397,7 @@ const modules = [
     group: 'revenue',
     title: 'Promoções',
     icon: 'tag',
-    tier: 'premium',
+    tier: 'base',
     promise: 'Campanhas com regras que o próprio sistema aplica, em todos os canais.',
     summary: 'Entrega grátis, percentagem, valor fixo e leve X pague Y, com produtos, canais e datas definidos.',
     problem: [
@@ -708,7 +708,7 @@ const modules = [
     group: 'structure',
     title: 'Auditoria',
     icon: 'history',
-    tier: 'optional',
+    tier: 'base',
     productArea: 'audit',
     promise: 'Quem fez o quê, e quando, com os valores antes e depois.',
     summary: 'Trilha de alterações das ações relevantes na plataforma, para consulta pela gestão.',

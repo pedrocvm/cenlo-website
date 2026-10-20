@@ -27,7 +27,7 @@ export type Submission = {
   }
 }
 
-export const UTM_KEYS = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content'] as const
+export const UTM_KEYS = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content', 'utm_id'] as const
 
 export type FieldError = { field: string; message: string }
 export type Result = { ok: true; submission: Submission } | { ok: false; status: number; errors: FieldError[] }

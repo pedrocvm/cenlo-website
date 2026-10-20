@@ -6,6 +6,9 @@ import { shotsFor } from '@/lib/food-builder/screenshots'
 import ModuleIcon from '@/components/food-builder/ModuleIcon'
 import SelectToggle, { RemoveLink, TierBadge } from '@/components/food-builder/SelectToggle'
 import Gallery from '@/components/food-builder/Gallery'
+import ModuleVideos from '@/components/food-builder/ModuleVideos'
+import { videosFor } from '@/lib/food-builder/videos'
+import { MODULE_EXAMPLES } from '@/lib/food-builder/benefits'
 
 export const dynamicParams = false
 
@@ -26,9 +29,11 @@ export default async function ModulePage({ params }: { params: Promise<{ slug: s
   if (!m) notFound()
   const group = GROUPS.find(g => g.id === m.group)!
   const shots = shotsFor(m.id)
+  const videos = videosFor(m.id)
   const i = MODULES.indexOf(m)
   const prev = MODULES[i - 1]
   const next = MODULES[i + 1]
+  const nextVideoModule = MODULES.slice(i + 1).find(item => videosFor(item.id).length)
 
   return (
     <article>
@@ -48,6 +53,13 @@ export default async function ModulePage({ params }: { params: Promise<{ slug: s
           <RemoveLink id={m.id} title={m.title} />
         </div>
       </header>
+
+      <section id="demonstracao" className="fb-section fm-demo-section" aria-labelledby="s-shots">
+        <h2 id="s-shots" className="fm-demo-title">Veja o módulo em funcionamento</h2>
+        {videos.length ? <ModuleVideos key={m.id} nextModule={nextVideoModule ? { href: `/configurar/${nextVideoModule.slug}#demonstracao`, title: nextVideoModule.title } : undefined} videos={videos} title={m.title} poster={shots[0]?.src} /> : <><Gallery shots={shots} title={m.title} /><p className="fb-note">Imagens reais com dados de demonstração. Vídeo específico deste recurso ainda não disponível nesta página.</p></>}
+      </section>
+
+      {MODULE_EXAMPLES[m.id] && <section className="fb-section fm-examples" aria-labelledby="s-examples"><span className="fb-eyebrow">No dia a dia do restaurante</span><h2 id="s-examples">Onde isso faz diferença</h2><div>{MODULE_EXAMPLES[m.id].map((example, index) => <article key={example.title}><span className="fm-example-number">0{index + 1}</span><h3>{example.title}</h3><p>{example.text}</p></article>)}</div><p className="fb-note">Exemplos ilustrativos. As regras e a configuração são definidas para a sua operação.</p></section>}
 
       <section className="fb-section" aria-labelledby="s-problem">
         <div className="fb-section-head">
@@ -73,22 +85,6 @@ export default async function ModulePage({ params }: { params: Promise<{ slug: s
                 <p>{d.text}</p>
               </div>
             ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="fb-section" aria-labelledby="s-shots">
-        <div className="fb-section-head">
-          <h2 id="s-shots">Veja o módulo em funcionamento</h2>
-          <div>
-            {shots.length ? (
-              <>
-                <Gallery shots={shots} title={m.title} />
-                <p className="fb-note">Capturas da plataforma Cenlo Food com dados de demonstração.</p>
-              </>
-            ) : (
-              <p className="fb-pending">Estamos a preparar as capturas deste módulo. Se quiser vê-lo a funcionar, inclua-o na sua configuração e mostramos-lhe numa demonstração.</p>
-            )}
           </div>
         </div>
       </section>

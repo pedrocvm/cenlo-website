@@ -1,3 +1,4 @@
+import DiagnosticWelcome from '@/components/food-builder/DiagnosticWelcome'
 import type { Metadata } from 'next'
 import Image from 'next/image'
 import { BASE_MODULES, GROUPS, MODULES } from '@/lib/food-builder/catalog'
@@ -20,6 +21,7 @@ export const metadata: Metadata = {
 export default function FoodBuilderPage() {
   return (
     <>
+      <DiagnosticWelcome />
       <section className="fb-hero" aria-labelledby="fb-title">
         <div>
           <span className="fb-eyebrow">Cenlo Food Builder</span>
@@ -34,7 +36,7 @@ export default function FoodBuilderPage() {
           <ol className="fb-steps">
             <li>Explore os módulos e veja o Cenlo a funcionar.</li>
             <li>Adicione à sua configuração o que faz sentido.</li>
-            <li>Envie-nos a seleção para a analisarmos consigo.</li>
+            <li>Confira a oferta, escolha como pagar e envie seu pedido de implantação.</li>
           </ol>
         </div>
         <div className="fb-hero-media">

@@ -4,8 +4,15 @@ import { MODULES } from '@/lib/food-builder/catalog'
 
 const KEY = 'cenlo-food-builder:selection:v1'
 const EMPTY: readonly string[] = []
-const known = new Set(MODULES.filter(m => m.tier !== 'base').map(m => m.id as string))
-const base = new Set(MODULES.filter(m => m.tier === 'base').map(m => m.id as string))
+export const EXTRA_SELECTION_MODULES = [
+  { id: 'conversation-order', title: 'Fechar pedidos na conversa', tier: 'base' as const, slug: null },
+  { id: 'online-ordering', title: 'Página de pedidos online', tier: 'base' as const, slug: null },
+  { id: 'menu-import', title: 'Importação de cardápio com IA', tier: 'optional' as const, slug: null },
+]
+const known = new Set([...MODULES.filter(m => m.tier !== 'base').map(m => m.id as string), ...EXTRA_SELECTION_MODULES.filter(m => m.tier !== 'base').map(m => m.id)])
+export const BASE_SELECTION_MODULES = [...MODULES, ...EXTRA_SELECTION_MODULES].filter(m => m.tier === 'base')
+export const BASE_SELECTION_IDS = BASE_SELECTION_MODULES.map(m => m.id as string)
+const base = new Set(BASE_SELECTION_IDS)
 const listeners = new Set<() => void>()
 let cache: readonly string[] | null = null
 
@@ -13,7 +20,7 @@ function read(): readonly string[] {
   if (cache) return cache
   try {
     const parsed: unknown = JSON.parse(localStorage.getItem(KEY) ?? '[]')
-    cache = Array.isArray(parsed) ? parsed.filter((id): id is string => typeof id === 'string' && known.has(id)) : []
+    cache = Array.isArray(parsed) ? [...known].filter(id => parsed.includes(id)) : []
   } catch {
     cache = []
   }
@@ -21,7 +28,7 @@ function read(): readonly string[] {
 }
 
 function write(next: readonly string[]) {
-  cache = MODULES.filter(m => next.includes(m.id)).map(m => m.id)
+  cache = [...known].filter(id => next.includes(id))
   try {
     localStorage.setItem(KEY, JSON.stringify(cache))
   } catch {
@@ -64,4 +71,14 @@ export function removeModule(id: string) {
 
 export function clearSelection() {
   write([])
+}
+
+/** Read current selection after hydration, before creating an offer. */
+export function readSelection() { return read() }
+
+/** Synchronize explicit requirements without changing the frozen offer or included plan extras. */
+export function replaceSelection(ids: readonly string[]) { write(ids) }
+
+export function mergeSelectionIntoComposition(ids: readonly string[], selection: readonly string[]) {
+  return [...new Set([...BASE_SELECTION_IDS, ...ids.filter(id => base.has(id)), ...selection])]
 }
