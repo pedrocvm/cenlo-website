@@ -244,7 +244,7 @@ export default function FoodOfferJourney({ entry = 'builder' }: { entry?: 'build
     try {
       const receipt = await call('/requests', { submissionId: next.submissionId, offerId: next.offer!.id, sessionKey: next.sessionKey, kind: review, payment: next.payment || 'cash', contact,
         ...(next.decision ? { decision: next.decision } : {}), ...(next.desiredStart ? { desiredStart: next.desiredStart } : {}), consentToken: next.isTest ? undefined : consentToken(), confirmation: true, ...(review === 'question' ? { question: next.question || '' } : {}), website: '' })
-      update({ receipt }); if (!next.isTest && receipt.leadEventId) contactReceived(receipt.leadEventId); setReview(null); setConfirmed(false); window.scrollTo({ top: 0, behavior: 'instant' })
+      update({ receipt }); if (!next.isTest && receipt.leadEventId) contactReceived(receipt.leadEventId, receipt.kind); setReview(null); setConfirmed(false); window.scrollTo({ top: 0, behavior: 'instant' })
     } catch (e) { if ((e as Error & { code?: string }).code === 'promotion_expired') { setPromotionRejected(true); setReview(null); setConfirmed(false) } setError((e as Error).message) }
     finally { lock.current = false; setBusy(false) }
   }
@@ -276,7 +276,7 @@ export default function FoodOfferJourney({ entry = 'builder' }: { entry?: 'build
         consentToken: next.isTest ? undefined : consentToken(), contact, question: next.question || '', confirmation: true, website: '',
         ...((next.offer?.id || next.previousOfferId) ? { previousOfferId: next.offer?.id || next.previousOfferId } : {}),
       })
-      update({ evaluationReceipt }); if (!next.isTest && evaluationReceipt.leadEventId) contactReceived(evaluationReceipt.leadEventId)
+      update({ evaluationReceipt }); if (!next.isTest && evaluationReceipt.leadEventId) contactReceived(evaluationReceipt.leadEventId, 'evaluation')
       window.location.assign(evaluationReceipt.whatsappUrl)
     } catch (e) { setError((e as Error).message) }
     finally { lock.current = false; setBusy(false) }

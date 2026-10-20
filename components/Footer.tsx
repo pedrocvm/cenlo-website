@@ -6,7 +6,8 @@ import { usePrivacy } from './PrivacyContext'
 
 export default function Footer() {
   const { openModal } = usePrivacy()
-  if (usePathname().startsWith('/configurar')) return null
+  const path = usePathname()
+  if (path.startsWith('/configurar') || path.startsWith('/contratar')) return null
 
   return (
     <footer className="site-footer">
