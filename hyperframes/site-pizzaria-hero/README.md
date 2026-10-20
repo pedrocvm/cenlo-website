@@ -22,17 +22,19 @@ npx --yes hyperframes@0.8.179 check .
 npx --yes hyperframes@0.8.179 snapshot . --at 1.2,3.4,5.5,7.4,9.6,11.2,12.6
 ```
 
-## Render (só depois de aprovada a direção)
+## Render
+
+Direção aprovada por Pedro em 20/10/2026. Arquivos em `public/site-pizzaria/`: `filme-desktop.mp4` (1,4 MB), `filme-desktop.webm`, `filme-desktop-poster.jpg`, `filme-mobile.mp4` (1,8 MB), `filme-mobile.webm`, `filme-mobile-poster.jpg`. Os posters são o quadro 3,6 s. Para refazer:
 
 ```bash
 cd hyperframes/site-pizzaria-hero
-npx --yes hyperframes@0.8.179 render . --video-frame-format png --output renders/site-pizzaria-desktop.mp4
-npx --yes hyperframes@0.8.179 render . --format webm --output renders/site-pizzaria-desktop.webm
-npx --yes hyperframes@0.8.179 render . -c compositions/mobile.html --output renders/site-pizzaria-mobile.mp4
-npx --yes hyperframes@0.8.179 render . -c compositions/mobile.html --format webm --output renders/site-pizzaria-mobile.webm
+npx --yes hyperframes@0.8.179 render . --video-frame-format png --crf 22 -o ../../public/site-pizzaria/filme-desktop.mp4
+npx --yes hyperframes@0.8.179 render . --format webm --video-frame-format png -o ../../public/site-pizzaria/filme-desktop.webm
+npx --yes hyperframes@0.8.179 render . -c compositions/mobile.html --video-frame-format png --crf 22 -o ../../public/site-pizzaria/filme-mobile.mp4
+npx --yes hyperframes@0.8.179 render . -c compositions/mobile.html --format webm --video-frame-format png -o ../../public/site-pizzaria/filme-mobile.webm
 ```
 
-Posters: `snapshot --at 3.6` (desktop) e o mesmo instante na composição mobile.
+Posters: `ffmpeg -ss 3.6 -i filme-<formato>.mp4 -frames:v 1 -q:v 3 filme-<formato>-poster.jpg`.
 
 ## Imagem social
 
