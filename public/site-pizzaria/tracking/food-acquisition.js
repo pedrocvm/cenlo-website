@@ -36,7 +36,7 @@ const landingAcquisition={
  // Never throws: a Meta hiccup must not turn a saved diagnostic into "failed" on screen.
  diagnosticSaved:(submissionId)=>{try{if(submissionId)Promise.resolve(client.mirrorMeta('Contact',`diagnostic-${submissionId}`)).catch(()=>{});}catch{}},
 };
-window.CenloAcquisition=landingAcquisition;
+if(onLanding())window.CenloAcquisition=landingAcquisition;
 window.addEventListener('cenlo-food-navigation',()=>{if(onLanding())window.CenloAcquisition=landingAcquisition;});
 window.addEventListener('cenlo-site-pizzaria-leave',()=>{if(window.CenloAcquisition===landingAcquisition)delete window.CenloAcquisition;});
 // Preferences remain accessible in the footer; collapsed consent never floats over content.

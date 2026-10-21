@@ -91,7 +91,7 @@ export class AcquisitionClient {
     if(!preview)void this.activatePixel();
   }
   async activatePixel(){
-    if(this.preview)return;
+    if(this.preview||!isSitePizzaria())return;
     if(isSitePizzaria()){landingView();return;}
     const existed=typeof globalThis.fbq==='function';
     const product=this.product;const id=this.pixels[product]??=await pixelFor(this,product);
@@ -156,6 +156,7 @@ export class AcquisitionClient {
   }
   context() { return {sessionId:this.receipt.sessionId,product:this.product,entryProduct:this.entryProduct,environment:'production',trafficClass:'public',experience:this.surface,...(this.revision?{bioRevision:this.revision}:{}),attribution:this.attribution}; }
   event(name, properties={}) {
+    if(this.preview||!isSitePizzaria())return false;
     const view=name==='food_funnel_viewed'&&isSitePizzaria()&&!this.preview?landingView():null;
     const eventId=view?.id||crypto.randomUUID();
     void this.mirror(name,eventId);
@@ -166,7 +167,7 @@ export class AcquisitionClient {
   }
   async mirror(name,eventId){const metaName=META_EVENTS[name];if(metaName)await this.mirrorMeta(metaName,eventId);}
   async mirrorMeta(metaName,eventId,properties={}){
-    if(this.preview)return;
+    if(this.preview||!isSitePizzaria())return;
     if(isSitePizzaria()&&metaName==='Lead'){confirmedLandingLead(eventId);return;}
     const product=this.product;const id=this.pixels[product]??=await pixelFor(this,product);
     if(!id)return;loadPixel(id);
