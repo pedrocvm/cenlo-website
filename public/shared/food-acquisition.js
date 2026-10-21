@@ -12,10 +12,12 @@ if(!config&&!preview){try{const cached=storageGet(`cenlo-${product}-acquisition-
 const stored=storageGet('cenlo-food-autonomous:v1',sessionStorage)||storageGet('cenlo_food_diag_v2')||{};
 const campaign=Object.fromEntries(Object.entries({...stored.attribution,...attributionFrom(location.search)}).filter(([k,v])=>['source','medium','campaign','content','term','id'].includes(k)&&typeof v==='string'&&/^[a-zA-Z0-9_.-]{1,80}$/.test(v)));
 const client=new AcquisitionClient({surface:'diagnostic',product,entryProduct:params.get('produto')===product?product:null,attribution:campaign,api:runtime.api||API,policyVersion:config?.analytics.policyVersion,disabled:preview||!config?.analytics.enabled,preview,onChange:()=>window.dispatchEvent(new Event('cenlo-acquisition-change'))});
-if(location.pathname.startsWith('/configurar')||location.pathname.startsWith('/contratar')){const context=client.context.bind(client);client.context=()=>({...context(),experience:'food_offer'});}
-else if(/^\/(food\/?)?$/.test(location.pathname)){const context=client.context.bind(client);client.context=()=>({...context(),experience:'food_landing'});}
-else if(location.pathname.startsWith('/site-pizzaria')){const context=client.context.bind(client);client.context=()=>({...context(),experience:'site_offer'});}
-let observed=false;const observe=()=>{if(!observed&&!preview)observed=client.event('food_funnel_viewed');};window.addEventListener('cenlo-acquisition-change',observe);
+const baseContext=client.context.bind(client);
+client.context=()=>({...baseContext(),experience:location.pathname.startsWith('/site-pizzaria')?'site_offer':/^\/(food\/?)?$/.test(location.pathname)?'food_landing':location.pathname.startsWith('/configurar')||location.pathname.startsWith('/contratar')?'food_offer':'diagnostic'});
+let observed=false, observedPath=location.pathname;
+const observe=()=>{if(!observed&&!preview)observed=client.event('food_funnel_viewed');};
+window.addEventListener('cenlo-acquisition-change',observe);
+window.addEventListener('cenlo-food-navigation',()=>{if(observedPath!==location.pathname){observedPath=location.pathname;observed=false;void client.activatePixel();observe();}});
 if(code&&!preview)await client.exchange(code);void client.prepare();observe();
 window.CenloAcquisition={
  // Same rule as the CRM: a contract request (2026-10-19) or a pizzeria site request (2026-10-20) is a Lead.

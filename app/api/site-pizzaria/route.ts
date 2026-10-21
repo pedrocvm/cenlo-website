@@ -65,7 +65,7 @@ export async function POST(request: NextRequest) {
   const lead = { ...result.lead, device: request.headers.get('user-agent')?.slice(0, 500) || null }
 
   const previous = accepted.get(lead.submissionId)
-  if (previous) return NextResponse.json({ ok: true, reference: previous.reference, replay: true }, { status: 200 })
+  if (previous) return NextResponse.json({ ok: true, reference: previous.reference, replay: true, ...(previous.leadEventId ? { leadEventId: previous.leadEventId } : {}) }, { status: 200 })
   const consentToken = typeof body.consentToken === 'string' && body.consentToken.length <= 4000 ? body.consentToken : undefined
 
   let leadEventId: string | undefined
