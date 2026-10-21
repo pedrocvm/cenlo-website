@@ -24,7 +24,11 @@ export const metadata: Metadata = {
   verification: { google: 'Ddn-tK87l-pIHq5Vzqi7DvgD3MTTAbjIT-tlsE3d3CA' },
   robots: { index: true, follow: true, googleBot: { index: true, follow: true, 'max-image-preview': 'large', 'max-snippet': -1, 'max-video-preview': -1 } },
   icons: {
-    icon: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Crect width='48' height='48' rx='10' fill='%230A0A0D'/%3E%3Cpath d='M35.4 17.1 A13.2 13.2 0 1 0 35.4 30.9' fill='none' stroke='%23F4F1EA' stroke-width='5.1' stroke-linecap='round'/%3E%3Ccircle cx='26.6' cy='24' r='5.7' fill='%23F26522'/%3E%3C/svg%3E",
+    icon: [
+      { url: '/favicon.ico', sizes: '16x16 32x32 48x48 96x96' },
+      { url: '/favicon-96x96.png', type: 'image/png', sizes: '96x96' },
+    ],
+    apple: { url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' },
   },
 }
 
