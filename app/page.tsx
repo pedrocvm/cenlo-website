@@ -8,8 +8,8 @@ import HowItWorks from '@/components/home/HowItWorks'
 import ProductVisual from '@/components/ProductVisual'
 import { Arrow, ArrowOut } from '@/components/Icons'
 
-const title = 'Cenlo · Centrais para negócios locais'
-const description = 'Pedido do restaurante, marcação do studio e aviso da padaria num lugar só. Conheça o Cenlo Food, o Cenlo Beauty e a Fornada Certa.'
+const title = 'Cenlo | Software de gestão e atendimento para negócios locais'
+const description = 'Software para gerir atendimento, pedidos e marcações em Portugal. Conheça o Cenlo Food para restaurantes e o Cenlo Beauty para salões e studios de beleza.'
 
 export const metadata: Metadata = {
   title,
