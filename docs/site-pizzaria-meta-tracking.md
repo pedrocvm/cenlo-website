@@ -2,7 +2,7 @@
 
 ## Verified diagnosis
 
-- `cenlofood.cenlo.pt/site-pizzaria` is a reverse proxy to the Next.js `cenlo-next` project (`pedrocvm/cenlo-website`). `/shared/*` comes from the separate `cenlo-food-lp` static project. Both need the same runtime.
+- `cenlofood.cenlo.pt/site-pizzaria` is a reverse proxy to the Next.js `cenlo-next` project (`pedrocvm/cenlo-website`). `/shared/*` comes from the separate `cenlo-food-lp` static project. The landing now loads its scoped tracking runtime under `/site-pizzaria/tracking/*`, which uses the existing proxy to the same Next.js deployment.
 - Before the fix, a real browser request already contained `dl=https://cenlofood.cenlo.pt/site-pizzaria`; the OpenBridge request also contained that full `website_context.location`. The CRM outbox contained two sent PageViews for the full landing URL since October 20. The Meta stats connector returned origin-only URL buckets. It does not establish that the application sent the root URL; the reason for Meta's reporting normalization remains outside the verified application evidence.
 - The inline Pixel bootstrap sent a PageView without our event ID. The CRM generated a different UUID for its copy. Meta's browser/OpenBridge auto-generated ID therefore could not deduplicate against CRM CAPI. The acquisition client also initialized the same Pixel a second time.
 - The inline bootstrap and noscript image ignored preview/test exclusion.
@@ -20,9 +20,9 @@
 
 ## Deployment
 
-Deploy the Next.js project through its existing Git integration. Deploy the exact `deploy/official-lps/deployment.json` files through the Vercel API for `cenlo-food-lp`. The manifest preserves the current SEO release, routes and Beauty assets. Do not deploy the older `deploy/food-lp` directory.
+Deploy the Next.js project through its existing Git integration. The HTML and scoped runtime under `public/site-pizzaria/tracking/` release atomically through the existing `/site-pizzaria/:path*` proxy. No static-project production deployment or routing change is necessary. The original shared scripts, SEO manifest, Food home and Beauty remain unchanged.
 
-The static release changes only `shared/food-acquisition.js`, `shared/food-acquisition-core.js`, and adds `shared/site-pizzaria-pixel.js`. Both project previews must pass before publication. A short cross-project transition may have mixed runtimes; publish the two tested versions together and verify the public domain, not only cenlo.pt.
+The scoped acquisition files preserve the existing consent/session protocol, derived from the current Food acquisition client, with landing-specific PageView IDs and confirmed Lead handling. They must retain compatibility with the CRM acquisition contract.
 
 ## Validation
 

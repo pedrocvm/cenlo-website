@@ -1,6 +1,5 @@
 import type { Metadata, Viewport } from 'next'
-import Script from 'next/script'
-import FoodAcquisition from '@/components/food-builder/FoodAcquisition'
+import SitePizzariaTracking from '@/components/site-pizzaria/SitePizzariaTracking'
 import './site-pizzaria.css'
 
 const title = 'Site para pizzaria por €149,90 | Cenlo Food'
@@ -25,9 +24,8 @@ export const viewport: Viewport = {
 export default function SitePizzariaLayout({ children }: { children: React.ReactNode }) {
   return (
     <>
-      <Script type="module" src="/shared/site-pizzaria-pixel.js" strategy="afterInteractive" />
       {children}
-      <FoodAcquisition />
+      <SitePizzariaTracking />
     </>
   )
 }

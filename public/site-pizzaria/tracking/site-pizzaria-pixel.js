@@ -47,6 +47,7 @@ export function confirmedLandingLead(eventId) {
 }
 
 if (typeof window !== 'undefined') {
+  window.addEventListener('cenlo-site-pizzaria-leave', () => { delete globalThis.__cenloSitePizzariaView; });
   window.addEventListener('cenlo-food-navigation', () => {
     if (isSitePizzaria()) landingView();
     else delete globalThis.__cenloSitePizzariaView;

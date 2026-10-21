@@ -1,4 +1,3 @@
-import { isSitePizzaria, landingView, confirmedLandingLead } from './site-pizzaria-pixel.js';
 /** Acquisition wire v1. Canonical contract: Cenlo-CRM/packages/contracts/src/acquisition. */
 export const POLICY = '2026-09-25-v1';
 export const API = 'https://api-crm.cenlo.pt/public/acquisition';
@@ -55,9 +54,8 @@ export function forgetMeta(){writeCookie('_fbp','',0);writeCookie('_fbc','',0);}
 async function pixelFor(client,product){try{client.marketingConfig??=fetch(client.marketingUrl,{credentials:'omit',referrerPolicy:'no-referrer',signal:AbortSignal.timeout(5000)}).then(r=>r.ok?r.json():{});const id=(await client.marketingConfig)?.[product]?.pixelId;return typeof id==='string'&&/^\d{8,20}$/.test(id)?id:null;}catch{return null;}}
 const initialised=new Set();
 function loadPixel(id){
-  if(id==='1010704101993887'&&globalThis.__cenloFoodPixelInitialized)initialised.add(id);
   if(!globalThis.fbq){!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(globalThis,document,'script','https://connect.facebook.net/en_US/fbevents.js');}
-  if(!initialised.has(id)){globalThis.fbq('set','autoConfig',false,id);globalThis.fbq('init',id);initialised.add(id);if(id==='1010704101993887')globalThis.__cenloFoodPixelInitialized=true;}
+  if(!initialised.has(id)){globalThis.fbq('set','autoConfig',false,id);globalThis.fbq('init',id);initialised.add(id);}
 }
 const PROOFS_KEY='cenlo-acquisition-revocations-v1', WITHDRAWALS_KEY='cenlo-acquisition-withdrawals-v1';
 const DAY=86400000, MAX_PROOFS=128;
@@ -91,8 +89,6 @@ export class AcquisitionClient {
     if(!preview)void this.activatePixel();
   }
   async activatePixel(){
-    if(this.preview)return;
-    if(isSitePizzaria()){landingView();return;}
     const existed=typeof globalThis.fbq==='function';
     const product=this.product;const id=this.pixels[product]??=await pixelFor(this,product);
     if(!id)return;loadPixel(id);
@@ -156,8 +152,7 @@ export class AcquisitionClient {
   }
   context() { return {sessionId:this.receipt.sessionId,product:this.product,entryProduct:this.entryProduct,environment:'production',trafficClass:'public',experience:this.surface,...(this.revision?{bioRevision:this.revision}:{}),attribution:this.attribution}; }
   event(name, properties={}) {
-    const view=name==='food_funnel_viewed'&&isSitePizzaria()&&!this.preview?landingView():null;
-    const eventId=view?.id||crypto.randomUUID();
+    const eventId=crypto.randomUUID();
     void this.mirror(name,eventId);
     if (!this.receipt || this.disabled || Date.parse(this.receipt.expiresAt)<=Date.now()) return false;
     const consentToken=this.receipt.consentToken;
@@ -167,7 +162,6 @@ export class AcquisitionClient {
   async mirror(name,eventId){const metaName=META_EVENTS[name];if(metaName)await this.mirrorMeta(metaName,eventId);}
   async mirrorMeta(metaName,eventId,properties={}){
     if(this.preview)return;
-    if(isSitePizzaria()&&metaName==='Lead'){confirmedLandingLead(eventId);return;}
     const product=this.product;const id=this.pixels[product]??=await pixelFor(this,product);
     if(!id)return;loadPixel(id);
     try{globalThis.fbq(META_STANDARD.has(metaName)?'trackSingle':'trackSingleCustom',id,metaName,{content_category:product,...properties},{eventID:eventId});}catch{}
