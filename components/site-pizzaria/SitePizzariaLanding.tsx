@@ -335,8 +335,11 @@ export default function SitePizzariaLanding() {
       if (response.ok && result.ok) {
         setSubmit({ state: 'success', reference: result.reference })
         track('lead_saved', { reference: result.reference })
-        const leadEventId = typeof result.leadEventId === 'string' ? result.leadEventId : `food-contact:${submissionId.current}`
-        acquisition()?.contactReceived?.(leadEventId, 'site_offer')
+        // Only the CRM can confirm a new Lead. Honeypots, existing contacts and
+        // unmeasured submissions deliberately have no leadEventId.
+        if (typeof result.leadEventId === 'string') {
+          acquisition()?.contactReceived?.(result.leadEventId, 'site_offer')
+        }
         return
       }
       if (response.status === 422 && result.field && result.field in EMPTY) {
