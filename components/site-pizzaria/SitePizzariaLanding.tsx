@@ -57,6 +57,7 @@ type Acquisition = {
   event?: (name: string, props?: Record<string, unknown>) => unknown
   contactReceived?: (eventId: string, intent: string) => void
   consentToken?: () => string | undefined
+  meta?: () => { fbp?: string; fbc?: string } | undefined
 }
 const acquisition = () => (window as typeof window & { CenloAcquisition?: Acquisition }).CenloAcquisition
 
@@ -327,6 +328,7 @@ export default function SitePizzariaLanding() {
           pageUrl: window.location.href,
           referrer: document.referrer || null,
           consentToken: acquisition()?.consentToken?.(),
+          meta: acquisition()?.meta?.(),
           timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || null,
           attribution: Object.fromEntries(['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term', 'utm_id', 'fbclid', 'gclid'].map(k => [k, params.get(k) || ''])),
         }),
@@ -335,8 +337,7 @@ export default function SitePizzariaLanding() {
       if (response.ok && result.ok) {
         setSubmit({ state: 'success', reference: result.reference })
         track('lead_saved', { reference: result.reference })
-        // Only the CRM can confirm a new Lead. Honeypots, existing contacts and
-        // unmeasured submissions deliberately have no leadEventId.
+        // Only a request the CRM saved carries a leadEventId; honeypots and failures never do.
         if (typeof result.leadEventId === 'string') {
           acquisition()?.contactReceived?.(result.leadEventId, 'site_offer')
         }

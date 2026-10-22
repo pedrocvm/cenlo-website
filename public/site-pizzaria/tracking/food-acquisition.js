@@ -1,4 +1,5 @@
-import { AcquisitionClient, CONFIG, API, verifyPublished, attributionFrom, consentControls, storageGet, storageSet } from './food-acquisition-core.js';
+import { AcquisitionClient, CONFIG, API, verifyPublished, attributionFrom, consentControls, storageGet, storageSet, readCookie } from './food-acquisition-core.js';
+import { trackingAllowed } from './site-pizzaria-pixel.js';
 // Food-only adapter of the existing acquisition consent client. Beauty stays unchanged.
 const onLanding=()=>/^\/site-pizzaria\/?$/.test(location.pathname);
 const product='food'; // This entry point belongs only to the Food funnel.
@@ -25,6 +26,8 @@ const landingAcquisition={
  // Same rule as the CRM: a contract request (2026-10-19) or a pizzeria site request (2026-10-20) is a Lead.
  contactReceived:(eventId,intent)=>{try{if(/^food-contact:[a-f0-9-]{36}$/.test(eventId))void client.mirrorMeta(intent==='implementation'||intent==='evaluation'||intent==='site_offer'?'Lead':'Contact',eventId).catch(()=>{});}catch{}},
  event:(name,props={})=>client.event(name,props),
+ // The Pixel's own cookies, read only where the landing Pixel runs; the CRM sends the request's Lead to CAPI with them (Pedro, 2026-10-22).
+ meta:()=>{if(!trackingAllowed())return;const fbp=readCookie('_fbp'),fbc=readCookie('_fbc');return fbp||fbc?{...(fbp?{fbp}:{}),...(fbc?{fbc}:{})}:undefined;},
  consentToken:()=>!client.disabled&&client.receipt&&Date.parse(client.receipt.expiresAt)>Date.now()?client.receipt.consentToken:undefined,
  diagnosticEndpoint:runtime.diagnosticEndpoint||'https://api-crm.cenlo.pt/crm/public/diagnostics',
  demoEnabled:()=>!!config?.demo.enabled,
