@@ -13,7 +13,7 @@
 
 - One PageView per landing visit, with a UUID shared by `fbq(..., {eventID})` and `food_funnel_viewed.eventId`. The existing CRM maps `site_offer` to `https://cenlofood.cenlo.pt/site-pizzaria`.
 - Browser PageView uses the actual location, including the path; the code does not replace the URL with its origin. The CRM uses its existing allowlisted landing URL, excluding query strings/PII.
-- CAPI remains conditional on an existing acquisition consent receipt. No consent is fabricated or silently granted. A saved request without a confirmed `leadEventId` is successful for the customer but is not counted as a Meta Lead by this client.
+- PageView CAPI remains conditional on an acquisition consent receipt. The Lead does not (Pedro, 2026-10-22): every request the CRM saves returns `food-contact:<submissionId>`, including existing CRM contacts, and the CRM queues the CAPI Lead with the Pixel's `_fbp`/`_fbc` cookies, the user agent and the landing URL with its UTM parameters. The form sends those cookies only where the landing Pixel runs, so preview, `?test=1` and test journeys never reach CAPI. The consent banner is unchanged.
 - Lead only after the API returns the CRM's `food-contact:<uuid>` receipt. No click, modal, validation attempt, failure, honeypot or success without that receipt emits Lead. Replays return the same receipt. The browser suppresses repeat delivery in the same tab; Meta also deduplicates by name and ID.
 - No landing Pixel on non-production hosts, HTTP, `?test=1`, or a marked Food test journey. No noscript beacon that bypasses those checks.
 - No campaign, ad, budget, CRM business rule, notification or landing copy/style change.

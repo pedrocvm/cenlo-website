@@ -26,7 +26,7 @@ function isRateLimited(ip: string) {
 }
 
 /** The CRM saves the lead and tells Pedro on WhatsApp. There is no other place a request can land. */
-async function saveInCrm(lead: SitePizzariaLead & { device: string | null }, consentToken: string | undefined) {
+async function saveInCrm(lead: SitePizzariaLead & { device: string | null }, consentToken: string | undefined, meta: object | undefined) {
   const endpoint = process.env.CENLO_SITE_PIZZARIA_CRM_ENDPOINT
   const token = process.env.CENLO_SITE_PIZZARIA_CRM_TOKEN
   if (!endpoint || !token) throw new Error('CRM não configurado')
@@ -34,7 +34,7 @@ async function saveInCrm(lead: SitePizzariaLead & { device: string | null }, con
   const response = await fetch(endpoint, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'Idempotency-Key': lead.submissionId, Authorization: `Bearer ${token}` },
-    body: JSON.stringify({ ...lead, ...(consentToken ? { consentToken } : {}) }),
+    body: JSON.stringify({ ...lead, ...(consentToken ? { consentToken } : {}), ...(meta ? { meta } : {}) }),
     cache: 'no-store',
     signal: AbortSignal.timeout(8_000),
   })
@@ -70,7 +70,8 @@ export async function POST(request: NextRequest) {
 
   let leadEventId: string | undefined
   try {
-    ;({ leadEventId } = await saveInCrm(lead, consentToken))
+    const meta = body.meta && typeof body.meta === 'object' && !Array.isArray(body.meta) ? body.meta : undefined
+    ;({ leadEventId } = await saveInCrm(lead, consentToken, meta))
   } catch (error) {
     console.error('site-pizzaria: lead não registrado no CRM', { reference: lead.reference, error: error instanceof Error ? error.message : 'falha' })
     return NextResponse.json({ ok: false, error: UNAVAILABLE }, { status: 503 })

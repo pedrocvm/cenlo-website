@@ -41,7 +41,7 @@ const META_EVENTS={bio_view_observed:'PageView',demo_entry_viewed:'ViewContent',
 const META_STANDARD=new Set(['PageView','ViewContent','Contact','Lead','Schedule']);
 const FBP=/^fb\.\d\.\d{10,13}\.\d{1,20}$/, FBC=/^fb\.\d\.\d{10,13}\.[A-Za-z0-9_-]{1,500}$/;
 // Cookies can be blocked or absent; neither may break the page or the withdrawal.
-function readCookie(name){try{return globalThis.document?.cookie.split('; ').find(c=>c.startsWith(name+'='))?.slice(name.length+1)||'';}catch{return '';}}
+export function readCookie(name){try{return globalThis.document?.cookie.split('; ').find(c=>c.startsWith(name+'='))?.slice(name.length+1)||'';}catch{return '';}}
 function writeCookie(name,value,days){try{if(!globalThis.document)return;const host=globalThis.location?.hostname??'';const shared=host==='cenlo.pt'||host.endsWith('.cenlo.pt');document.cookie=`${name}=${value};path=/;max-age=${Math.round(days*86400)};SameSite=Lax${shared?';domain=.cenlo.pt;Secure':''}`;}catch{}}
 /** Meta's own identifiers, created here so they exist before the Pixel loads.
  * Shared on .cenlo.pt: the bio, the demo and the diagnostic are the same visitor. */
